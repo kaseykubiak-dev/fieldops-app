@@ -1375,10 +1375,10 @@
                 </div>
                 <div class="acc-header-info">
                   <span class="acc-title">Internet</span>
-                  <span class="acc-sub">10 Gbps / 1 Gbps · 2 connections</span>
+                  <span class="acc-sub" id="internet-acc-sub">Loading…</span>
                 </div>
                 <div class="acc-badges">
-                  <span class="conn-badge partial">1/2 Connections Online</span>
+                  <span class="conn-badge partial" id="internet-acc-badge">—</span>
                 </div>
                 <svg class="acc-chevron" id="chev-internet" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
@@ -2320,6 +2320,7 @@
 
       // Fetch full account record for name, number, and tier
       const accountSysId = c.account?.value;
+      renderInternetSection(accountSysId || currentCaseSysId);
       if (accountSysId) {
         fetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`, {
           headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
@@ -2700,6 +2701,79 @@
       scroll.innerHTML = html;
     } catch (err) {
       scroll.innerHTML = `<div class="list-error"><strong>Error loading account details</strong><br>${escHtml(err.message)}</div>`;
+    }
+  }
+
+  // ── Internet section — simulated from database ────────────────────────────
+  let _internetDb = null;
+
+  async function fetchInternetDb() {
+    if (_internetDb) return _internetDb;
+    const res = await fetch('./internet-db.json');
+    if (!res.ok) throw new Error('Could not load internet-db.json');
+    _internetDb = await res.json();
+    return _internetDb;
+  }
+
+  function _hash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    }
+    return Math.abs(h);
+  }
+
+  async function renderInternetSection(seed) {
+    const body  = document.getElementById('body-internet');
+    const sub   = document.getElementById('internet-acc-sub');
+    const badge = document.getElementById('internet-acc-badge');
+
+    try {
+      const db = await fetchInternetDb();
+      const s  = _hash(seed || 'default');
+
+      const primary   = db.primary_pool[s % db.primary_pool.length];
+      const secondary = db.secondary_pool[(s >>> 4) % db.secondary_pool.length];
+
+      const region    = db.circuit_regions[s % db.circuit_regions.length];
+      const baseNum   = 1000 + (s % 8000);
+      const circ1     = `CIRC-${region}-${baseNum}`;
+      const circ2     = `CIRC-${region}-${baseNum + 1}`;
+
+      // WAN 2 is offline ~20% of the time (deterministic per customer)
+      const wan2Up    = (s % 5) !== 0;
+      const onlineCount = wan2Up ? 2 : 1;
+
+      sub.textContent   = `${primary.speed} / ${secondary.speed} · 2 connections`;
+      badge.textContent = `${onlineCount}/2 Connections Online`;
+      badge.className   = onlineCount === 2 ? 'conn-badge all-on' : 'conn-badge partial';
+
+      const wanBlock = (label, circ, cfg, statusCls, statusTxt) => `
+        <div class="wan-block">
+          <div class="wan-label-row">
+            <span class="wan-label">${label}</span>
+            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+          </div>
+          <div class="equip-detail-grid">
+            <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">${escHtml(circ)}</div></div>
+            <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(cfg.type)}</div></div>
+            <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
+            <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
+            <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>
+            <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">${escHtml(cfg.interface_ip)}</div></div>
+          </div>
+        </div>`;
+
+      body.innerHTML =
+        wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE') +
+        '<div class="wan-divider"></div>' +
+        wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE');
+
+    } catch (err) {
+      sub.textContent   = 'Unavailable';
+      badge.textContent = '—';
+      badge.className   = 'conn-badge';
+      body.innerHTML    = `<div style="padding:14px;color:var(--text-muted);font-size:12px;">Could not load internet data: ${escHtml(err.message)}</div>`;
     }
   }
 
