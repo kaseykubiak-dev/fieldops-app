@@ -3418,8 +3418,14 @@
   }
 
   function openDetail(ticketNumber) {
+    // If we're not on the Tickets tab, navigate there first
+    const listScreen = document.getElementById('screen-list');
+    if (!listScreen.classList.contains('active')) {
+      showScreen('list', document.getElementById('bnav-tickets'));
+      setDesktopNav('list');
+    }
     if (isMobileView()) {
-      document.getElementById('screen-list').classList.remove('active');
+      listScreen.classList.remove('active');
       document.getElementById('screen-detail').classList.add('active');
     }
     if (ticketNumber) {
