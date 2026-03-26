@@ -636,8 +636,7 @@
     /* Desktop topbar owns these — hide duplicates inside screen topbars */
     #screen-list .topbar .theme-toggle,
     #screen-list .topbar .notif-bell,
-    #screen-list .topbar .avatar-sm,
-    #screen-detail .detail-topbar .theme-toggle { display:none !important; }
+    #screen-list .topbar .avatar-sm { display:none !important; }
     .screen-wrap { display:flex; flex:1; min-height:0; overflow:hidden; }
     /* Default: tickets view — list (340px) + detail side by side */
     .screen { position:relative; display:none !important; }
@@ -1203,13 +1202,6 @@
           <img src="C_Spire_Logo.png" alt="C Spire" height="53">
         </div>
         <div class="topbar-right">
-          <div class="theme-toggle" onclick="toggleTheme()" title="Switch theme">
-            <div class="tt-track"><div class="tt-knob"></div></div>
-            <div class="tt-labels">
-              <span class="tt-active" id="tt-label-list">DARK</span>
-              <span class="tt-inactive" id="tt-sublabel-list">Light</span>
-            </div>
-          </div>
           <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge"></span></button>
           <div class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out">??</div>
         </div>
@@ -1261,14 +1253,6 @@
           <div class="detail-tb-id" id="detail-tb-id">—</div>
           <div class="detail-tb-title" id="detail-tb-title">—</div>
         </div>
-        <div class="theme-toggle" onclick="toggleTheme()" title="Switch theme" style="margin-right:4px;">
-          <div class="tt-track"><div class="tt-knob"></div></div>
-          <div class="tt-labels">
-            <span class="tt-active" id="tt-label-detail">DARK</span>
-            <span class="tt-inactive" id="tt-sublabel-detail">Light</span>
-          </div>
-        </div>
-        <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
       </div>
 
       <div class="detail-pills">
