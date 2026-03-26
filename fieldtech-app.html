@@ -483,11 +483,13 @@
   .quick-actions { display:flex; gap:8px; padding:0 14px 12px; align-items:center; }
   .travel-box { display:none; flex-direction:column; justify-content:center; padding:4px 8px; background:linear-gradient(90deg,rgba(0,192,243,0.1) 0%,rgba(0,192,243,0.04) 100%); border:1px solid rgba(0,192,243,0.25); border-radius:6px; }
   .travel-box.show { display:flex; }
-  /* Mobile: address row stacks vertically */
+  /* Mobile: address and contact rows stack vertically */
   @media(max-width:799px) {
     .addr-row-inner { flex-direction:column !important; align-items:stretch !important; }
     .addr-row-actions { flex-direction:row !important; align-items:center !important; gap:8px !important; margin-top:8px; }
     .addr-row-actions .travel-box.show { flex:1; }
+    .contact-row-inner { flex-direction:column !important; align-items:stretch !important; }
+    .contact-row-phone { flex-shrink:unset !important; text-align:left !important; margin-top:8px; }
   }
   .travel-box-time { font-size:13px; font-weight:700; color:var(--accent); line-height:1.2; }
   .travel-box-dist { font-size:10px; color:var(--text); margin-top:1px; }
@@ -1315,19 +1317,21 @@
               </div>
             </div>
             <!-- Row 3: Contact (left) | Phone + Call (right) -->
-            <div class="cust-field" style="display:flex;align-items:flex-start;gap:12px;">
-              <div style="min-width:0;flex:1;">
-                <div class="cf-label">On-site Contact</div>
-                <div class="cf-val" id="detail-cust-contact">—</div>
-              </div>
-              <div style="flex-shrink:0;text-align:right;">
-                <div class="cf-label">Phone</div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="cf-val" id="detail-cust-phone">—</div>
-                  <button class="btn btn-ghost" style="gap:4px;padding:4px 10px;font-size:11px;flex-shrink:0;" onclick="callCustomer()">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17l.19-.08z"/></svg>
-                    Call
-                  </button>
+            <div class="cust-field">
+              <div class="contact-row-inner" style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="min-width:0;flex:1;">
+                  <div class="cf-label">On-site Contact</div>
+                  <div class="cf-val" id="detail-cust-contact">—</div>
+                </div>
+                <div class="contact-row-phone" style="flex-shrink:0;text-align:right;">
+                  <div class="cf-label">Phone</div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="cf-val" id="detail-cust-phone">—</div>
+                    <button class="btn btn-ghost" style="gap:4px;padding:4px 10px;font-size:11px;flex-shrink:0;" onclick="callCustomer()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17l.19-.08z"/></svg>
+                      Call
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
