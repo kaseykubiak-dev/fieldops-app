@@ -1,0 +1,105 @@
+{
+  "models": [
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 40F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.2.7", "7.2.8", "7.4.3"],
+      "serial_prefix": "FGT40F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 60F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.2.7", "7.2.8", "7.4.3", "7.4.4"],
+      "serial_prefix": "FGT60F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 80F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.2.8", "7.4.3", "7.4.4", "7.6.0"],
+      "serial_prefix": "FGT80F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 100F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.2.8", "7.4.4", "7.6.0"],
+      "serial_prefix": "FGT100F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 200F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.4.3", "7.4.4", "7.6.0"],
+      "serial_prefix": "FGT200F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 400F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.4.4", "7.6.0"],
+      "serial_prefix": "FGT400F"
+    },
+    {
+      "vendor": "Fortinet",
+      "model": "FortiGate 600F",
+      "firmware_prefix": "FortiOS",
+      "firmware_versions": ["7.4.4", "7.6.0"],
+      "serial_prefix": "FGT600F"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX67",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.1.4", "18.2.1", "18.107.7"],
+      "serial_prefix": "Q2PN"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX75",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.1.4", "18.2.1", "18.107.7"],
+      "serial_prefix": "Q2QN"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX85",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.1.4", "18.2.1", "18.107.7"],
+      "serial_prefix": "Q2RN"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX95",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.2.1", "18.107.7"],
+      "serial_prefix": "Q2SN"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX105",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.2.1", "18.107.7"],
+      "serial_prefix": "Q2TN"
+    },
+    {
+      "vendor": "Cisco",
+      "model": "Cisco MX250",
+      "firmware_prefix": "MX",
+      "firmware_versions": ["18.2.1", "18.107.7"],
+      "serial_prefix": "Q2UN"
+    }
+  ],
+  "locations": [
+    "MDF Room · Rack U1",
+    "Network Closet · Shelf A",
+    "Server Room · Rack 2",
+    "IT Room · Rack A",
+    "Comms Room · Rack 1",
+    "Data Center · Rack 4",
+    "Wiring Closet · Wall Mount",
+    "Network Room · Rack B"
+  ]
+}

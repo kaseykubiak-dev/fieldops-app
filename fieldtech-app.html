@@ -1431,10 +1431,10 @@
                 </div>
                 <div class="acc-header-info">
                   <span class="acc-title">Firewall</span>
-                  <span class="acc-sub">2 devices · HA pair</span>
+                  <span class="acc-sub" id="fw-acc-sub">Loading…</span>
                 </div>
                 <div class="acc-badges">
-                  <span class="conn-badge all-on">2/2 Devices Online</span>
+                  <span class="conn-badge all-on" id="fw-acc-badge">—</span>
                 </div>
                 <svg class="acc-chevron" id="chev-firewall" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
@@ -2321,6 +2321,7 @@
       // Fetch full account record for name, number, and tier
       const accountSysId = c.account?.value;
       renderInternetSection(accountSysId || currentCaseSysId);
+      renderFirewallSection(accountSysId || currentCaseSysId);
       if (accountSysId) {
         fetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`, {
           headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
@@ -2774,6 +2775,119 @@
       badge.textContent = '—';
       badge.className   = 'conn-badge';
       body.innerHTML    = `<div style="padding:14px;color:var(--text-muted);font-size:12px;">Could not load internet data: ${escHtml(err.message)}</div>`;
+    }
+  }
+
+  // ── Firewall section — simulated from database ────────────────────────────
+  let _firewallDb = null;
+
+  async function fetchFirewallDb() {
+    if (_firewallDb) return _firewallDb;
+    const res = await fetch('./firewall-db.json');
+    if (!res.ok) throw new Error('Could not load firewall-db.json');
+    _firewallDb = await res.json();
+    return _firewallDb;
+  }
+
+  function _fwSerial(model, seed) {
+    if (model.vendor === 'Cisco') {
+      const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const a = letters[(seed >> 2)  % letters.length];
+      const b = letters[(seed >> 6)  % letters.length];
+      const c = letters[(seed >> 10) % letters.length];
+      const d = letters[(seed >> 14) % letters.length];
+      return `${model.serial_prefix}-${(seed % 9000 + 1000)}-${a}${b}${c}${d}`;
+    }
+    // Fortinet: prefix + 8 digits
+    return `${model.serial_prefix}${String(seed % 90000000 + 10000000)}`;
+  }
+
+  function _fwUptime(seed) {
+    const days = (seed % 180) + 1;
+    const hrs  = (seed >> 3) % 24;
+    return `${days}d ${hrs}h`;
+  }
+
+  async function renderFirewallSection(seed) {
+    const body  = document.getElementById('body-firewall');
+    const sub   = document.getElementById('fw-acc-sub');
+    const badge = document.getElementById('fw-acc-badge');
+
+    try {
+      const db       = await fetchFirewallDb();
+      const s        = _hash(seed || 'default');
+      const scenario = s % 3; // 0 = HA, 1 = Standalone, 2 = No firewall
+
+      if (scenario === 2) {
+        // ── No firewall ──────────────────────────────────────────────────
+        sub.textContent   = 'No devices';
+        badge.textContent = 'No Devices';
+        badge.className   = 'conn-badge all-off';
+        body.innerHTML    = `<div class="cal-empty-day" style="padding:18px 14px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>No managed firewall(s) on record.</span>
+        </div>`;
+        return;
+      }
+
+      const mdl      = db.models[(s >>> 2) % db.models.length];
+      const fw_ver   = mdl.firmware_versions[(s >>> 8) % mdl.firmware_versions.length];
+      const firmware = `${mdl.firmware_prefix} ${fw_ver}`;
+      const loc      = db.locations[(s >>> 5) % db.locations.length];
+      const loc2     = db.locations[(s >>> 7) % db.locations.length] || loc;
+      const serial1  = _fwSerial(mdl, s);
+      const serial2  = _fwSerial(mdl, s + 1);
+      const uptime   = _fwUptime(s);
+
+      const isHA     = scenario === 0;
+      const fw2Down  = isHA && (s % 7 === 0); // ~14% chance secondary is offline
+
+      const fwBlock = (label, roleTag, statusCls, statusTxt, role, serial, mgmtIp, uptimeOrSync, uptimeLabel, location, isNA) => `
+        <div class="wan-block">
+          <div class="wan-label-row">
+            <span class="wan-label">${label} <span style="font-weight:400;color:var(--text-muted);font-size:11px;">${roleTag}</span></span>
+            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+          </div>
+          <div class="equip-detail-grid">
+            <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">${isNA ? 'N/A' : escHtml(mdl.model)}</div></div>
+            <div class="edg-item"><div class="edg-label">Role</div><div class="edg-val">${isNA ? 'N/A' : role}</div></div>
+            <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">${isNA ? 'N/A' : escHtml(serial)}</div></div>
+            <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${isNA ? 'N/A' : firmware}</div></div>
+            <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">${isNA ? 'N/A' : mgmtIp}</div></div>
+            <div class="edg-item"><div class="edg-label">${uptimeLabel}</div><div class="edg-val" ${!isNA && uptimeLabel === 'Sync' ? 'style="color:var(--success);"' : ''}>${isNA ? 'N/A' : uptimeOrSync}</div></div>
+            <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">${isNA ? 'N/A' : escHtml(location)}</div></div>
+          </div>
+        </div>`;
+
+      if (isHA) {
+        // ── HA pair ──────────────────────────────────────────────────────
+        const onlineCount = fw2Down ? 1 : 2;
+        sub.textContent   = '2 devices · HA pair';
+        badge.textContent = `${onlineCount}/2 Devices Online`;
+        badge.className   = onlineCount === 2 ? 'conn-badge all-on' : 'conn-badge partial';
+
+        body.innerHTML =
+          fwBlock('FW-01', 'Primary',   'pill-resolved',                           'ONLINE',  'Primary / Active',   serial1, '10.0.0.1', uptime,        'Uptime', loc,  false) +
+          '<div class="wan-divider"></div>' +
+          fwBlock('FW-02', 'Secondary', fw2Down ? 'pill-critical' : 'pill-warning', fw2Down ? 'OFFLINE' : 'STANDBY', 'Secondary / Passive', serial2, '10.0.0.2', fw2Down ? '—' : 'In Sync', 'Sync',   loc2, false);
+
+      } else {
+        // ── Standalone ───────────────────────────────────────────────────
+        sub.textContent   = '1 device · Standalone';
+        badge.textContent = '1/1 Device Online';
+        badge.className   = 'conn-badge all-on';
+
+        body.innerHTML =
+          fwBlock('FW-01', 'Primary', 'pill-resolved', 'ONLINE', 'Standalone', serial1, '10.0.0.1', uptime, 'Uptime', loc, false) +
+          '<div class="wan-divider"></div>' +
+          fwBlock('FW-02', 'Secondary', 'pill', 'N/A', '', '', '', '', 'Sync', '', true);
+      }
+
+    } catch (err) {
+      sub.textContent   = 'Unavailable';
+      badge.textContent = '—';
+      badge.className   = 'conn-badge';
+      body.innerHTML    = `<div style="padding:14px;color:var(--text-muted);font-size:12px;">Could not load firewall data: ${escHtml(err.message)}</div>`;
     }
   }
 
