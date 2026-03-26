@@ -483,6 +483,12 @@
   .quick-actions { display:flex; gap:8px; padding:0 14px 12px; align-items:center; }
   .travel-box { display:none; flex-direction:column; justify-content:center; padding:4px 8px; background:linear-gradient(90deg,rgba(0,192,243,0.1) 0%,rgba(0,192,243,0.04) 100%); border:1px solid rgba(0,192,243,0.25); border-radius:6px; }
   .travel-box.show { display:flex; }
+  /* Mobile: address row stacks vertically */
+  @media(max-width:799px) {
+    .addr-row-inner { flex-direction:column !important; align-items:stretch !important; }
+    .addr-row-actions { flex-direction:row !important; align-items:center !important; gap:8px !important; margin-top:8px; }
+    .addr-row-actions .travel-box.show { flex:1; }
+  }
   .travel-box-time { font-size:13px; font-weight:700; color:var(--accent); line-height:1.2; }
   .travel-box-dist { font-size:10px; color:var(--text); margin-top:1px; }
   .travel-box-loading { font-size:11px; color:var(--text-muted); font-style:italic; }
@@ -1290,20 +1296,22 @@
               <div class="cf-val sla" id="detail-cust-sla">—</div>
             </div>
             <!-- Row 2: Service Address + travel/navigate -->
-            <div class="cust-field" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <div style="min-width:0;flex:1;">
-                <div class="cf-label">Service Address</div>
-                <div class="cf-val" id="detail-cust-addr">—</div>
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
-                <div class="travel-box" id="travel-box">
-                  <span class="travel-box-dist">Estimated Travel Time</span>
-                  <span class="travel-box-time" id="travel-box-content">Calculating…</span>
+            <div class="cust-field">
+              <div class="addr-row-inner" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <div style="min-width:0;flex:1;">
+                  <div class="cf-label">Service Address</div>
+                  <div class="cf-val" id="detail-cust-addr">—</div>
                 </div>
-                <button class="btn btn-ghost" style="gap:4px;padding:4px 10px;font-size:11px;" onclick="navigateToSite()">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-                  Navigate
-                </button>
+                <div class="addr-row-actions" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+                  <div class="travel-box" id="travel-box">
+                    <span class="travel-box-dist">Estimated Travel Time</span>
+                    <span class="travel-box-time" id="travel-box-content">Calculating…</span>
+                  </div>
+                  <button class="btn btn-ghost" style="gap:4px;padding:4px 10px;font-size:11px;" onclick="navigateToSite()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                    Navigate
+                  </button>
+                </div>
               </div>
             </div>
             <!-- Row 3: Contact (left) | Phone + Call (right) -->
