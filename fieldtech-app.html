@@ -447,7 +447,7 @@
   .retry-btn:active { opacity:.7; }
 
   /* DATE DIVIDER */
-  .date-divider { display:flex; align-items:center; justify-content:center; padding:8px 16px; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; }
+  .date-divider { display:flex; align-items:center; justify-content:center; padding:8px 16px; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; isolation:isolate; }
   .date-divider-label { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
   .date-divider-line { display:none; }
 
@@ -1008,7 +1008,7 @@
   .cust-sort-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:11px; font-weight:600; padding:5px 11px; border-radius:7px; cursor:pointer; white-space:nowrap; flex-shrink:0; }
   .cust-sort-btn.active { background:rgba(0,192,243,0.12); border-color:var(--accent); color:var(--accent); }
   .cust-list-body { flex:1; overflow-y:auto; }
-  .cust-alpha-hd { font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--accent); padding:6px 14px 4px; background:linear-gradient(90deg,rgba(0,192,243,0.10) 0%,rgba(0,192,243,0.03) 100%); border-left:3px solid var(--accent); text-transform:uppercase; position:sticky; top:0; z-index:4; }
+  .cust-alpha-hd { font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--accent); padding:6px 14px 4px; background:var(--surface); border-left:3px solid var(--accent); text-transform:uppercase; position:sticky; top:0; z-index:4; }
   .cust-card { padding:8px 14px; border-bottom:1px solid var(--border); cursor:pointer; }
   .cust-card:active { background:var(--surface2); }
   .cust-card-inner { background:linear-gradient(155deg,#162236 0%,#0f1a2e 100%); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:11px 13px; box-shadow:0 4px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,192,243,0.06), inset 0 1px 0 rgba(255,255,255,0.05); }
@@ -1039,7 +1039,7 @@
   .cust-sub-item-meta { display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--text-muted); }
   .cust-sub-item-meta span { display:flex; align-items:center; gap:3px; }
   .cust-empty-msg { padding:18px 14px; text-align:center; color:var(--text-muted); font-size:13px; }
-  html[data-theme="cspire"] .cust-alpha-hd { color:#0a5a7a; background:linear-gradient(90deg,rgba(0,192,243,0.35) 0%,rgba(0,192,243,0.18) 100%); border-left-color:#0a5a7a; }
+  html[data-theme="cspire"] .cust-alpha-hd { color:#0a5a7a; background:var(--surface); border-left-color:#0a5a7a; }
   html[data-theme="cspire"] .cust-card-num { color:#0a5a7a; }
   html[data-theme="cspire"] .cust-card-inner { background:linear-gradient(155deg,#dceef8 0%,#cee4f4 100%); border:1px solid rgba(0,80,160,0.2); box-shadow:0 4px 16px rgba(0,60,140,0.12), 0 0 0 1px rgba(255,255,255,0.5), inset 0 1px 0 rgba(255,255,255,0.75); }
   html[data-theme="cspire"] .cust-detail-banner-head { background:linear-gradient(90deg,rgba(0,192,243,0.35) 0%,rgba(0,192,243,0.18) 100%); border-left-color:#0a5a7a; }
