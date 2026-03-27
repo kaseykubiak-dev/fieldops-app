@@ -617,6 +617,21 @@
   .wan-label { font-size:13px; font-weight:700; color:var(--text); font-family:var(--mono); }
   .wan-divider { height:1px; background:var(--border); margin:0 14px; }
 
+  /* Sub-accordion — collapsible device rows inside each main accordion */
+  .sub-acc { border-bottom:1px solid var(--border); }
+  .sub-acc:last-child { border-bottom:none; }
+  .sub-acc-header { display:flex; align-items:center; gap:8px; padding:11px 14px; cursor:pointer; user-select:none; transition:background .15s; }
+  .sub-acc-header:hover { background:rgba(0,192,243,0.05); }
+  .sub-acc-header:active { background:rgba(0,192,243,0.09); }
+  .sub-acc-left { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+  .sub-acc-label { font-size:13px; font-weight:700; color:var(--text); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sub-acc-chev { color:var(--text-muted); flex-shrink:0; transition:transform .2s; }
+  .sub-acc.open .sub-acc-chev { transform:rotate(180deg); }
+  .sub-acc-body { display:none; padding:0 14px 12px; }
+  .sub-acc.open .sub-acc-body { display:block; }
+  html[data-theme="cspire"] .sub-acc { border-bottom-color:rgba(0,80,160,0.18); }
+  html[data-theme="cspire"] .sub-acc-header:hover { background:rgba(0,192,243,0.07); }
+
   /* Detail grid inside each block */
   .equip-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .edg-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:8px 10px; }
@@ -1538,32 +1553,40 @@
               </button>
               <div class="acc-body" id="body-ddos">
 
-                <div class="wan-block">
-                  <div class="wan-label-row">
-                    <span class="wan-label">Core Switch</span>
-                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                <div class="sub-acc">
+                  <div class="sub-acc-header" onclick="toggleSubAcc(this)">
+                    <div class="sub-acc-left">
+                      <span class="sub-acc-label">Core Switch</span>
+                      <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                    </div>
+                    <svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
                   </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Cisco Catalyst 9300</div></div>
-                    <div class="edg-item"><div class="edg-label">Ports</div><div class="edg-val">48-port PoE+</div></div>
-                    <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">FCW2239G0BL</div></div>
-                    <div class="edg-item"><div class="edg-label">IOS-XE</div><div class="edg-val">17.9.3</div></div>
-                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">MDF Room · Rack U8</div></div>
+                  <div class="sub-acc-body">
+                    <div class="equip-detail-grid">
+                      <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Cisco Catalyst 9300</div></div>
+                      <div class="edg-item"><div class="edg-label">Ports</div><div class="edg-val">48-port PoE+</div></div>
+                      <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">FCW2239G0BL</div></div>
+                      <div class="edg-item"><div class="edg-label">IOS-XE</div><div class="edg-val">17.9.3</div></div>
+                      <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">MDF Room · Rack U8</div></div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="wan-divider"></div>
-
-                <div class="wan-block" style="margin-bottom:0;">
-                  <div class="wan-label-row">
-                    <span class="wan-label">DDoS Protection</span>
-                    <span class="pill pill-resolved" style="font-size:10px;">ACTIVE</span>
+                <div class="sub-acc">
+                  <div class="sub-acc-header" onclick="toggleSubAcc(this)">
+                    <div class="sub-acc-left">
+                      <span class="sub-acc-label">DDoS Protection</span>
+                      <span class="pill pill-resolved" style="font-size:10px;">ACTIVE</span>
+                    </div>
+                    <svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
                   </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Cloudflare Magic</div></div>
-                    <div class="edg-item"><div class="edg-label">Capacity</div><div class="edg-val">100 Gbps</div></div>
-                    <div class="edg-item"><div class="edg-label">Mode</div><div class="edg-val">Always-on</div></div>
-                    <div class="edg-item"><div class="edg-label">Clean pipe</div><div class="edg-val">GRE tunnel</div></div>
+                  <div class="sub-acc-body">
+                    <div class="equip-detail-grid">
+                      <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Cloudflare Magic</div></div>
+                      <div class="edg-item"><div class="edg-label">Capacity</div><div class="edg-val">100 Gbps</div></div>
+                      <div class="edg-item"><div class="edg-label">Mode</div><div class="edg-val">Always-on</div></div>
+                      <div class="edg-item"><div class="edg-label">Clean pipe</div><div class="edg-val">GRE tunnel</div></div>
+                    </div>
                   </div>
                 </div>
 
@@ -2703,25 +2726,31 @@
       badge.textContent = `${onlineCount}/2 Connections Online`;
       badge.className   = onlineCount === 2 ? 'conn-badge all-on' : 'conn-badge partial';
 
+      const chevSvg = `<svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
+
       const wanBlock = (label, circ, cfg, statusCls, statusTxt) => `
-        <div class="wan-block">
-          <div class="wan-label-row">
-            <span class="wan-label">${label}</span>
-            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+        <div class="sub-acc">
+          <div class="sub-acc-header" onclick="toggleSubAcc(this)">
+            <div class="sub-acc-left">
+              <span class="sub-acc-label">${label}</span>
+              <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+            </div>
+            ${chevSvg}
           </div>
-          <div class="equip-detail-grid">
-            <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">${escHtml(circ)}</div></div>
-            <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(cfg.type)}</div></div>
-            <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
-            <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
-            <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>
-            <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">${escHtml(cfg.interface_ip)}</div></div>
+          <div class="sub-acc-body">
+            <div class="equip-detail-grid">
+              <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">${escHtml(circ)}</div></div>
+              <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(cfg.type)}</div></div>
+              <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
+              <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
+              <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>
+              <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">${escHtml(cfg.interface_ip)}</div></div>
+            </div>
           </div>
         </div>`;
 
       body.innerHTML =
         wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE') +
-        '<div class="wan-divider"></div>' +
         wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE');
 
     } catch (err) {
@@ -2796,20 +2825,27 @@
       const isHA     = scenario === 0;
       const fw2Down  = isHA && (s % 7 === 0); // ~14% chance secondary is offline
 
+      const fwChev = `<svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
+
       const fwBlock = (label, roleTag, statusCls, statusTxt, role, serial, mgmtIp, uptimeOrSync, uptimeLabel, location, isNA) => `
-        <div class="wan-block">
-          <div class="wan-label-row">
-            <span class="wan-label">${label} <span style="font-weight:400;color:var(--text-muted);font-size:11px;">${roleTag}</span></span>
-            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+        <div class="sub-acc">
+          <div class="sub-acc-header" onclick="toggleSubAcc(this)">
+            <div class="sub-acc-left">
+              <span class="sub-acc-label">${label} <span style="font-weight:400;color:var(--text-muted);font-size:11px;">${roleTag}</span></span>
+              <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+            </div>
+            ${fwChev}
           </div>
-          <div class="equip-detail-grid">
-            <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">${isNA ? 'N/A' : escHtml(mdl.model)}</div></div>
-            <div class="edg-item"><div class="edg-label">Role</div><div class="edg-val">${isNA ? 'N/A' : role}</div></div>
-            <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">${isNA ? 'N/A' : escHtml(serial)}</div></div>
-            <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${isNA ? 'N/A' : firmware}</div></div>
-            <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">${isNA ? 'N/A' : mgmtIp}</div></div>
-            <div class="edg-item"><div class="edg-label">${uptimeLabel}</div><div class="edg-val" ${!isNA && uptimeLabel === 'Sync' ? 'style="color:var(--success);"' : ''}>${isNA ? 'N/A' : uptimeOrSync}</div></div>
-            <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">${isNA ? 'N/A' : escHtml(location)}</div></div>
+          <div class="sub-acc-body">
+            <div class="equip-detail-grid">
+              <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">${isNA ? 'N/A' : escHtml(mdl.model)}</div></div>
+              <div class="edg-item"><div class="edg-label">Role</div><div class="edg-val">${isNA ? 'N/A' : role}</div></div>
+              <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">${isNA ? 'N/A' : escHtml(serial)}</div></div>
+              <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${isNA ? 'N/A' : firmware}</div></div>
+              <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">${isNA ? 'N/A' : mgmtIp}</div></div>
+              <div class="edg-item"><div class="edg-label">${uptimeLabel}</div><div class="edg-val" ${!isNA && uptimeLabel === 'Sync' ? 'style="color:var(--success);"' : ''}>${isNA ? 'N/A' : uptimeOrSync}</div></div>
+              <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">${isNA ? 'N/A' : escHtml(location)}</div></div>
+            </div>
           </div>
         </div>`;
 
@@ -2821,9 +2857,8 @@
         badge.className   = onlineCount === 2 ? 'conn-badge all-on' : 'conn-badge partial';
 
         body.innerHTML =
-          fwBlock('FW-01', 'Primary',   'pill-resolved',                           'ONLINE',  'Primary / Active',   serial1, '10.0.0.1', uptime,        'Uptime', loc,  false) +
-          '<div class="wan-divider"></div>' +
-          fwBlock('FW-02', 'Secondary', fw2Down ? 'pill-critical' : 'pill-warning', fw2Down ? 'OFFLINE' : 'STANDBY', 'Secondary / Passive', serial2, '10.0.0.2', fw2Down ? '—' : 'In Sync', 'Sync',   loc2, false);
+          fwBlock('FW-01', 'Primary',   'pill-resolved',                            'ONLINE',  'Primary / Active',   serial1, '10.0.0.1', uptime,               'Uptime', loc,  false) +
+          fwBlock('FW-02', 'Secondary', fw2Down ? 'pill-critical' : 'pill-warning', fw2Down ? 'OFFLINE' : 'STANDBY', 'Secondary / Passive', serial2, '10.0.0.2', fw2Down ? '—' : 'In Sync', 'Sync', loc2, false);
 
       } else {
         // ── Standalone ───────────────────────────────────────────────────
@@ -2832,9 +2867,8 @@
         badge.className   = 'conn-badge all-on';
 
         body.innerHTML =
-          fwBlock('FW-01', 'Primary', 'pill-resolved', 'ONLINE', 'Standalone', serial1, '10.0.0.1', uptime, 'Uptime', loc, false) +
-          '<div class="wan-divider"></div>' +
-          fwBlock('FW-02', 'Secondary', 'pill', 'N/A', '', '', '', '', 'Sync', '', true);
+          fwBlock('FW-01', 'Primary',   'pill-resolved', 'ONLINE', 'Standalone', serial1, '10.0.0.1', uptime, 'Uptime', loc, false) +
+          fwBlock('FW-02', 'Secondary', 'pill',          'N/A',    '',           '',      '',          '',     'Sync',   '',  true);
       }
 
     } catch (err) {
@@ -2893,19 +2927,24 @@
         const statusTxt = isOffline ? 'OFFLINE' : 'ONLINE';
 
         return `
-        <div class="wan-block"${i === picked.length - 1 ? ' style="margin-bottom:0;"' : ''}>
-          <div class="wan-label-row">
-            <span class="wan-label">${escHtml(mdl.vendor)} ${escHtml(mdl.model)}</span>
-            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+        <div class="sub-acc">
+          <div class="sub-acc-header" onclick="toggleSubAcc(this)">
+            <div class="sub-acc-left">
+              <span class="sub-acc-label">${escHtml(mdl.vendor)} ${escHtml(mdl.model)}</span>
+              <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+            </div>
+            <svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="equip-detail-grid">
-            <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(mdl.type)}</div></div>
-            <div class="edg-item"><div class="edg-label">Units Deployed</div><div class="edg-val">${units}</div></div>
-            <div class="edg-item"><div class="edg-label">Lines / Unit</div><div class="edg-val">${mdl.lines} line keys</div></div>
-            <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · ${escHtml(mdl.poe)}</div></div>
-            <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${escHtml(fw)}</div></div>
-            <div class="edg-item"><div class="edg-label">Location</div><div class="edg-val">${escHtml(loc)}</div></div>
-            <div class="edg-item edg-full"><div class="edg-label">Provisioning</div><div class="edg-val mono">${escHtml(prov)}</div></div>
+          <div class="sub-acc-body">
+            <div class="equip-detail-grid">
+              <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(mdl.type)}</div></div>
+              <div class="edg-item"><div class="edg-label">Units Deployed</div><div class="edg-val">${units}</div></div>
+              <div class="edg-item"><div class="edg-label">Lines / Unit</div><div class="edg-val">${mdl.lines} line keys</div></div>
+              <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · ${escHtml(mdl.poe)}</div></div>
+              <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${escHtml(fw)}</div></div>
+              <div class="edg-item"><div class="edg-label">Location</div><div class="edg-val">${escHtml(loc)}</div></div>
+              <div class="edg-item edg-full"><div class="edg-label">Provisioning</div><div class="edg-val mono">${escHtml(prov)}</div></div>
+            </div>
           </div>
         </div>`;
       });
@@ -2917,7 +2956,7 @@
                         : onlineCount === 0             ? 'conn-badge all-off'
                         :                                 'conn-badge partial';
 
-      body.innerHTML = blocks.join('<div class="wan-divider"></div>');
+      body.innerHTML = blocks.join('');
 
     } catch (err) {
       sub.textContent   = 'Unavailable';
@@ -3514,6 +3553,10 @@
     startSession();
   }
   // else login screen is already visible by default
+
+  function toggleSubAcc(el) {
+    el.closest('.sub-acc').classList.toggle('open');
+  }
 
   function toggleAcc(id) {
     const body = document.getElementById('body-' + id);
