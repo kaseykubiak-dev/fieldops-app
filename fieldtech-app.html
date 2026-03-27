@@ -1507,80 +1507,15 @@
                 </div>
                 <div class="acc-header-info">
                   <span class="acc-title">VoIP Phones</span>
-                  <span class="acc-sub">48 lines · 3 phone models</span>
+                  <span class="acc-sub" id="voip-acc-sub">Loading…</span>
                 </div>
                 <div class="acc-badges">
-                  <span class="conn-badge all-off">0/1 Connections Online</span>
+                  <span class="conn-badge partial" id="voip-acc-badge">—</span>
                 </div>
                 <svg class="acc-chevron" id="chev-voip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
               <div class="acc-body" id="body-voip">
-
-                <!-- SIP Trunk -->
-                <div class="wan-block">
-                  <div class="wan-label-row">
-                    <span class="wan-label">SIP Trunk</span>
-                    <span class="pill pill-critical" style="font-size:10px;">OFFLINE</span>
-                  </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Twilio Flex</div></div>
-                    <div class="edg-item"><div class="edg-label">Lines</div><div class="edg-val">48 active</div></div>
-                    <div class="edg-item"><div class="edg-label">DID Range</div><div class="edg-val mono">555-200 – 248</div></div>
-                    <div class="edg-item"><div class="edg-label">Codec</div><div class="edg-val">G.711 / G.729</div></div>
-                  </div>
-                </div>
-
-                <div class="wan-divider"></div>
-
-                <!-- Phone model 1 -->
-                <div class="wan-block">
-                  <div class="wan-label-row">
-                    <span class="wan-label">Polycom VVX 450</span>
-                    <span style="font-size:11px;color:var(--text-muted);">×32 units</span>
-                  </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Desktop IP Phone</div></div>
-                    <div class="edg-item"><div class="edg-label">Lines/Unit</div><div class="edg-val">12 line keys</div></div>
-                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">6.4.3.5768</div></div>
-                    <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · 802.3af</div></div>
-                    <div class="edg-item edg-full"><div class="edg-label">Provisioning</div><div class="edg-val mono">prov.nexus-corp.local</div></div>
-                  </div>
-                </div>
-
-                <div class="wan-divider"></div>
-
-                <!-- Phone model 2 -->
-                <div class="wan-block">
-                  <div class="wan-label-row">
-                    <span class="wan-label">Cisco 8851</span>
-                    <span style="font-size:11px;color:var(--text-muted);">×12 units</span>
-                  </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Executive Phone</div></div>
-                    <div class="edg-item"><div class="edg-label">Lines/Unit</div><div class="edg-val">5 line keys</div></div>
-                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">14.2(1)SR2</div></div>
-                    <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · 802.3at</div></div>
-                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">C-Suite / Conf Rooms</div></div>
-                  </div>
-                </div>
-
-                <div class="wan-divider"></div>
-
-                <!-- Phone model 3 -->
-                <div class="wan-block" style="margin-bottom:0;">
-                  <div class="wan-label-row">
-                    <span class="wan-label">Yealink CP960</span>
-                    <span style="font-size:11px;color:var(--text-muted);">×4 units</span>
-                  </div>
-                  <div class="equip-detail-grid">
-                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Conference Phone</div></div>
-                    <div class="edg-item"><div class="edg-label">Coverage</div><div class="edg-val">360° / 20 ft</div></div>
-                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">73.85.0.15</div></div>
-                    <div class="edg-item"><div class="edg-label">WiFi</div><div class="edg-val">802.11 a/b/g/n</div></div>
-                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">Board Room, Conf A–C</div></div>
-                  </div>
-                </div>
-
+                <div style="padding:14px;color:var(--text-muted);font-size:12px;">Loading…</div>
               </div>
             </div>
 
@@ -2340,6 +2275,7 @@
       const accountSysId = c.account?.value;
       renderInternetSection(accountSysId || currentCaseSysId);
       renderFirewallSection(accountSysId || currentCaseSysId);
+      renderVoipSection(accountSysId || currentCaseSysId);
       if (accountSysId) {
         fetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`, {
           headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
@@ -2906,6 +2842,88 @@
       badge.textContent = '—';
       badge.className   = 'conn-badge';
       body.innerHTML    = `<div style="padding:14px;color:var(--text-muted);font-size:12px;">Could not load firewall data: ${escHtml(err.message)}</div>`;
+    }
+  }
+
+  // ── VoIP section — simulated from database ───────────────────────────────
+  let _phonesDb = null;
+
+  async function fetchPhonesDb() {
+    if (_phonesDb) return _phonesDb;
+    const res = await fetch('./phones-db.json');
+    if (!res.ok) throw new Error('Could not load phones-db.json');
+    _phonesDb = await res.json();
+    return _phonesDb;
+  }
+
+  async function renderVoipSection(seed) {
+    const body  = document.getElementById('body-voip');
+    const sub   = document.getElementById('voip-acc-sub');
+    const badge = document.getElementById('voip-acc-badge');
+
+    try {
+      const db = await fetchPhonesDb();
+      const s  = _hash(seed || 'default');
+
+      // Pick 2–3 distinct phone models deterministically
+      const modelCount = 2 + (s % 2); // 2 or 3
+      const picked = [];
+      for (let i = 0; i < modelCount; i++) {
+        const idx = (s >>> (i * 5)) % db.models.length;
+        const mdl = db.models[idx];
+        if (!picked.find(p => p.model === mdl.model)) picked.push(mdl);
+      }
+      // Ensure we always have at least 2
+      if (picked.length < 2) picked.push(db.models[(s + 3) % db.models.length]);
+
+      // Assign unit counts, locations, firmware, status per model
+      const prov = db.provisioning_servers[(s >>> 3) % db.provisioning_servers.length];
+      let totalUnits = 0;
+      let offlineCount = 0;
+
+      const blocks = picked.map((mdl, i) => {
+        const units    = db.unit_counts[(s >>> (i * 4 + 2)) % db.unit_counts.length];
+        const fw       = mdl.firmware_versions[(s >>> (i * 3 + 1)) % mdl.firmware_versions.length];
+        const loc      = db.locations[(s >>> (i * 6 + 3)) % db.locations.length];
+        const isOffline = (s % 9 === 0) && i === picked.length - 1; // ~11% last model offline
+        totalUnits += units;
+        if (isOffline) offlineCount++;
+
+        const statusCls = isOffline ? 'pill-critical' : 'pill-resolved';
+        const statusTxt = isOffline ? 'OFFLINE' : 'ONLINE';
+
+        return `
+        <div class="wan-block"${i === picked.length - 1 ? ' style="margin-bottom:0;"' : ''}>
+          <div class="wan-label-row">
+            <span class="wan-label">${escHtml(mdl.vendor)} ${escHtml(mdl.model)}</span>
+            <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+          </div>
+          <div class="equip-detail-grid">
+            <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(mdl.type)}</div></div>
+            <div class="edg-item"><div class="edg-label">Units Deployed</div><div class="edg-val">${units}</div></div>
+            <div class="edg-item"><div class="edg-label">Lines / Unit</div><div class="edg-val">${mdl.lines} line keys</div></div>
+            <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · ${escHtml(mdl.poe)}</div></div>
+            <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${escHtml(fw)}</div></div>
+            <div class="edg-item"><div class="edg-label">Location</div><div class="edg-val">${escHtml(loc)}</div></div>
+            <div class="edg-item edg-full"><div class="edg-label">Provisioning</div><div class="edg-val mono">${escHtml(prov)}</div></div>
+          </div>
+        </div>`;
+      });
+
+      const onlineCount = picked.length - offlineCount;
+      sub.textContent   = `${totalUnits} units · ${picked.length} model${picked.length > 1 ? 's' : ''}`;
+      badge.textContent = `${onlineCount}/${picked.length} Models Online`;
+      badge.className   = onlineCount === picked.length ? 'conn-badge all-on'
+                        : onlineCount === 0             ? 'conn-badge all-off'
+                        :                                 'conn-badge partial';
+
+      body.innerHTML = blocks.join('<div class="wan-divider"></div>');
+
+    } catch (err) {
+      sub.textContent   = 'Unavailable';
+      badge.textContent = '—';
+      badge.className   = 'conn-badge';
+      body.innerHTML    = `<div style="padding:14px;color:var(--text-muted);font-size:12px;">Could not load phone data: ${escHtml(err.message)}</div>`;
     }
   }
 
