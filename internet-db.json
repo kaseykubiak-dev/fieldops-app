@@ -10,7 +10,8 @@
       "upload": "1 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.0/30",
-      "interface_ip": "192.0.2.1"
+      "interface_ip": "192.0.2.1",
+      "gateway_ip": "192.0.2.2"
     },
     {
       "type": "Dedicated Fiber",
@@ -18,7 +19,8 @@
       "upload": "2 Gbps",
       "provider": "Lumen",
       "static_ip_range": "192.0.2.4/30",
-      "interface_ip": "192.0.2.5"
+      "interface_ip": "192.0.2.5",
+      "gateway_ip": "192.0.2.6"
     },
     {
       "type": "Dedicated Fiber",
@@ -26,7 +28,8 @@
       "upload": "5 Gbps",
       "provider": "AT&T Fiber",
       "static_ip_range": "192.0.2.8/29",
-      "interface_ip": "192.0.2.9"
+      "interface_ip": "192.0.2.9",
+      "gateway_ip": "192.0.2.14"
     },
     {
       "type": "Dedicated Fiber",
@@ -34,7 +37,8 @@
       "upload": "10 Gbps",
       "provider": "Crown Castle",
       "static_ip_range": "192.0.2.16/28",
-      "interface_ip": "192.0.2.17"
+      "interface_ip": "192.0.2.17",
+      "gateway_ip": "192.0.2.30"
     },
     {
       "type": "Dedicated Fiber",
@@ -42,7 +46,8 @@
       "upload": "10 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.32/28",
-      "interface_ip": "192.0.2.33"
+      "interface_ip": "192.0.2.33",
+      "gateway_ip": "192.0.2.46"
     },
     {
       "type": "Dedicated Fiber",
@@ -50,7 +55,8 @@
       "upload": "25 Gbps",
       "provider": "Windstream",
       "static_ip_range": "192.0.2.48/29",
-      "interface_ip": "192.0.2.49"
+      "interface_ip": "192.0.2.49",
+      "gateway_ip": "192.0.2.54"
     },
     {
       "type": "Dedicated Fiber",
@@ -58,7 +64,8 @@
       "upload": "40 Gbps",
       "provider": "Lumen",
       "static_ip_range": "192.0.2.56/28",
-      "interface_ip": "192.0.2.57"
+      "interface_ip": "192.0.2.57",
+      "gateway_ip": "192.0.2.70"
     },
     {
       "type": "Metro Ethernet Fiber",
@@ -66,7 +73,8 @@
       "upload": "100 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.72/28",
-      "interface_ip": "192.0.2.73"
+      "interface_ip": "192.0.2.73",
+      "gateway_ip": "192.0.2.86"
     },
     {
       "type": "Dedicated Fiber",
@@ -74,7 +82,8 @@
       "upload": "10 Gbps",
       "provider": "Consolidated Communications",
       "static_ip_range": "192.0.2.88/29",
-      "interface_ip": "192.0.2.89"
+      "interface_ip": "192.0.2.89",
+      "gateway_ip": "192.0.2.94"
     },
     {
       "type": "Metro Ethernet Fiber",
@@ -82,7 +91,8 @@
       "upload": "5 Gbps",
       "provider": "Spectrum Business",
       "static_ip_range": "192.0.2.96/30",
-      "interface_ip": "192.0.2.97"
+      "interface_ip": "192.0.2.97",
+      "gateway_ip": "192.0.2.98"
     }
   ],
   "secondary_pool": [
@@ -92,7 +102,8 @@
       "upload": "25 Mbps",
       "provider": "Comcast Business",
       "static_ip_range": "198.51.100.0/30",
-      "interface_ip": "198.51.100.1"
+      "interface_ip": "198.51.100.1",
+      "gateway_ip": "198.51.100.2"
     },
     {
       "type": "Cable",
@@ -100,7 +111,8 @@
       "upload": "35 Mbps",
       "provider": "Spectrum Business",
       "static_ip_range": "198.51.100.4/29",
-      "interface_ip": "198.51.100.5"
+      "interface_ip": "198.51.100.5",
+      "gateway_ip": "198.51.100.10"
     },
     {
       "type": "Cable",
@@ -108,7 +120,8 @@
       "upload": "35 Mbps",
       "provider": "Cox Business",
       "static_ip_range": "198.51.100.12/30",
-      "interface_ip": "198.51.100.13"
+      "interface_ip": "198.51.100.13",
+      "gateway_ip": "198.51.100.14"
     },
     {
       "type": "Cable",
@@ -116,7 +129,8 @@
       "upload": "35 Mbps",
       "provider": "Comcast Business",
       "static_ip_range": "198.51.100.16/30",
-      "interface_ip": "198.51.100.17"
+      "interface_ip": "198.51.100.17",
+      "gateway_ip": "198.51.100.18"
     },
     {
       "type": "Cable",
@@ -124,7 +138,8 @@
       "upload": "50 Mbps",
       "provider": "Charter Business",
       "static_ip_range": "198.51.100.20/29",
-      "interface_ip": "198.51.100.21"
+      "interface_ip": "198.51.100.21",
+      "gateway_ip": "198.51.100.26"
     },
     {
       "type": "Fixed Wireless",
@@ -132,7 +147,8 @@
       "upload": "5 Mbps",
       "provider": "Windstream",
       "static_ip_range": "198.51.100.28/30",
-      "interface_ip": "198.51.100.29"
+      "interface_ip": "198.51.100.29",
+      "gateway_ip": "198.51.100.30"
     },
     {
       "type": "Fixed Wireless",
@@ -140,7 +156,8 @@
       "upload": "20 Mbps",
       "provider": "Lumen",
       "static_ip_range": "198.51.100.32/30",
-      "interface_ip": "198.51.100.33"
+      "interface_ip": "198.51.100.33",
+      "gateway_ip": "198.51.100.34"
     },
     {
       "type": "Fixed Wireless",
@@ -148,7 +165,8 @@
       "upload": "15 Mbps",
       "provider": "Starlink Business",
       "static_ip_range": "198.51.100.36/30",
-      "interface_ip": "198.51.100.37"
+      "interface_ip": "198.51.100.37",
+      "gateway_ip": "198.51.100.38"
     },
     {
       "type": "DSL",
@@ -156,7 +174,8 @@
       "upload": "3 Mbps",
       "provider": "AT&T",
       "static_ip_range": "198.51.100.40/30",
-      "interface_ip": "198.51.100.41"
+      "interface_ip": "198.51.100.41",
+      "gateway_ip": "198.51.100.42"
     },
     {
       "type": "DSL",
@@ -164,7 +183,8 @@
       "upload": "5 Mbps",
       "provider": "CenturyLink",
       "static_ip_range": "198.51.100.44/30",
-      "interface_ip": "198.51.100.45"
+      "interface_ip": "198.51.100.45",
+      "gateway_ip": "198.51.100.46"
     },
     {
       "type": "DSL",
@@ -172,7 +192,8 @@
       "upload": "10 Mbps",
       "provider": "Frontier",
       "static_ip_range": "198.51.100.48/29",
-      "interface_ip": "198.51.100.49"
+      "interface_ip": "198.51.100.49",
+      "gateway_ip": "198.51.100.54"
     },
     {
       "type": "Cable",
@@ -180,7 +201,8 @@
       "upload": "20 Mbps",
       "provider": "Mediacom Business",
       "static_ip_range": "198.51.100.56/30",
-      "interface_ip": "198.51.100.57"
+      "interface_ip": "198.51.100.57",
+      "gateway_ip": "198.51.100.58"
     }
   ]
 }
