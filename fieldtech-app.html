@@ -2129,7 +2129,7 @@
     const isClosed = filterState === 'closed';
     const groups = {};
     incidents.forEach(inc => {
-      const d = new Date(isClosed ? (inc.resolved_at || inc.opened_at) : (inc.u_scheduled_start || inc.opened_at));
+      const d = parseSNDate(isClosed ? (inc.resolved_at || inc.opened_at) : (inc.u_scheduled_start || inc.opened_at));
       const key = d.toDateString();
       if (!groups[key]) groups[key] = [];
       groups[key].push(inc);
@@ -2161,7 +2161,7 @@
         const location = locationParts.join(' · ');
         const startRaw = isClosed ? (inc.resolved_at || inc.u_scheduled_start) : inc.u_scheduled_start;
         const startLabel = isClosed ? 'Closed ' : 'Start ';
-        const startStr = startRaw ? formatTime(new Date(startRaw)) : '—';
+        const startStr = startRaw ? formatTime(parseSNDate(startRaw)) : '—';
         const caseType = getCaseType(inc);
 
         html += `
@@ -2257,7 +2257,7 @@
       currentCaseNumber = c.number?.display_value || c.number?.value || c.number;
 
       // Topbar
-      const openedDate = new Date(c.opened_at?.value || c.opened_at);
+      const openedDate = parseSNDate(c.opened_at?.value || c.opened_at);
       const dateStr = openedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       document.getElementById('detail-tb-id').textContent    = `${c.number} · ${dateStr}`;
       document.getElementById('detail-tb-title').textContent = c.short_description || '—';
@@ -4186,7 +4186,7 @@
           company: t.account?.display_value || t.account || '',
           desc:    t.short_description || '',
           priority: t.priority,
-          time:    new Date(t.sys_created_on),
+          time:    parseSNDate(t.sys_created_on),
           read:    false
         });
       });
