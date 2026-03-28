@@ -3281,7 +3281,7 @@
     const endGS   = `javascript:gs.dateGenerate('${year}-${monthPad}-${lastDayPad}','end')`;
 
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
-    const fields = 'number,short_description,priority,state,opened_at,account,account.name,location,u_scheduled_start';
+    const fields = 'number,short_description,priority,state,opened_at,account,account.name,location,u_scheduled_start,u_ticket_type';
 
     // Query 1: tickets whose scheduled start falls in this month
     const qSched  = `${assignedTo}u_scheduled_startBETWEEN${startGS}@${endGS}^ORDERBYu_scheduled_start`;
