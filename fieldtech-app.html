@@ -2096,8 +2096,8 @@
       query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
     }
 
-    const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
-    const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
+    const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.name,account.number,contact,location,location.name,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
+    const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=false`;
 
     try {
       const res = await fetch(url, {
@@ -2157,7 +2157,7 @@
         const state    = _closedThisSession.has(inc.number)
                          ? { label: 'Closed', cls: 'pill-resolved' }
                          : (STATE_MAP[inc.state] || { label: 'Open', cls: 'pill-open' });
-        const company  = inc.account?.display_value  || inc.account  || 'Unknown Customer';
+        const company  = inc['account.name'] || inc.account?.display_value || inc.account || 'Unknown Customer';
         const locationParts = [inc['location.street'], inc['location.city'] && inc['location.state'] ? inc['location.city'] + ', ' + inc['location.state'] : (inc['location.city'] || inc['location.state'] || '')].filter(Boolean);
         const location = locationParts.join(' · ');
         const startRaw = isClosed ? (inc.resolved_at || inc.u_scheduled_start) : inc.u_scheduled_start;
@@ -3180,8 +3180,8 @@
     if (cachedAssignedTickets) return;
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
     const query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
-    const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.number,contact,location,assigned_to,u_scheduled_start,u_ticket_type';
-    const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=200&sysparm_display_value=true`;
+    const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.name,account.number,contact,location,location.name,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
+    const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=200&sysparm_display_value=false`;
     try {
       const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
       if (res.ok) {
@@ -3195,10 +3195,10 @@
     const q = query.trim().toLowerCase();
     if (!q) { fetchTickets(activeFilter); return; }
     const filtered = (cachedAssignedTickets || []).filter(inc => {
-      const customerName = (inc.account?.display_value || inc.account || '').toLowerCase();
+      const customerName = (inc['account.name'] || inc.account?.display_value || inc.account || '').toLowerCase();
       const accountNum   = (inc['account.number'] || '').toLowerCase();
       const ticketNum    = (inc.number || '').toLowerCase();
-      const address      = (inc.location?.display_value || inc.location || '').toLowerCase();
+      const address      = (inc['location.name'] || inc['location.city'] || inc['location.street'] || '').toLowerCase();
       const description  = (inc.short_description || '').toLowerCase();
       return customerName.includes(q) || accountNum.includes(q) || ticketNum.includes(q) || address.includes(q) || description.includes(q);
     });
