@@ -1,3 +1,5 @@
 node_modules/
 .env
 App History/
+seed_servicenow.py
+seed_test_user.py
