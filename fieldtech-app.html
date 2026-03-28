@@ -1692,23 +1692,7 @@
         <div class="section">
           <div class="section-title">Links <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· All links disabled in demo</span></div>
           <div class="card">
-            <div class="card-body" style="padding:0;">
-              <div class="link-group-label">Order Information</div>
-              <a href="#" onclick="return false;" class="portal-link">ServiceNow</a>
-              <a href="#" onclick="return false;" class="portal-link">Salesforce</a>
-              <div class="link-group-label">Circuit Information</div>
-              <a href="#" onclick="return false;" class="portal-link">Arkis</a>
-              <div class="link-group-label">Networking Portals</div>
-              <a href="#" onclick="return false;" class="portal-link">Cisco Meraki</a>
-              <a href="#" onclick="return false;" class="portal-link">AdTran N-Command (Jules)<span class="vpn-badge">VPN</span></a>
-              <div class="link-group-label">Voice Portals</div>
-              <a href="#" onclick="return false;" class="portal-link">Cisco Webex</a>
-              <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 1<span class="vpn-badge">VPN</span></a>
-              <a href="#" onclick="return false;" class="portal-link last">Broadsoft Cluster 3<span class="vpn-badge">VPN</span></a>
-              <div class="link-group-label">Inventory &amp; Vehicle Management</div>
-              <a href="#" onclick="return false;" class="portal-link">C Spire Truck Stock<span class="vpn-badge">VPN</span></a>
-              <a href="#" onclick="return false;" class="portal-link last">Vehicle Mileage Reporting<span class="vpn-badge">VPN</span></a>
-            </div>
+            <div class="card-body" style="padding:0;" id="links-container-detail"></div>
           </div>
         </div>
 
@@ -1894,23 +1878,7 @@
       </div>
       <div class="detail-scroll" style="padding:12px 14px;min-height:0;">
         <div class="card">
-          <div class="card-body" style="padding:0;">
-            <div class="link-group-label" style="border-top:none;">Order Information</div>
-            <a href="#" onclick="return false;" class="portal-link">ServiceNow</a>
-            <a href="#" onclick="return false;" class="portal-link">Salesforce</a>
-            <div class="link-group-label">Circuit Information</div>
-            <a href="#" onclick="return false;" class="portal-link">Arkis</a>
-            <div class="link-group-label">Networking Portals</div>
-            <a href="#" onclick="return false;" class="portal-link">Cisco Meraki</a>
-            <a href="#" onclick="return false;" class="portal-link">AdTran N-Command (Jules)<span class="vpn-badge">VPN</span></a>
-            <div class="link-group-label">Voice Portals</div>
-            <a href="#" onclick="return false;" class="portal-link">Cisco Webex</a>
-            <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 1<span class="vpn-badge">VPN</span></a>
-            <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 3<span class="vpn-badge">VPN</span></a>
-            <div class="link-group-label">Inventory &amp; Vehicle Management</div>
-            <a href="#" onclick="return false;" class="portal-link">C Spire Truck Stock<span class="vpn-badge">VPN</span></a>
-            <a href="#" onclick="return false;" class="portal-link last">Vehicle Mileage Reporting<span class="vpn-badge">VPN</span></a>
-          </div>
+          <div class="card-body" style="padding:0;" id="links-container-screen"></div>
         </div>
         <p style="font-size:11px;color:var(--accent2);font-weight:600;text-align:center;padding:10px 0 4px;">· All links disabled in demo</p>
       </div>
@@ -2912,6 +2880,51 @@
       h = Math.imul(31, h) + str.charCodeAt(i) | 0;
     }
     return Math.abs(h);
+  }
+
+  // ── Links data — single source for ticket detail and Important Links screen ─
+  const _LINKS_DATA = [
+    { group: 'App Dashboard', links: [
+      { label: 'My Apps', vpn: false },
+    ]},
+    { group: 'Order Information', links: [
+      { label: 'ServiceNow', vpn: false },
+      { label: 'Salesforce',  vpn: false },
+    ]},
+    { group: 'Circuit Information', links: [
+      { label: 'Arkis', vpn: false },
+    ]},
+    { group: 'Networking Portals', links: [
+      { label: 'Cisco Meraki',              vpn: false },
+      { label: 'AdTran N-Command (Jules)',  vpn: true  },
+    ]},
+    { group: 'Voice Portals', links: [
+      { label: 'Cisco Webex',       vpn: false },
+      { label: 'Broadsoft Cluster 1', vpn: true  },
+      { label: 'Broadsoft Cluster 3', vpn: true  },
+    ]},
+    { group: 'Inventory &amp; Vehicle Management', links: [
+      { label: 'C Spire Truck Stock',       vpn: true },
+      { label: 'Vehicle Mileage Reporting', vpn: true },
+    ]},
+  ];
+
+  function buildLinksHTML() {
+    return _LINKS_DATA.map((section, i) => {
+      const labelStyle = i === 0 ? ' style="border-top:none;"' : '';
+      const items = section.links.map(link =>
+        `<a href="#" onclick="return false;" class="portal-link">${escHtml(link.label)}${link.vpn ? '<span class="vpn-badge">VPN</span>' : ''}</a>`
+      ).join('');
+      return `<div class="link-group-label"${labelStyle}>${section.group}</div>${items}`;
+    }).join('');
+  }
+
+  function initLinksContainers() {
+    const html = buildLinksHTML();
+    ['links-container-detail', 'links-container-screen'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    });
   }
 
   // ── Service Order catalog — used for install tickets ─────────────────────
@@ -4587,6 +4600,9 @@
     showScreen('list', document.getElementById('bnav-tickets'));
     openDetail(number);
   }
+
+  // ── Populate shared links containers ─────────────────────────────────────
+  initLinksContainers();
 
   // ── Restore persisted settings on load ───────────────────────────────────
   (function restoreSettings() {
