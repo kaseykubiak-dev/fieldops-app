@@ -3288,18 +3288,25 @@
       // Deterministically decide how many devices this location has
       const deviceCount = db.device_counts[s % db.device_counts.length];
 
-      // Pick a subnet for this location
-      const subnet = db.ip_subnets[(s >>> 4) % db.ip_subnets.length];
+      const subnet = db.ip_subnet;
 
-      // Generate device rows
+      // Generate device rows with unique IPs per location
       let onlineCount = 0;
       const rows = [];
+      const usedOctets = new Set();
       for (let i = 0; i < deviceCount; i++) {
-        const si      = _hash(seed + '_vd_' + i);
-        const model   = db.models[si % db.models.length];
-        const user    = db.users[(si >>> 3) % db.users.length];
-        const lastOct = 10 + ((si >>> 6) % 240);
-        const ip      = subnet + lastOct;
+        const si    = _hash(seed + '_vd_' + i);
+        const model = db.models[si % db.models.length];
+        const user  = db.users[(si >>> 3) % db.users.length];
+        // Find a unique last octet (10–254) for this location
+        let lastOct = 10 + ((si >>> 6) % 245);
+        let attempt = 0;
+        while (usedOctets.has(lastOct) && attempt < 245) {
+          lastOct = (lastOct % 245) + 10;
+          attempt++;
+        }
+        usedOctets.add(lastOct);
+        const ip = subnet + lastOct;
         const offline = (si % 100) < Math.floor(db.offline_rate * 100);
         if (!offline) onlineCount++;
 
