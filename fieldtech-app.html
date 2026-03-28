@@ -1499,7 +1499,7 @@
 
         <!-- SERVICES & EQUIPMENT (collapsible) -->
         <div class="section">
-          <div class="section-title">Services &amp; Equipment</div>
+          <div class="section-title">Services &amp; Equipment <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Built using internal databases to replicate realtime data</span></div>
           <div class="card" style="overflow:visible;">
 
             <!-- ── INTERNET ── -->
@@ -1708,7 +1708,7 @@
 
         <!-- TIMELINE -->
         <div class="section">
-          <div class="section-title">Activity Log</div>
+          <div class="section-title">Activity Log <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pulls realtime from ServiceNow</span></div>
           <div class="card">
             <div class="card-body">
               <div class="tl" id="detail-timeline">
@@ -1720,7 +1720,7 @@
 
         <!-- UPDATE -->
         <div class="section">
-          <div class="section-title">Update Ticket</div>
+          <div class="section-title">Update Ticket <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pushes updates and closures realtime to ServiceNow</span></div>
           <div class="card">
             <div class="card-body">
               <div class="form-col">
@@ -3125,8 +3125,9 @@
             <div class="equip-detail-grid">
               <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">${escHtml(circ)}</div></div>
               <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(cfg.type)}</div></div>
-              <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
               <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
+              <div class="edg-item"><div class="edg-label">Download</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
+              <div class="edg-item"><div class="edg-label">Upload</div><div class="edg-val">${escHtml(cfg.upload || cfg.speed)}</div></div>
               <div class="edg-item"><div class="edg-label">Circuit Owner</div><div class="edg-val">${ownerBadge(owner)}</div></div>
               <div class="edg-item"><div class="edg-label">Arkis Circuit ID</div><div class="edg-val">${arkisVal(arkis)}</div></div>
               <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>

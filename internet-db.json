@@ -7,6 +7,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "1 Gbps",
+      "upload": "1 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.0/30",
       "interface_ip": "192.0.2.1"
@@ -14,6 +15,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "2 Gbps",
+      "upload": "2 Gbps",
       "provider": "Lumen",
       "static_ip_range": "192.0.2.4/30",
       "interface_ip": "192.0.2.5"
@@ -21,6 +23,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "5 Gbps",
+      "upload": "5 Gbps",
       "provider": "AT&T Fiber",
       "static_ip_range": "192.0.2.8/29",
       "interface_ip": "192.0.2.9"
@@ -28,6 +31,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "10 Gbps",
+      "upload": "10 Gbps",
       "provider": "Crown Castle",
       "static_ip_range": "192.0.2.16/28",
       "interface_ip": "192.0.2.17"
@@ -35,6 +39,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "10 Gbps",
+      "upload": "10 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.32/28",
       "interface_ip": "192.0.2.33"
@@ -42,6 +47,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "25 Gbps",
+      "upload": "25 Gbps",
       "provider": "Windstream",
       "static_ip_range": "192.0.2.48/29",
       "interface_ip": "192.0.2.49"
@@ -49,6 +55,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "40 Gbps",
+      "upload": "40 Gbps",
       "provider": "Lumen",
       "static_ip_range": "192.0.2.56/28",
       "interface_ip": "192.0.2.57"
@@ -56,6 +63,7 @@
     {
       "type": "Metro Ethernet Fiber",
       "speed": "100 Gbps",
+      "upload": "100 Gbps",
       "provider": "Zayo",
       "static_ip_range": "192.0.2.72/28",
       "interface_ip": "192.0.2.73"
@@ -63,6 +71,7 @@
     {
       "type": "Dedicated Fiber",
       "speed": "10 Gbps",
+      "upload": "10 Gbps",
       "provider": "Consolidated Communications",
       "static_ip_range": "192.0.2.88/29",
       "interface_ip": "192.0.2.89"
@@ -70,6 +79,7 @@
     {
       "type": "Metro Ethernet Fiber",
       "speed": "5 Gbps",
+      "upload": "5 Gbps",
       "provider": "Spectrum Business",
       "static_ip_range": "192.0.2.96/30",
       "interface_ip": "192.0.2.97"
@@ -79,6 +89,7 @@
     {
       "type": "Cable",
       "speed": "250 Mbps",
+      "upload": "25 Mbps",
       "provider": "Comcast Business",
       "static_ip_range": "198.51.100.0/30",
       "interface_ip": "198.51.100.1"
@@ -86,6 +97,7 @@
     {
       "type": "Cable",
       "speed": "500 Mbps",
+      "upload": "35 Mbps",
       "provider": "Spectrum Business",
       "static_ip_range": "198.51.100.4/29",
       "interface_ip": "198.51.100.5"
@@ -93,6 +105,7 @@
     {
       "type": "Cable",
       "speed": "500 Mbps",
+      "upload": "35 Mbps",
       "provider": "Cox Business",
       "static_ip_range": "198.51.100.12/30",
       "interface_ip": "198.51.100.13"
@@ -100,6 +113,7 @@
     {
       "type": "Cable",
       "speed": "1 Gbps",
+      "upload": "35 Mbps",
       "provider": "Comcast Business",
       "static_ip_range": "198.51.100.16/30",
       "interface_ip": "198.51.100.17"
@@ -107,6 +121,7 @@
     {
       "type": "Cable",
       "speed": "1 Gbps",
+      "upload": "50 Mbps",
       "provider": "Charter Business",
       "static_ip_range": "198.51.100.20/29",
       "interface_ip": "198.51.100.21"
@@ -114,6 +129,7 @@
     {
       "type": "Fixed Wireless",
       "speed": "25 Mbps",
+      "upload": "5 Mbps",
       "provider": "Windstream",
       "static_ip_range": "198.51.100.28/30",
       "interface_ip": "198.51.100.29"
@@ -121,6 +137,7 @@
     {
       "type": "Fixed Wireless",
       "speed": "100 Mbps",
+      "upload": "20 Mbps",
       "provider": "Lumen",
       "static_ip_range": "198.51.100.32/30",
       "interface_ip": "198.51.100.33"
@@ -128,6 +145,7 @@
     {
       "type": "Fixed Wireless",
       "speed": "250 Mbps",
+      "upload": "15 Mbps",
       "provider": "Starlink Business",
       "static_ip_range": "198.51.100.36/30",
       "interface_ip": "198.51.100.37"
@@ -135,6 +153,7 @@
     {
       "type": "DSL",
       "speed": "25 Mbps",
+      "upload": "3 Mbps",
       "provider": "AT&T",
       "static_ip_range": "198.51.100.40/30",
       "interface_ip": "198.51.100.41"
@@ -142,6 +161,7 @@
     {
       "type": "DSL",
       "speed": "50 Mbps",
+      "upload": "5 Mbps",
       "provider": "CenturyLink",
       "static_ip_range": "198.51.100.44/30",
       "interface_ip": "198.51.100.45"
@@ -149,6 +169,7 @@
     {
       "type": "DSL",
       "speed": "100 Mbps",
+      "upload": "10 Mbps",
       "provider": "Frontier",
       "static_ip_range": "198.51.100.48/29",
       "interface_ip": "198.51.100.49"
@@ -156,6 +177,7 @@
     {
       "type": "Cable",
       "speed": "300 Mbps",
+      "upload": "20 Mbps",
       "provider": "Mediacom Business",
       "static_ip_range": "198.51.100.56/30",
       "interface_ip": "198.51.100.57"
