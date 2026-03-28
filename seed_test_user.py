@@ -46,7 +46,7 @@ CASES = [
         "priority": "1",
         "state": "1",
         "u_ticket_type": "repair",
-        "u_scheduled_start_offset_hours": -24,
+        "sched": (-1,  8,  0),
     },
     {
         "short_description": "Firewall HA pair failover — secondary unit not syncing",
@@ -54,7 +54,7 @@ CASES = [
         "priority": "2",
         "state": "1",
         "u_ticket_type": "repair",
-        "u_scheduled_start_offset_hours": 0,
+        "sched": ( 0, 10,  0),
     },
     {
         "short_description": "Intermittent packet loss — degraded performance reported",
@@ -62,7 +62,7 @@ CASES = [
         "priority": "2",
         "state": "2",
         "u_ticket_type": "repair",
-        "u_scheduled_start_offset_hours": -48,
+        "sched": (-2, 13, 30),
     },
     {
         "short_description": "Managed switch replacement — end of life hardware",
@@ -70,7 +70,7 @@ CASES = [
         "priority": "3",
         "state": "1",
         "u_ticket_type": "repair",
-        "u_scheduled_start_offset_hours": 24,
+        "sched": ( 1,  9,  0),
     },
     {
         "short_description": "Firewall firmware upgrade — scheduled maintenance",
@@ -78,16 +78,16 @@ CASES = [
         "priority": "4",
         "state": "1",
         "u_ticket_type": "repair",
-        "u_scheduled_start_offset_hours": 48,
+        "sched": ( 3, 14,  0),
     },
-    # ── Install tickets ───────────────────────────────────────────────────────
+    # ── Install tickets ────────────────────────────────────────────
     {
         "short_description": "New fiber circuit installation — equipment staging and CPE config",
         "description": "New dedicated fiber circuit has been provisioned by carrier. On-site work order to rack and configure the new CPE, patch to firewall WAN2 interface, and validate connectivity before cutover. Coordinate with NOC for IP assignment confirmation.",
         "priority": "3",
         "state": "1",
         "u_ticket_type": "install",
-        "u_scheduled_start_offset_hours": -72,
+        "sched": (-3,  8, 30),
     },
     {
         "short_description": "Managed firewall deployment — new FortiGate 200F install",
@@ -95,7 +95,7 @@ CASES = [
         "priority": "2",
         "state": "1",
         "u_ticket_type": "install",
-        "u_scheduled_start_offset_hours": 8,
+        "sched": ( 0, 14,  0),
     },
     {
         "short_description": "VoIP phone system installation — 12-unit Poly deployment",
@@ -103,7 +103,7 @@ CASES = [
         "priority": "3",
         "state": "1",
         "u_ticket_type": "install",
-        "u_scheduled_start_offset_hours": 32,
+        "sched": ( 2, 10,  0),
     },
     {
         "short_description": "Network infrastructure upgrade — core switch stack replacement",
@@ -111,7 +111,7 @@ CASES = [
         "priority": "2",
         "state": "1",
         "u_ticket_type": "install",
-        "u_scheduled_start_offset_hours": 72,
+        "sched": ( 4, 15, 30),
     },
 ]
 
@@ -141,10 +141,19 @@ def sn_patch(table, sys_id, payload):
     return r.json()["result"]
 
 
-def sn_time(offset_hours):
-    """ServiceNow datetime string offset from now."""
-    dt = datetime.utcnow() + timedelta(hours=offset_hours)
-    return dt.strftime("%Y-%m-%d %H:%M:%S")
+CST_UTC_OFFSET = 6  # CST = UTC-6; change to 5 during CDT if needed
+
+def sn_time_cst(day_offset, local_hour, local_minute=0):
+    """
+    Return a UTC datetime string for a given CST local time on a day
+    relative to today.  ServiceNow stores timestamps in UTC.
+    """
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
+    local_dt = (now + timedelta(days=day_offset)).replace(
+        hour=local_hour, minute=local_minute, second=0, microsecond=0)
+    utc_dt = local_dt + timedelta(hours=CST_UTC_OFFSET)
+    return utc_dt.strftime("%Y-%m-%d %H:%M:%S")
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
@@ -275,7 +284,7 @@ def main():
             "u_ticket_type":     case_tmpl.get("u_ticket_type", "repair"),
             "account":           acct_id,
             "assigned_to":       new_id,
-            "u_scheduled_start": sn_time(case_tmpl["u_scheduled_start_offset_hours"]),
+            "u_scheduled_start": sn_time_cst(*case_tmpl["sched"]),
         }
         if contact_id: payload["contact"]  = contact_id
         if loc_id:     payload["location"] = loc_id
