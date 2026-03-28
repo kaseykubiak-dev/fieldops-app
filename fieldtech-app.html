@@ -3091,7 +3091,18 @@
         ? `<span style="color:var(--accent);font-weight:700;">${escHtml(owner)}</span>`
         : `<span style="color:var(--text-muted);">${escHtml(owner)}</span>`;
 
-      const wanBlock = (label, circ, cfg, statusCls, statusTxt, owner) => `
+      const arkisId = (wanKey) => {
+        const h = _hash((seed || 'default') + wanKey);
+        return '1' + String(h % 10000000).padStart(7, '0');
+      };
+      const wan1Arkis = wan1Owner === 'C Spire' ? arkisId('arkis1') : null;
+      const wan2Arkis = wan2Owner === 'C Spire' ? arkisId('arkis2') : null;
+
+      const arkisVal = (id) => id
+        ? `<a href="#" onclick="return false;" class="order-link" style="font-size:12px;">${escHtml(id)}</a>`
+        : `<span style="color:var(--text-muted);">N/A</span>`;
+
+      const wanBlock = (label, circ, cfg, statusCls, statusTxt, owner, arkis) => `
         <div class="sub-acc">
           <div class="sub-acc-header" onclick="toggleSubAcc(this)">
             <div class="sub-acc-left">
@@ -3107,6 +3118,7 @@
               <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
               <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
               <div class="edg-item"><div class="edg-label">Circuit Owner</div><div class="edg-val">${ownerBadge(owner)}</div></div>
+              <div class="edg-item"><div class="edg-label">Arkis Circuit ID</div><div class="edg-val">${arkisVal(arkis)}</div></div>
               <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>
               <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">${escHtml(cfg.interface_ip)}</div></div>
             </div>
@@ -3114,8 +3126,8 @@
         </div>`;
 
       body.innerHTML =
-        wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE',                         wan1Owner) +
-        wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE', wan2Owner);
+        wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE',                         wan1Owner, wan1Arkis) +
+        wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE', wan2Owner, wan2Arkis);
 
     } catch (err) {
       sub.textContent   = 'Unavailable';
