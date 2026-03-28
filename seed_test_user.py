@@ -45,40 +45,40 @@ CASES = [
         "description": "Customer reports complete loss of internet service. WAN1 circuit is showing offline in monitoring. ISP has been notified but on-site verification and possible failover configuration required. Affects all locations on this account.",
         "priority": "1",
         "state": "1",
-        "category": "repair",
-        "u_scheduled_start_offset_hours": 2,
+        "u_ticket_type": "repair",
+        "u_scheduled_start_offset_hours": -24,
     },
     {
         "short_description": "Firewall HA pair failover — secondary unit not syncing",
         "description": "HA pair failed over to secondary unit last night during maintenance window. Primary unit is back online but HA sync is failing. Secondary unit shows out-of-sync state in dashboard. On-site investigation needed to restore redundancy.",
         "priority": "2",
         "state": "1",
-        "category": "repair",
-        "u_scheduled_start_offset_hours": 4,
+        "u_ticket_type": "repair",
+        "u_scheduled_start_offset_hours": 0,
     },
     {
         "short_description": "Intermittent packet loss — degraded performance reported",
         "description": "Customer is reporting intermittent packet loss and degraded network performance throughout the business day. Monitoring shows periodic spikes in latency on the primary circuit. Physical layer inspection and ISP escalation may be required.",
         "priority": "2",
         "state": "2",
-        "category": "repair",
-        "u_scheduled_start_offset_hours": 8,
+        "u_ticket_type": "repair",
+        "u_scheduled_start_offset_hours": -48,
     },
     {
         "short_description": "Managed switch replacement — end of life hardware",
         "description": "Core managed switch has reached end of life and is exhibiting instability under load. Replacement unit has been staged and is ready for deployment. Planned outage window required for swap. Customer has approved Saturday maintenance window.",
         "priority": "3",
         "state": "1",
-        "category": "repair",
-        "u_scheduled_start_offset_hours": 48,
+        "u_ticket_type": "repair",
+        "u_scheduled_start_offset_hours": 24,
     },
     {
         "short_description": "Firewall firmware upgrade — scheduled maintenance",
         "description": "Quarterly firmware upgrade for managed FortiGate firewall. Current version has a known vulnerability patched in the target release. Change request approved. Coordinate with customer IT contact for brief maintenance window during off-hours.",
         "priority": "4",
         "state": "1",
-        "category": "repair",
-        "u_scheduled_start_offset_hours": 72,
+        "u_ticket_type": "repair",
+        "u_scheduled_start_offset_hours": 48,
     },
     # ── Install tickets ───────────────────────────────────────────────────────
     {
@@ -86,32 +86,32 @@ CASES = [
         "description": "New dedicated fiber circuit has been provisioned by carrier. On-site work order to rack and configure the new CPE, patch to firewall WAN2 interface, and validate connectivity before cutover. Coordinate with NOC for IP assignment confirmation.",
         "priority": "3",
         "state": "1",
-        "category": "install",
-        "u_scheduled_start_offset_hours": 24,
+        "u_ticket_type": "install",
+        "u_scheduled_start_offset_hours": -72,
     },
     {
         "short_description": "Managed firewall deployment — new FortiGate 200F install",
         "description": "New FortiGate 200F has been staged and shipped to site. On-site technician to rack unit, cable WAN/LAN interfaces, apply baseline config from NOC template, and validate policy set with customer IT contact before going live.",
         "priority": "2",
         "state": "1",
-        "category": "install",
-        "u_scheduled_start_offset_hours": 32,
+        "u_ticket_type": "install",
+        "u_scheduled_start_offset_hours": 8,
     },
     {
         "short_description": "VoIP phone system installation — 12-unit Poly deployment",
         "description": "New VoIP phone system rollout for customer. Twelve Poly VVX 350 desktop phones to be unpacked, PoE-powered via new switch, provisioned against hosted PBX, and tested for inbound/outbound call quality. Coordinate with telecom team for DID porting status.",
         "priority": "3",
         "state": "1",
-        "category": "install",
-        "u_scheduled_start_offset_hours": 56,
+        "u_ticket_type": "install",
+        "u_scheduled_start_offset_hours": 32,
     },
     {
         "short_description": "Network infrastructure upgrade — core switch stack replacement",
         "description": "Full core switch stack replacement as part of campus refresh. Three new Catalyst 9300 units to be racked, stacked, configured with VLAN templates, and uplinked to existing fiber distribution layer. Coordinate planned outage window with customer facilities.",
         "priority": "2",
         "state": "1",
-        "category": "install",
-        "u_scheduled_start_offset_hours": 96,
+        "u_ticket_type": "install",
+        "u_scheduled_start_offset_hours": 72,
     },
 ]
 
@@ -272,7 +272,7 @@ def main():
             "description":       case_tmpl["description"],
             "priority":          case_tmpl["priority"],
             "state":             case_tmpl["state"],
-            "category":          case_tmpl.get("category", "repair"),
+            "u_ticket_type":     case_tmpl.get("u_ticket_type", "repair"),
             "account":           acct_id,
             "assigned_to":       new_id,
             "u_scheduled_start": sn_time(case_tmpl["u_scheduled_start_offset_hours"]),
@@ -281,7 +281,7 @@ def main():
         if loc_id:     payload["location"] = loc_id
 
         rec = sn_post("sn_customerservice_case", payload)
-        cat_label = case_tmpl.get("category", "repair").upper()
+        cat_label = case_tmpl.get("u_ticket_type", "repair").upper()
         print(f"  ✓ {rec.get('number','—')}  [{['','Critical','High','Medium','Low'][int(case_tmpl['priority'])]}]  [{cat_label}]  {acct['name']}")
         created_cases.append(rec.get("number", "—"))
 
