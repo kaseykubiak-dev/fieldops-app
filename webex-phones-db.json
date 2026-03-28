@@ -9,10 +9,8 @@
     { "vendor": "Poly",    "model": "VVX 450",   "label": "Poly VVX 450",    "type": "Desktop" },
     { "vendor": "Poly",    "model": "CCX 500",   "label": "Poly CCX 500",    "type": "Media Phone" },
     { "vendor": "Poly",    "model": "CCX 600",   "label": "Poly CCX 600",    "type": "Media Phone" },
-    { "vendor": "Poly",    "model": "Trio 8800", "label": "Poly Trio 8800",  "type": "Conference" },
-    { "vendor": "Yealink", "model": "T46U",      "label": "Yealink T46U",    "type": "Desktop" },
-    { "vendor": "Yealink", "model": "T54W",      "label": "Yealink T54W",    "type": "Desktop" },
-    { "vendor": "Yealink", "model": "CP960",     "label": "Yealink CP960",   "type": "Conference" }
+    { "vendor": "Poly",  "model": "Trio 8800", "label": "Poly Trio 8800",  "type": "Conference" },
+    { "vendor": "Poly",  "model": "Trio 8500", "label": "Poly Trio 8500",  "type": "Conference" }
   ],
   "users": [
     "Amanda Reyes",    "Brandon Cole",    "Carla Mendez",    "David Nguyen",
