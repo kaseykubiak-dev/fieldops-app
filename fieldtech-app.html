@@ -451,6 +451,10 @@
   .so-item-meta  { font-size:11px; color:var(--text-muted); margin-top:2px; }
   .so-item-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
   .so-item-qty   { font-size:12px; font-weight:600; font-family:var(--mono); color:var(--text-dim); }
+  .so-group-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; padding:8px 16px 5px; border-top:1px solid var(--border); }
+  .so-group-label:first-child { border-top:none; }
+  .so-lic-count  { font-size:15px; font-weight:700; font-family:var(--mono); color:var(--text); line-height:1; }
+  .so-lic-label  { font-size:10px; color:var(--text-muted); margin-top:2px; }
 
   .chevron { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); opacity:.4; }
 
@@ -1377,9 +1381,8 @@
         <div class="section" id="service-order-section" style="display:none;">
           <div class="section-title">Service Order</div>
           <div class="card" style="overflow:visible;">
-            <div style="padding:10px 16px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <div style="padding:10px 16px 8px;border-bottom:1px solid var(--border);">
               <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Work Items</span>
-              <span id="service-order-count" class="pill pill-pending" style="font-size:10px;">—</span>
             </div>
             <div class="card-body" style="padding:0;">
               <div id="service-order-items"></div>
@@ -2782,8 +2785,9 @@
 
   // ── Service Order catalog — used for install tickets ─────────────────────
   const _SO_CATALOG = [
+    // Equipment — order controls display sequence within the Equipment group
     {
-      key: 'firewall', label: 'Firewall',
+      key: 'firewall', group: 'equipment', order: 1, label: 'Firewall',
       icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
       products: [
         { brand: 'Fortinet',     model: 'FortiGate 60F',  qty: 1 },
@@ -2796,7 +2800,14 @@
       ]
     },
     {
-      key: 'switch', label: 'Switch',
+      key: 'sensor', group: 'equipment', order: 2, label: 'Security Sensor',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      products: [
+        { brand: 'Arctic Wolf', model: 'AWN Sensor', qty: 1 },
+      ]
+    },
+    {
+      key: 'switch', group: 'equipment', order: 3, label: 'Switch',
       icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><line x1="6" y1="12" x2="6" y2="12.01" stroke-width="2.5"/><line x1="10" y1="12" x2="10" y2="12.01" stroke-width="2.5"/><line x1="14" y1="12" x2="14" y2="12.01" stroke-width="2.5"/></svg>`,
       products: [
         { brand: 'Cisco Meraki', model: 'MS120-8FP',  qty: 2 },
@@ -2806,23 +2817,16 @@
       ]
     },
     {
-      key: 'ap', label: 'Wireless Access Point',
+      key: 'ap', group: 'equipment', order: 4, label: 'Wireless Access Point',
       icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>`,
       products: [
-        { brand: 'Cisco Meraki', model: 'MR36', qty: [2,4,6,8]    },
-        { brand: 'Cisco Meraki', model: 'MR44', qty: [2,4,6]      },
-        { brand: 'Cisco Meraki', model: 'MR56', qty: [2,4]        },
+        { brand: 'Cisco Meraki', model: 'MR36', qty: [2,4,6,8] },
+        { brand: 'Cisco Meraki', model: 'MR44', qty: [2,4,6]   },
+        { brand: 'Cisco Meraki', model: 'MR56', qty: [2,4]     },
       ]
     },
     {
-      key: 'sensor', label: 'Security Sensor',
-      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-      products: [
-        { brand: 'Arctic Wolf', model: 'AWN Sensor', qty: 1 },
-      ]
-    },
-    {
-      key: 'phone', label: 'Phone',
+      key: 'phone', group: 'equipment', order: 5, label: 'Phone',
       icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17l.19-.08z"/></svg>`,
       products: [
         { brand: 'Cisco',   model: '7841 IP Phone', qty: [4,6,8,10,12] },
@@ -2831,13 +2835,14 @@
         { brand: 'Polycom', model: 'VVX 450',       qty: [4,6,8,10]    },
       ]
     },
+    // Services
     {
-      key: 'cloud', label: 'Cloud Service',
+      key: 'cloud', group: 'service', order: 1, label: 'Cloud Service',
       icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
       products: [
-        { brand: 'Microsoft', model: '365 Business Basic',    qty: 1 },
-        { brand: 'Microsoft', model: '365 Business Standard', qty: 1 },
-        { brand: 'Microsoft', model: '365 Business Premium',  qty: 1 },
+        { brand: 'Microsoft', model: '365 Business Basic'    },
+        { brand: 'Microsoft', model: '365 Business Standard' },
+        { brand: 'Microsoft', model: '365 Business Premium'  },
       ]
     },
   ];
@@ -2857,26 +2862,41 @@
     const items = chosen.map(cat => {
       const ls = _hash(caseNumber + cat.key);
       const p  = cat.products[ls % cat.products.length];
-      const qty = Array.isArray(p.qty) ? p.qty[ls % p.qty.length] : p.qty;
-      return { ...cat, brand: p.brand, model: p.model, qty };
+      const qty = p.qty ? (Array.isArray(p.qty) ? p.qty[ls % p.qty.length] : p.qty) : null;
+      // Licenses: deterministic 10–100
+      const licenses = 10 + (_hash(caseNumber + cat.key + 'lic') % 91);
+      return { ...cat, brand: p.brand, model: p.model, qty, licenses };
     });
 
-    const rows = items.map(item => `
-      <div class="so-item">
-        <div class="so-icon so-icon-${item.key}">${item.icon}</div>
-        <div class="so-item-body">
-          <div class="so-item-model">${escHtml(item.model)}</div>
-          <div class="so-item-meta">${escHtml(item.brand)} &middot; ${escHtml(item.label)}</div>
-        </div>
-        <div class="so-item-right">
-          <div class="so-item-qty">&times;&nbsp;${item.qty}</div>
-          <span class="pill pill-pending" style="font-size:10px;">Pending</span>
-        </div>
-      </div>`).join('');
+    const equipment = items.filter(i => i.group === 'equipment').sort((a, b) => a.order - b.order);
+    const services  = items.filter(i => i.group === 'service').sort((a, b) => a.order - b.order);
 
-    document.getElementById('service-order-items').innerHTML = rows;
-    document.getElementById('service-order-count').textContent =
-      `${items.length} item${items.length !== 1 ? 's' : ''} \u00b7 Pending`;
+    const itemRow = item => {
+      const right = item.group === 'service'
+        ? `<div class="so-item-right"><div class="so-lic-count">${item.licenses}</div><div class="so-lic-label">Licenses</div></div>`
+        : `<div class="so-item-right"><div class="so-item-qty">&times;&nbsp;${item.qty}</div><span class="pill pill-pending" style="font-size:10px;">Pending Installation</span></div>`;
+      return `
+        <div class="so-item">
+          <div class="so-icon so-icon-${item.key}">${item.icon}</div>
+          <div class="so-item-body">
+            <div class="so-item-model">${escHtml(item.model)}</div>
+            <div class="so-item-meta">${escHtml(item.brand)} &middot; ${escHtml(item.label)}</div>
+          </div>
+          ${right}
+        </div>`;
+    };
+
+    let html = '';
+    if (equipment.length) {
+      html += `<div class="so-group-label">Equipment</div>`;
+      html += equipment.map(itemRow).join('');
+    }
+    if (services.length) {
+      html += `<div class="so-group-label">Services</div>`;
+      html += services.map(itemRow).join('');
+    }
+
+    document.getElementById('service-order-items').innerHTML = html;
   }
 
   async function renderInternetSection(seed) {
