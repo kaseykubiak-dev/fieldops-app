@@ -465,6 +465,7 @@
   .portal-link::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:.6; flex-shrink:0; }
   .portal-link:hover { background:rgba(0,192,243,0.05); text-decoration:underline; }
   .portal-link.last { /* last in group — no special styling needed, border handled by next sibling */ }
+  .vpn-badge { margin-left:auto; font-size:9px; font-weight:700; letter-spacing:.04em; padding:2px 6px; border-radius:4px; background:rgba(255,215,64,0.1); color:var(--warning); border:1px solid rgba(255,215,64,0.28); flex-shrink:0; }
 
   .chevron { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); opacity:.4; }
 
@@ -1224,7 +1225,7 @@
       <span class="disc-title">Disclaimer</span>
     </div>
     <div class="disc-body">
-      <p class="disc-text">This application is intended for demonstration purposes only. No internal C Spire systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources. This application was developed exclusively using Claude Code.</p>
+      <p class="disc-text">This application is intended for demonstration purposes only. No internal C Spire systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources.</p>
       <button class="login-btn" onclick="dismissDisclaimer()">I Understand</button>
     </div>
   </div>
@@ -1699,14 +1700,14 @@
               <a href="#" onclick="return false;" class="portal-link">Arkis</a>
               <div class="link-group-label">Networking Portals</div>
               <a href="#" onclick="return false;" class="portal-link">Cisco Meraki</a>
-              <a href="#" onclick="return false;" class="portal-link">AdTran N-Command (Jules)</a>
+              <a href="#" onclick="return false;" class="portal-link">AdTran N-Command (Jules)<span class="vpn-badge">VPN</span></a>
               <div class="link-group-label">Voice Portals</div>
               <a href="#" onclick="return false;" class="portal-link">Cisco Webex</a>
-              <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 1</a>
-              <a href="#" onclick="return false;" class="portal-link last">Broadsoft Cluster 3</a>
+              <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 1<span class="vpn-badge">VPN</span></a>
+              <a href="#" onclick="return false;" class="portal-link last">Broadsoft Cluster 3<span class="vpn-badge">VPN</span></a>
               <div class="link-group-label">Inventory &amp; Vehicle Management</div>
-              <a href="#" onclick="return false;" class="portal-link">C Spire Truck Stock</a>
-              <a href="#" onclick="return false;" class="portal-link last">Vehicle Mileage Reporting</a>
+              <a href="#" onclick="return false;" class="portal-link">C Spire Truck Stock<span class="vpn-badge">VPN</span></a>
+              <a href="#" onclick="return false;" class="portal-link last">Vehicle Mileage Reporting<span class="vpn-badge">VPN</span></a>
             </div>
           </div>
         </div>
@@ -1976,7 +1977,7 @@
             <div class="link-group-label">Voice Portals</div>
             <a href="#" onclick="return false;" class="portal-link">Cisco Webex</a>
             <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 1</a>
-            <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 3</a>
+            <a href="#" onclick="return false;" class="portal-link">Broadsoft Cluster 3<span class="vpn-badge">VPN</span></a>
             <div class="link-group-label">Inventory &amp; Vehicle Management</div>
             <a href="#" onclick="return false;" class="portal-link">C Spire Truck Stock</a>
             <a href="#" onclick="return false;" class="portal-link last">Vehicle Mileage Reporting</a>
