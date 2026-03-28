@@ -2086,7 +2086,8 @@
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
     let query;
     if (filterState === 'today') {
-      query = `${assignedTo}u_scheduled_startONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()^state!=4^state!=5^ORDERBYu_scheduled_start`;
+      const { start, end } = localTodayUTCBounds();
+      query = `${assignedTo}u_scheduled_start>=${start}^u_scheduled_start<=${end}^state!=4^state!=5^ORDERBYu_scheduled_start`;
     } else if (filterState === 'assigned') {
       query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
     } else if (filterState === 'closed') {
@@ -2225,6 +2226,18 @@
     // ServiceNow returns UTC timestamps without Z — add it so browsers parse correctly
     if (!str) return null;
     return new Date(str.replace(' ', 'T') + 'Z');
+  }
+
+  function localTodayUTCBounds() {
+    // Returns UTC start/end strings for today in the user's local timezone.
+    // Prevents reliance on the ServiceNow server's timezone for "today" filtering.
+    const now = new Date();
+    const fmt = d => d.toISOString().replace('T', ' ').slice(0, 19);
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(),  0,  0,  0);
+    const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    console.log(`[FieldTech] Loading tickets — local time: ${now.toLocaleTimeString()} (${tz})`);
+    return { start: fmt(start), end: fmt(end) };
   }
   function escHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

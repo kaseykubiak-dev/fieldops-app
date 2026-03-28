@@ -12,6 +12,7 @@ Usage:
 import requests
 from requests.auth import HTTPBasicAuth
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import random
 
 # ─── Config ───────────────────────────────────────────────────────────────────
@@ -141,23 +142,41 @@ def sn_patch(table, sys_id, payload):
     return r.json()["result"]
 
 
-CST_UTC_OFFSET = 6  # CST = UTC-6; change to 5 during CDT if needed
+_CENTRAL = ZoneInfo("America/Chicago")
+
+def central_utc_offset():
+    """
+    Returns the current UTC offset for America/Chicago as a positive integer
+    of hours to ADD to local time to get UTC (e.g. 5 for CDT, 6 for CST).
+    Automatically accounts for Daylight Saving Time.
+    """
+    now_central = datetime.now(_CENTRAL)
+    offset_seconds = now_central.utcoffset().total_seconds()
+    return -int(offset_seconds / 3600)   # negative because UTC is ahead
 
 def sn_time_cst(day_offset, local_hour, local_minute=0):
     """
-    Return a UTC datetime string for a given CST local time on a day
-    relative to today.  ServiceNow stores timestamps in UTC.
+    Return a UTC datetime string for a given Central local time on a day
+    relative to today. Automatically uses CDT (UTC-5) or CST (UTC-6)
+    depending on whether Daylight Saving Time is currently in effect.
     """
     from datetime import timezone
+    offset = central_utc_offset()
     now = datetime.now(timezone.utc)
     local_dt = (now + timedelta(days=day_offset)).replace(
         hour=local_hour, minute=local_minute, second=0, microsecond=0)
-    utc_dt = local_dt + timedelta(hours=CST_UTC_OFFSET)
+    utc_dt = local_dt + timedelta(hours=offset)
     return utc_dt.strftime("%Y-%m-%d %H:%M:%S")
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
+
+    # ── 0. Show timezone info ─────────────────────────────────────────────────
+    offset = central_utc_offset()
+    tz_label = "CDT (UTC-5)" if offset == 5 else "CST (UTC-6)"
+    now_central = datetime.now(_CENTRAL)
+    print(f"\n── Timezone: {tz_label}  |  Local time: {now_central.strftime('%Y-%m-%d %H:%M')} Central")
 
     # ── 1. Look up source user ────────────────────────────────────────────────
     print(f"\n── Looking up source user: {SOURCE_USER}")
