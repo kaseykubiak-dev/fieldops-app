@@ -3890,7 +3890,7 @@
       const isToday   = dStr === todayStr;
       const dateLabel = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
-      html += `<div class="cal-agenda-day${isToday ? ' cal-agenda-today' : ''}">`;
+      html += `<div class="cal-agenda-day${isToday ? ' cal-agenda-today' : ''}" data-date="${dStr}">`;
       html += `<div class="cal-agenda-date-hd">
         ${isToday ? '<span class="cal-agenda-today-badge">Today</span>' : ''}
         ${escHtml(dateLabel)}
@@ -3934,6 +3934,13 @@
 
     html += '</div>';
     document.getElementById('cal-grid').innerHTML = html;
+
+    // If a day was picked via the picker, scroll it into view
+    if (_cal.selectedDay) {
+      const targetStr = calDateStr(new Date(_cal.year, _cal.month, _cal.selectedDay));
+      const el = document.querySelector(`.cal-agenda-day[data-date="${targetStr}"]`);
+      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
   }
 
   function selectCalDay(dateStr) {
