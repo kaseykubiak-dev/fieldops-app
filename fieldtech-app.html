@@ -2095,7 +2095,7 @@
       query = `${assignedTo}state!=4^state!=5^ORDERBYDESCopened_at`;
     }
 
-    const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start';
+    const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start,category';
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
 
     try {
@@ -2191,9 +2191,9 @@
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   function getCaseType(inc) {
-    // TODO: replace with field-based logic once the ServiceNow variable is identified
-    // e.g. if (inc.u_case_type === 'installation') return { label: 'Install', cls: 'installation' };
-    //      if (inc.u_case_type === 'service_call')  return { label: 'Service Call', cls: 'service-call' };
+    const cat = (inc.category?.display_value || inc.category || '').toLowerCase();
+    if (cat === 'install' || cat === 'installation') return { label: 'Install', cls: 'installation' };
+    if (cat === 'service_call' || cat === 'service call') return { label: 'Service Call', cls: 'service-call' };
     return { label: 'Repair', cls: 'repair' };
   }
 
@@ -2229,7 +2229,7 @@
     document.getElementById('detail-timeline').innerHTML = '<div class="list-loading"><div class="spinner"></div></div>';
 
     const fields = 'sys_id,number,short_description,description,priority,state,opened_at,' +
-                   'assigned_to,contact,account,cmdb_ci,location,location.street,location.city,location.state,location.zip,sla_due,u_scheduled_start';
+                   'assigned_to,contact,account,cmdb_ci,location,location.street,location.city,location.state,location.zip,sla_due,u_scheduled_start,category';
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=number=${number}&sysparm_fields=${fields}&sysparm_display_value=both&sysparm_limit=1`;
 
     try {
@@ -3153,7 +3153,7 @@
     if (cachedAssignedTickets) return;
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
     const query = `${assignedTo}state!=4^state!=5^ORDERBYDESCopened_at`;
-    const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,assigned_to,u_scheduled_start';
+    const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,assigned_to,u_scheduled_start,category';
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=200&sysparm_display_value=true`;
     try {
       const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
