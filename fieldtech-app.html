@@ -2404,18 +2404,12 @@
   let currentCaseNumber  = null;
   const _closedThisSession = new Set();
 
-  // ── Open current case directly in ServiceNow (auto-login as test_fieldtech) ─
+  // ── Open current case directly in ServiceNow ─────────────────────────────
   function openInServiceNow() {
     if (!currentCaseSysId) return;
-    const caseUrl  = '/now/cwf/agent/record/sn_customerservice_case/' + currentCaseSysId;
-    // Try GET-based auto-login (works on PDIs where CSRF is relaxed).
-    // If ServiceNow rejects the credentials the goto URL is still preserved,
-    // so after manual login the browser will land on the correct case.
-    const loginUrl = SN.instance + '/login.do'
-      + '?user_name=test_fieldtech'
-      + '&user_password=TestFieldTech1!'
-      + '&sysparm_goto_url=' + encodeURIComponent(caseUrl);
-    window.open(loginUrl, '_blank');
+    // Open the case URL directly — ServiceNow stores the requested URL and
+    // redirects back to it after login, so no sysparm_goto_url needed.
+    window.open(SN.instance + '/now/cwf/agent/record/sn_customerservice_case/' + currentCaseSysId, '_blank');
   }
 
   async function fetchCaseDetail(number) {
