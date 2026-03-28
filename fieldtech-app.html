@@ -1095,9 +1095,9 @@
 
   /* ── CALENDAR TYPE CHIPS ── */
   .cal-chip.chip-repair  { border-left-color:var(--accent2); color:var(--accent2); background:rgba(255,103,32,0.11); }
-  .cal-chip.chip-install { border-left-color:var(--accent);  color:var(--accent);  background:rgba(0,192,243,0.11); }
+  .cal-chip.chip-install { border-left-color:var(--success); color:var(--success); background:rgba(0,201,106,0.11); }
   html[data-theme="cspire"] .cal-chip.chip-repair  { background:rgba(255,103,32,0.13); }
-  html[data-theme="cspire"] .cal-chip.chip-install { background:rgba(0,192,243,0.14); color:#0a5a7a; border-left-color:#0a5a7a; }
+  html[data-theme="cspire"] .cal-chip.chip-install { background:rgba(0,135,90,0.14); color:var(--success); border-left-color:var(--success); }
   html[data-theme="cspire"] .cal-dow-cell { color:var(--text-dim); }
 
   /* ── CAL PANEL DRAG HANDLE ── */
@@ -2762,13 +2762,21 @@
       const wan2Up    = (s % 5) !== 0;
       const onlineCount = wan2Up ? 2 : 1;
 
+      // Circuit ownership: 80% C Spire, 20% Customer (deterministic per account + WAN)
+      const wan1Owner = ((s % 10) < db.c_spire_weight) ? 'C Spire' : 'Customer';
+      const wan2Owner = (((s >>> 3) % 10) < db.c_spire_weight) ? 'C Spire' : 'Customer';
+
       sub.textContent   = `${primary.speed} / ${secondary.speed} · 2 connections`;
       badge.textContent = `${onlineCount}/2 Connections Online`;
       badge.className   = onlineCount === 2 ? 'conn-badge all-on' : 'conn-badge partial';
 
       const chevSvg = `<svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
 
-      const wanBlock = (label, circ, cfg, statusCls, statusTxt) => `
+      const ownerBadge = (owner) => owner === 'C Spire'
+        ? `<span style="color:var(--accent);font-weight:700;">${escHtml(owner)}</span>`
+        : `<span style="color:var(--text-muted);">${escHtml(owner)}</span>`;
+
+      const wanBlock = (label, circ, cfg, statusCls, statusTxt, owner) => `
         <div class="sub-acc">
           <div class="sub-acc-header" onclick="toggleSubAcc(this)">
             <div class="sub-acc-left">
@@ -2783,6 +2791,7 @@
               <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">${escHtml(cfg.type)}</div></div>
               <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">${escHtml(cfg.speed)}</div></div>
               <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">${escHtml(cfg.provider)}</div></div>
+              <div class="edg-item"><div class="edg-label">Circuit Owner</div><div class="edg-val">${ownerBadge(owner)}</div></div>
               <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">${escHtml(cfg.static_ip_range)}</div></div>
               <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">${escHtml(cfg.interface_ip)}</div></div>
             </div>
@@ -2790,8 +2799,8 @@
         </div>`;
 
       body.innerHTML =
-        wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE') +
-        wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE');
+        wanBlock('WAN 1', circ1, primary,   'pill-resolved', 'ONLINE',                         wan1Owner) +
+        wanBlock('WAN 2', circ2, secondary, wan2Up ? 'pill-resolved' : 'pill-critical', wan2Up ? 'ONLINE' : 'OFFLINE', wan2Owner);
 
     } catch (err) {
       sub.textContent   = 'Unavailable';
@@ -3422,9 +3431,10 @@
       html += '<div class="cal-agenda-cards">';
 
       dayTix.forEach(inc => {
-        const pri     = PRIORITY_MAP[inc.priority] || { label:'Low',  cls:'pill-low'  };
-        const state   = STATE_MAP[inc.state]        || { label:'Open', cls:'pill-open' };
-        const company = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || 'Unknown';
+        const pri      = PRIORITY_MAP[inc.priority] || { label:'Low',  cls:'pill-low'  };
+        const state    = STATE_MAP[inc.state]        || { label:'Open', cls:'pill-open' };
+        const caseType = getCaseType(inc);
+        const company  = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || 'Unknown';
         const startRaw = inc.u_scheduled_start;
         const timeStr  = startRaw
           ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
@@ -3439,6 +3449,7 @@
           <div class="cal-mini-pills">
             <span class="pill ${pri.cls}">${pri.label}</span>
             <span class="pill ${state.cls}">${state.label}</span>
+            <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
             <span class="cal-mini-num">${escHtml(inc.number)}</span>
           </div>
         </div>`;

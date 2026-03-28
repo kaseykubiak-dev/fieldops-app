@@ -1,6 +1,8 @@
 {
   "fiber_types": ["Dedicated Fiber", "Metro Ethernet Fiber"],
   "circuit_regions": ["NX", "SE", "MW", "SW", "NE", "GL", "AT", "CP"],
+  "circuit_owners": ["C Spire", "Customer"],
+  "c_spire_weight": 8,
   "primary_pool": [
     {
       "type": "Dedicated Fiber",
