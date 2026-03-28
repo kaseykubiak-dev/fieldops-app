@@ -2098,13 +2098,20 @@
     const mobileRow = document.getElementById('more-mobile-row');
     if (mobileRow && window.innerWidth < 800) mobileRow.style.display = 'none';
 
-    // Hide login screen, show disclaimer before entering app
+    // Hide login screen
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('login-password').removeEventListener('keydown', loginOnEnter);
-    document.getElementById('disclaimer-modal').classList.remove('hidden');
+
+    // Show disclaimer only if not yet acknowledged this session
+    if (!sessionStorage.getItem('ft_disclaimer_ack')) {
+      document.getElementById('disclaimer-modal').classList.remove('hidden');
+      return;
+    }
+    dismissDisclaimer();
   }
 
   function dismissDisclaimer() {
+    sessionStorage.setItem('ft_disclaimer_ack', '1');
     document.getElementById('disclaimer-modal').classList.add('hidden');
     if (!isMobileView()) document.getElementById('desktop-topbar').style.display = 'flex';
 
