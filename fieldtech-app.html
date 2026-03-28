@@ -3290,14 +3290,29 @@
 
       const subnet = db.ip_subnet;
 
-      // Generate device rows with unique IPs per location
+      // Generate device rows with unique IPs and unique users per location
       let onlineCount = 0;
       const rows = [];
       const usedOctets = new Set();
+      const usedUsers  = new Set();
       for (let i = 0; i < deviceCount; i++) {
         const si    = _hash(seed + '_vd_' + i);
         const model = db.models[si % db.models.length];
-        const user  = db.users[(si >>> 3) % db.users.length];
+        // Generate a unique full name for this device
+        let firstIdx = (si >>> 3)  % db.first_names.length;
+        let lastIdx  = (si >>> 11) % db.last_names.length;
+        let userName = db.first_names[firstIdx] + ' ' + db.last_names[lastIdx];
+        let nameAttempt = 0;
+        while (usedUsers.has(userName) && nameAttempt < 200) {
+          lastIdx  = (lastIdx  + 1) % db.last_names.length;
+          userName = db.first_names[firstIdx] + ' ' + db.last_names[lastIdx];
+          if (usedUsers.has(userName)) {
+            firstIdx = (firstIdx + 1) % db.first_names.length;
+            userName = db.first_names[firstIdx] + ' ' + db.last_names[lastIdx];
+          }
+          nameAttempt++;
+        }
+        usedUsers.add(userName);
         // Find a unique last octet (10–254) for this location
         let lastOct = 10 + ((si >>> 6) % 245);
         let attempt = 0;
@@ -3314,7 +3329,7 @@
           <span class="iface-dot ${offline ? 'down' : 'up'}"></span>
           <div class="vd-info">
             <span class="vd-model">${escHtml(model.label)}</span>
-            <span class="vd-user">${escHtml(user)}</span>
+            <span class="vd-user">${escHtml(userName)}</span>
           </div>
           <span class="vd-ip">${escHtml(ip)}</span>
           <span class="vd-status ${offline ? 'offline' : 'online'}">${offline ? 'OFFLINE' : 'ONLINE'}</span>
