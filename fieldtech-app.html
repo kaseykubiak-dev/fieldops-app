@@ -2095,7 +2095,7 @@
       query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
     }
 
-    const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
+    const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
 
     try {
@@ -2125,10 +2125,11 @@
       return;
     }
 
-    // Group by calendar date
+    // Group by calendar date — closed tickets group by resolved_at
+    const isClosed = filterState === 'closed';
     const groups = {};
     incidents.forEach(inc => {
-      const d = new Date(inc.u_scheduled_start || inc.opened_at);
+      const d = new Date(isClosed ? (inc.resolved_at || inc.opened_at) : (inc.u_scheduled_start || inc.opened_at));
       const key = d.toDateString();
       if (!groups[key]) groups[key] = [];
       groups[key].push(inc);
@@ -2158,7 +2159,8 @@
         const company  = inc.account?.display_value  || inc.account  || 'Unknown Customer';
         const locationParts = [inc['location.street'], inc['location.city'] && inc['location.state'] ? inc['location.city'] + ', ' + inc['location.state'] : (inc['location.city'] || inc['location.state'] || '')].filter(Boolean);
         const location = locationParts.join(' · ');
-        const startRaw = inc.u_scheduled_start;
+        const startRaw = isClosed ? (inc.resolved_at || inc.u_scheduled_start) : inc.u_scheduled_start;
+        const startLabel = isClosed ? 'Closed ' : 'Start ';
         const startStr = startRaw ? formatTime(new Date(startRaw)) : '—';
         const caseType = getCaseType(inc);
 
@@ -2174,7 +2176,7 @@
               <div class="ticket-row1">
                 <span class="ticket-id">${escHtml(inc.number)}</span>
                 <div class="ticket-meta">
-                  <span class="ticket-start"><span class="ticket-start-label">Start </span>${startStr}</span>
+                  <span class="ticket-start"><span class="ticket-start-label">${startLabel}</span>${startStr}</span>
                 </div>
               </div>
               <div class="ticket-title">${escHtml(inc.short_description)}</div>
