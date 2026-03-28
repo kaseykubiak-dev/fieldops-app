@@ -2182,7 +2182,8 @@
       const keys = await caches.keys();
       await Promise.all(keys.map(k => caches.delete(k)));
     }
-    // Append timestamp to URL to bypass any remaining HTTP cache
+    // Land on Tickets tab after reload so the refresh is visually obvious
+    localStorage.setItem('ft_tab', 'list');
     location.href = location.pathname + '?v=' + Date.now();
   }
 
@@ -3933,13 +3934,22 @@
     }
 
     html += '</div>';
-    document.getElementById('cal-grid').innerHTML = html;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = html;
 
-    // If a day was picked via the picker, scroll it into view
-    if (_cal.selectedDay) {
-      const targetStr = calDateStr(new Date(_cal.year, _cal.month, _cal.selectedDay));
-      const el = document.querySelector(`.cal-agenda-day[data-date="${targetStr}"]`);
-      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    // Scroll to picked day, or fall back to today if in current month
+    const today = new Date();
+    const scrollTarget = _cal.selectedDay
+      ? calDateStr(new Date(_cal.year, _cal.month, _cal.selectedDay))
+      : (_cal.year === today.getFullYear() && _cal.month === today.getMonth())
+        ? calDateStr(today)
+        : null;
+
+    if (scrollTarget) {
+      setTimeout(() => {
+        const el = grid.querySelector(`.cal-agenda-day[data-date="${scrollTarget}"]`);
+        if (el) grid.scrollTop = el.offsetTop;
+      }, 50);
     }
   }
 
