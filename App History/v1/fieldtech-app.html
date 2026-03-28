@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FieldOps — Technician Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── DARK MODE (default) ── */
+  :root {
+    --bg: #0d0f14;
+    --surface: #141720;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --success: #00c96a;
+    --warning: #ffd740;
+    --danger: #ff5252;
+    --text: #e8ecf4;
+    --text-dim: #8892aa;
+    --text-muted: #4a5270;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --bottom-bar: 64px;
+    --top-bar: 56px;
+    /* theme toggle pill */
+    --toggle-bg: #1c2030;
+    --toggle-border: #252a3a;
+    --toggle-knob: #00d4ff;
+    --toggle-label: #8892aa;
+    --cust-banner-bg: rgba(0,212,255,0.05);
+    --cust-banner-border: rgba(0,212,255,0.2);
+    --cust-banner-head-bg: rgba(0,212,255,0.05);
+    --cust-banner-head-border: rgba(0,212,255,0.12);
+    --cust-icon-bg: rgba(0,212,255,0.12);
+    --cust-icon-border: rgba(0,212,255,0.25);
+    --cust-glance-bg: rgba(0,212,255,0.05);
+    --cust-glance-border: rgba(0,212,255,0.13);
+  }
+
+  /* ── C SPIRE LIGHT THEME ── */
+  html[data-theme="cspire"] {
+    --bg: #c8dff0;
+    --surface: #daeaf6;
+    --surface2: #b0cfe8;
+    --border: #7aaecf;
+    --accent: #00B5F0;
+    --accent2: #074A75;
+    --success: #00875a;
+    --warning: #b86e00;
+    --danger: #c0392b;
+    --text: #0d2d45;
+    --text-dim: #1a4a6b;
+    --text-muted: #3a6a8a;
+    --toggle-bg: #b0cfe8;
+    --toggle-border: #7aaecf;
+    --toggle-knob: #00B5F0;
+    --toggle-label: #3a6a8a;
+    --cust-banner-bg: rgba(0,181,240,0.1);
+    --cust-banner-border: rgba(0,181,240,0.4);
+    --cust-banner-head-bg: rgba(0,181,240,0.12);
+    --cust-banner-head-border: rgba(0,181,240,0.3);
+    --cust-icon-bg: rgba(0,181,240,0.18);
+    --cust-icon-border: rgba(0,181,240,0.4);
+    --cust-glance-bg: rgba(0,181,240,0.1);
+    --cust-glance-border: rgba(0,181,240,0.35);
+  }
+
+  /* C Spire overrides for things that hardcode rgba */
+  html[data-theme="cspire"] .cust-banner { border-color: var(--cust-banner-border); background: var(--cust-banner-bg); }
+  html[data-theme="cspire"] .cust-banner-head { background: var(--cust-banner-head-bg); border-color: var(--cust-banner-head-border); }
+  html[data-theme="cspire"] .cust-icon { background: var(--cust-icon-bg); border-color: var(--cust-icon-border); }
+  html[data-theme="cspire"] .cust-glance { background: var(--cust-glance-bg); border-color: var(--cust-glance-border); }
+  html[data-theme="cspire"] .acc-internet { background:rgba(0,181,240,0.1); border-color:rgba(0,181,240,0.25); color:var(--accent); }
+  html[data-theme="cspire"] .acc-firewall  { background:rgba(0,135,90,0.1);  border-color:rgba(0,135,90,0.25);  color:var(--success); }
+  html[data-theme="cspire"] .acc-voip      { background:rgba(7,74,117,0.1);  border-color:rgba(7,74,117,0.25);  color:var(--accent2); }
+  html[data-theme="cspire"] .acc-ddos      { background:rgba(184,110,0,0.1); border-color:rgba(184,110,0,0.25); color:var(--warning); }
+  html[data-theme="cspire"] .pill-open     { background:rgba(0,181,240,0.12); color:#006fa3; }
+  html[data-theme="cspire"] .pill-progress { background:rgba(7,74,117,0.12); color:var(--accent2); }
+  html[data-theme="cspire"] .topbar-logo   { background: var(--accent2); }
+  html[data-theme="cspire"] .avatar-sm     { background: linear-gradient(135deg, #c2dff0, #a5cbdf); color: var(--accent2); border-color: var(--border); }
+  html[data-theme="cspire"] .select-field  { background-color: var(--surface2); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a90aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
+  html[data-theme="cspire"] .bnav-dot      { border-color: var(--surface); background: #e05c00; }
+  html[data-theme="cspire"] .icon-btn .badge { background: #e05c00; border-color: var(--surface); }
+  html[data-theme="cspire"] .svc-dot.on   { box-shadow: 0 0 5px var(--success); }
+  html[data-theme="cspire"] .dot-live     { background: var(--success); }
+  html[data-theme="cspire"] .cust-tier    { background: rgba(0,181,240,0.12); color: #006fa3; }
+  html[data-theme="cspire"] .cf-val.sla   { color: #006fa3; }
+  html[data-theme="cspire"] .detail-tb-id { color: var(--accent2); }
+  html[data-theme="cspire"] .back-btn     { color: var(--accent2); }
+  html[data-theme="cspire"] .ticket-id    { color: var(--accent2); }
+  html[data-theme="cspire"] .cust-bn-id   { color: var(--accent2); }
+
+  /* C Spire SVG logo */
+  .cspire-logo-svg { display:flex; align-items:center; flex-shrink:0; }
+  /* In dark mode the navy text is too dark — lighten it */
+  :root .cspire-logo-svg text:last-child { fill: #a8c8e8; }
+  html[data-theme="cspire"] .cspire-logo-svg text:last-child { fill: #074A75; }
+
+  /* THEME TOGGLE COMPONENT */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-border);
+    border-radius: 20px;
+    padding: 3px 8px 3px 4px;
+    cursor: pointer;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:active { opacity: .8; }
+  .tt-track {
+    width: 32px; height: 18px;
+    background: var(--toggle-bg);
+    border: 1.5px solid var(--toggle-border);
+    border-radius: 9px;
+    position: relative;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .tt-knob {
+    width: 12px; height: 12px;
+    background: var(--toggle-knob);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: transform .2s ease, background .2s;
+  }
+  html[data-theme="cspire"] .tt-knob { transform: translateX(14px); }
+  .tt-labels {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+  .tt-active {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--mono);
+    letter-spacing: .03em;
+  }
+  html[data-theme="cspire"] .tt-active { color: var(--accent2); }
+  .tt-inactive {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  /* C Spire branded header bar */
+  html[data-theme="cspire"] .topbar { border-bottom: 2px solid var(--accent); }
+  html[data-theme="cspire"] .detail-topbar { border-bottom: 2px solid var(--accent); }
+  html[data-theme="cspire"] .bottom-nav { border-top: 2px solid var(--accent); }
+  html[data-theme="cspire"] .cspire-wordmark { display: flex !important; }
+  .cspire-wordmark { display: none; align-items: baseline; gap: 0px; }
+  .cspire-c { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--sans); letter-spacing: -.5px; }
+  .cspire-spire { font-size: 13px; font-weight: 700; color: var(--accent2); font-family: var(--sans); letter-spacing: .02em; text-transform: uppercase; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { background:var(--bg); color:var(--text); font-family:var(--sans); height:100%; overflow:hidden; overscroll-behavior:none; }
+
+  .app { display:flex; flex-direction:column; height:100vh; height:100dvh; }
+
+  /* TOP BAR */
+  .topbar { height:var(--top-bar); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 16px; gap:12px; flex-shrink:0; z-index:20; }
+  .topbar-logo { width:30px; height:30px; background:var(--accent); border-radius:7px; display:flex; align-items:center; justify-content:center; }
+  .topbar-logo svg { color:var(--bg); }
+  .topbar-title { font-family:var(--mono); font-size:14px; font-weight:600; color:var(--text); letter-spacing:.04em; }
+  .topbar-right { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .icon-btn { width:36px; height:36px; border-radius:9px; background:transparent; border:none; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; position:relative; }
+  .icon-btn:active { background:var(--surface2); }
+  .icon-btn .badge { position:absolute; top:5px; right:5px; width:7px; height:7px; background:var(--accent2); border-radius:50%; border:2px solid var(--surface); }
+  .avatar-sm { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#2a3a5c,#1a2540); border:2px solid var(--border); color:var(--accent); font-family:var(--mono); font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+  /* SCREEN WRAP */
+  .screen-wrap { flex:1; overflow:hidden; position:relative; }
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; overflow:hidden; background:var(--bg); }
+  .screen.active { display:flex; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { height:var(--bottom-bar); background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 4px; padding-bottom:env(safe-area-inset-bottom); flex-shrink:0; z-index:20; }
+  .bnav-btn { flex:1; height:52px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:10px; transition:all .15s; position:relative; }
+  .bnav-btn.active { color:var(--accent); }
+  .bnav-label { font-size:10px; font-weight:500; letter-spacing:.02em; }
+  .bnav-dot { position:absolute; top:8px; right:calc(50% - 14px); width:7px; height:7px; background:var(--accent2); border-radius:50%; border:2px solid var(--surface); }
+  .bnav-btn.active::after { content:''; position:absolute; bottom:4px; width:20px; height:2px; background:var(--accent); border-radius:1px; }
+
+  /* ─── TICKET LIST SCREEN ─── */
+  .list-header { padding:14px 16px 10px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+  .list-title { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; }
+  .search-box { position:relative; }
+  .search-box svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+  .search-box input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:9px 10px 9px 34px; color:var(--text); font-family:var(--sans); font-size:14px; outline:none; }
+  .search-box input::placeholder { color:var(--text-muted); }
+  .search-box input:focus { border-color:var(--accent); }
+
+  .stat-strip { display:flex; gap:8px; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0; }
+  .stat-chip { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:8px 6px; text-align:center; }
+  .stat-val { font-family:var(--mono); font-size:20px; font-weight:600; line-height:1; margin-bottom:2px; }
+  .stat-val.danger { color:var(--danger); }
+  .stat-val.warning { color:var(--warning); }
+  .stat-val.accent { color:var(--accent); }
+  .stat-lbl { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+
+  .filter-tabs { display:flex; gap:4px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0; }
+  .filter-tab { flex:1; padding:7px 0; border:none; border-radius:7px; background:transparent; color:var(--text-muted); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; }
+  .filter-tab.active { background:var(--surface2); color:var(--text); }
+
+  .ticket-list { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
+
+  /* TICKET CARD */
+  .ticket-card { padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .ticket-card:active { background:var(--surface2); }
+  .ticket-inner { background:var(--surface); border:1px solid var(--border); border-radius:11px; overflow:hidden; }
+
+  /* Customer header inside card */
+  .cust-glance { display:flex; align-items:baseline; gap:6px; padding:9px 12px 8px; background:rgba(0,212,255,0.07); border-bottom:1px solid rgba(0,212,255,0.15); }
+  .cust-glance-name { font-size:14px; font-weight:700; color:var(--accent); flex-shrink:0; }
+  .cust-glance-sep { color:var(--text-muted); font-size:11px; flex-shrink:0; }
+  .cust-glance-addr { font-size:12px; font-weight:500; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+
+  /* Card body */
+  .ticket-body { padding:9px 12px 10px; display:flex; flex-direction:column; gap:7px; }
+  .ticket-row1 { display:flex; justify-content:space-between; align-items:center; }
+  .ticket-id { font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  .ticket-meta { display:flex; align-items:center; gap:10px; }
+  .ticket-time { font-size:11px; color:var(--text-muted); }
+  .ticket-start { font-size:11px; color:var(--text-dim); }
+  .ticket-start-label { color:var(--text-muted); }
+  .ticket-title { font-size:14px; font-weight:600; color:var(--text); line-height:1.3; }
+  .ticket-pills { display:flex; gap:5px; }
+
+  .pill { padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; font-family:var(--mono); }
+  .pill-critical { background:rgba(255,82,82,0.15); color:var(--danger); }
+  .pill-high { background:rgba(255,107,53,0.15); color:var(--accent2); }
+  .pill-medium { background:rgba(255,215,64,0.15); color:var(--warning); }
+  .pill-low { background:rgba(0,230,118,0.12); color:var(--success); }
+  .pill-open { background:rgba(0,212,255,0.1); color:var(--accent); }
+  .pill-progress { background:rgba(255,107,53,0.1); color:var(--accent2); }
+  .pill-resolved { background:rgba(0,230,118,0.1); color:var(--success); }
+  .pill-enroute { background:rgba(0,212,255,0.12); color:var(--accent); }
+
+  .chevron { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); opacity:.4; }
+
+  /* LOADING / ERROR STATES */
+  .list-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:48px 24px; color:var(--text-muted); }
+  .spinner { width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .list-error { margin:16px; padding:14px; background:rgba(255,82,82,0.08); border:1px solid rgba(255,82,82,0.25); border-radius:10px; font-size:13px; color:var(--danger); line-height:1.5; }
+  .list-error strong { display:block; margin-bottom:4px; }
+  .retry-btn { margin-top:10px; padding:7px 14px; background:transparent; border:1px solid var(--danger); border-radius:7px; color:var(--danger); font-size:12px; cursor:pointer; }
+  .retry-btn:active { opacity:.7; }
+
+  /* DATE DIVIDER */
+  .date-divider { display:flex; align-items:center; gap:12px; padding:10px 16px; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; }
+  .date-divider-label { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+  .date-divider-line { flex:1; height:1px; background:var(--border); }
+
+  /* ─── DETAIL SCREEN ─── */
+  .detail-topbar { height:var(--top-bar); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 12px; gap:10px; flex-shrink:0; }
+  .back-btn { width:36px; height:36px; border:none; background:transparent; color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0; }
+  .back-btn:active { background:var(--surface2); }
+  .detail-tb-info { flex:1; min-width:0; }
+  .detail-tb-id { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .detail-tb-title { font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .detail-pills { display:flex; gap:6px; padding:10px 14px; flex-shrink:0; align-items:center; flex-wrap:wrap; }
+
+  .detail-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:20px; }
+
+  /* CUSTOMER BANNER */
+  .cust-banner { margin:12px 14px; background:var(--surface); border:1px solid rgba(0,212,255,0.2); border-radius:13px; overflow:hidden; }
+  .cust-banner-head { display:flex; align-items:center; gap:10px; padding:12px 14px; background:rgba(0,212,255,0.05); border-bottom:1px solid rgba(0,212,255,0.12); }
+  .cust-icon { width:38px; height:38px; border-radius:10px; background:rgba(0,212,255,0.12); border:1px solid rgba(0,212,255,0.25); display:flex; align-items:center; justify-content:center; color:var(--accent); flex-shrink:0; }
+  .cust-bn-name { font-size:16px; font-weight:700; color:var(--text); }
+  .cust-bn-id { font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:1px; }
+  .cust-tier { margin-left:auto; padding:3px 9px; border-radius:5px; background:rgba(255,107,53,0.15); color:var(--accent2); font-size:11px; font-weight:600; font-family:var(--mono); flex-shrink:0; }
+
+  .cust-banner-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .cust-field { padding:10px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .cust-field:nth-child(even) { border-right:none; }
+  .cust-field:nth-last-child(-n+2) { border-bottom:none; }
+  .cf-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+  .cf-val { font-size:13px; font-weight:500; color:var(--text); line-height:1.3; }
+  .cf-val.mono { font-family:var(--mono); font-size:12px; color:var(--text-dim); }
+  .cf-val.addr { font-size:12px; color:var(--text-dim); }
+  .cf-val.sla { color:var(--accent2); font-weight:600; }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display:flex; gap:8px; padding:0 14px 12px; }
+  .btn { padding:11px 14px; border-radius:9px; border:none; font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all .15s; }
+  .btn:active { opacity:.8; transform:scale(.98); }
+  .btn-ghost { background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); }
+  .btn-accent { background:var(--accent); color:var(--bg); flex:1; }
+  .btn-success { background:var(--success); color:var(--bg); }
+
+  /* SECTIONS */
+  .section { margin:0 14px 12px; }
+  .section-title { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; padding:0 2px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .card-body { padding:14px; }
+  .desc-text { font-size:14px; line-height:1.65; color:var(--text-dim); }
+
+  /* FORM */
+  .form-col { display:flex; flex-direction:column; gap:10px; }
+  .select-field { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:11px 36px 11px 12px; color:var(--text); font-family:var(--sans); font-size:14px; outline:none; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-color:var(--surface2); }
+  .select-field:focus { border-color:var(--accent); }
+  .notes-area { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:12px; color:var(--text); font-family:var(--sans); font-size:14px; line-height:1.6; resize:none; height:110px; outline:none; }
+  .notes-area:focus { border-color:var(--accent); }
+  .notes-area::placeholder { color:var(--text-muted); }
+  .form-btns { display:flex; gap:8px; }
+
+  /* SERVICES */
+  .svc-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .svc-item:last-child { border-bottom:none; }
+  .svc-icon { width:34px; height:34px; border-radius:8px; background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2); display:flex; align-items:center; justify-content:center; color:var(--accent); flex-shrink:0; }
+  .svc-name { font-size:13px; font-weight:500; color:var(--text); }
+  .svc-detail { font-size:11px; color:var(--text-muted); margin-top:1px; }
+  .svc-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-left:auto; }
+  .svc-dot.on { background:var(--success); box-shadow:0 0 6px var(--success); }
+  .svc-dot.off { background:var(--text-muted); }
+
+  /* EQUIPMENT */
+  .equip-item { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:12px; margin-bottom:8px; }
+  .equip-item:last-child { margin-bottom:0; }
+  .equip-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
+  .equip-name { font-size:13px; font-weight:600; color:var(--text); }
+  .equip-serial { font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  .equip-model { font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+  /* TIMELINE */
+  .tl { display:flex; flex-direction:column; }
+  .tl-item { display:flex; gap:12px; padding-bottom:16px; }
+  .tl-item:last-child { padding-bottom:0; }
+  .tl-track { display:flex; flex-direction:column; align-items:center; width:18px; flex-shrink:0; }
+  .tl-dot { width:8px; height:8px; border-radius:50%; background:var(--border); margin-top:5px; flex-shrink:0; }
+  .tl-dot.a { background:var(--accent); }
+  .tl-dot.w { background:var(--warning); }
+  .tl-dot.s { background:var(--success); }
+  .tl-line { flex:1; width:1px; background:var(--border); margin-top:4px; }
+  .tl-actor { font-size:13px; font-weight:600; color:var(--text); }
+  .tl-ts { font-size:11px; color:var(--text-muted); font-family:var(--mono); margin-left:6px; }
+  .tl-body { font-size:12px; color:var(--text-dim); line-height:1.5; margin-top:2px; }
+
+  /* PLACEHOLDER */
+  .placeholder { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:var(--text-muted); padding:32px; text-align:center; }
+  .placeholder svg { opacity:.35; }
+  .placeholder h3 { font-size:16px; color:var(--text-dim); font-weight:600; }
+  .placeholder p { font-size:13px; line-height:1.5; }
+
+  /* ── ACCORDION ── */
+  .accordion { }
+  .acc-divider { height:1px; background:var(--border); }
+
+  .acc-header {
+    width:100%; display:flex; align-items:center; gap:10px;
+    padding:13px 14px; background:transparent; border:none;
+    cursor:pointer; text-align:left;
+    transition:background .12s;
+  }
+  .acc-header:active { background:var(--surface2); }
+
+  .acc-icon-wrap {
+    width:32px; height:32px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .acc-internet { background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2); color:var(--accent); }
+  .acc-firewall  { background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.2); color:var(--success); }
+  .acc-voip      { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.2); color:var(--accent2); }
+  .acc-ddos      { background:rgba(255,215,64,0.1);  border:1px solid rgba(255,215,64,0.2);  color:var(--warning); }
+
+  .acc-header-info { flex:1; min-width:0; }
+  .acc-title { display:block; font-size:14px; font-weight:600; color:var(--text); }
+  .acc-sub   { display:block; font-size:11px; color:var(--text-muted); margin-top:1px; }
+
+  .acc-badges { display:flex; align-items:center; flex-shrink:0; }
+
+  .acc-chevron { flex-shrink:0; color:var(--text-muted); transition:transform .2s ease; }
+  .acc-chevron.open { transform:rotate(180deg); }
+
+  /* Body */
+  .acc-body {
+    max-height:0; overflow:hidden;
+    transition:max-height .28s ease;
+    border-top:0px solid var(--border);
+  }
+  .acc-body.open {
+    max-height:1200px;
+    border-top:1px solid var(--border);
+  }
+
+  /* WAN / device blocks inside accordion */
+  .wan-block { padding:12px 14px; }
+  .wan-label-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .wan-label { font-size:13px; font-weight:700; color:var(--text); font-family:var(--mono); }
+  .wan-divider { height:1px; background:var(--border); margin:0 14px; }
+
+  /* Detail grid inside each block */
+  .equip-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .edg-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:8px 10px; }
+  .edg-item.edg-full { grid-column:1/-1; }
+  .edg-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+  .edg-val { font-size:12px; font-weight:500; color:var(--text); line-height:1.3; }
+  .edg-val.mono { font-family:var(--mono); font-size:11px; color:var(--text-dim); }
+
+  /* PULSE DOT */
+  .dot-live { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--success); animation:pulse 2s infinite; margin-right:5px; vertical-align:middle; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,230,118,.5)} 70%{box-shadow:0 0 0 5px rgba(0,230,118,0)} 100%{box-shadow:0 0 0 0 rgba(0,230,118,0)} }
+  @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+  .slide-in { animation:slideIn .22s ease both; }
+
+  /* DESKTOP */
+  @media(min-width:800px){
+    .app { flex-direction:row; }
+    .bottom-nav { display:none; }
+    .screen-wrap { display:flex; flex:1; overflow:hidden; }
+    .screen { position:relative; display:flex !important; }
+    #screen-list { width:340px; border-right:1px solid var(--border); flex-shrink:0; }
+    #screen-detail { flex:1; }
+    #screen-customers,#screen-map,#screen-more { display:none !important; }
+    .detail-topbar .back-btn { display:none; }
+  }
+  @media(max-width:799px){
+    #screen-detail { display:none; }
+    #screen-detail.active { display:flex; animation:slideIn .22s ease both; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- DESKTOP TOPBAR -->
+  <header class="topbar" style="display:none;" id="desktop-topbar">
+    <div class="topbar-logo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+    <span class="topbar-title">FieldOps</span>
+    <div class="topbar-right">
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge"></span></button>
+      <div class="avatar-sm">JR</div>
+    </div>
+  </header>
+
+  <div class="screen-wrap">
+
+    <!-- ══ LIST SCREEN ══ -->
+    <div class="screen active" id="screen-list">
+      <div class="topbar">
+        <div class="cspire-logo-svg">
+          <img src="C_Spire_Logo.png" alt="C Spire" height="53">
+        </div>
+        <div class="topbar-right">
+          <div class="theme-toggle" onclick="toggleTheme()" title="Switch theme">
+            <div class="tt-track"><div class="tt-knob"></div></div>
+            <div class="tt-labels">
+              <span class="tt-active" id="tt-label-list">DARK</span>
+              <span class="tt-inactive" id="tt-sublabel-list">Light</span>
+            </div>
+          </div>
+          <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge"></span></button>
+          <div class="avatar-sm">JR</div>
+        </div>
+      </div>
+
+      <div class="list-header">
+        <div class="list-title"><span class="dot-live"></span>My Assigned Tickets</div>
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search tickets, customers…">
+        </div>
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active">All</button>
+        <button class="filter-tab">Assigned</button>
+        <button class="filter-tab">Closed</button>
+      </div>
+
+      <div class="ticket-list" id="ticket-list">
+        <div class="list-loading"><div class="spinner"></div><span>Loading tickets…</span></div>
+      </div>
+    </div><!-- /screen-list -->
+
+
+    <!-- ══ DETAIL SCREEN ══ -->
+    <div class="screen" id="screen-detail">
+      <div class="detail-topbar">
+        <button class="back-btn" onclick="closeDetail()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="cspire-logo-svg" style="margin-right:4px;">
+          <img src="C_Spire_Logo.png" alt="C Spire" height="45">
+        </div>
+        <div class="detail-tb-info">
+          <div class="detail-tb-id" id="detail-tb-id">—</div>
+          <div class="detail-tb-title" id="detail-tb-title">—</div>
+        </div>
+        <div class="theme-toggle" onclick="toggleTheme()" title="Switch theme" style="margin-right:4px;">
+          <div class="tt-track"><div class="tt-knob"></div></div>
+          <div class="tt-labels">
+            <span class="tt-active" id="tt-label-detail">DARK</span>
+            <span class="tt-inactive" id="tt-sublabel-detail">Light</span>
+          </div>
+        </div>
+        <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+      </div>
+
+      <div class="detail-pills">
+        <span class="pill" id="detail-pill-priority"></span>
+        <span class="pill" id="detail-pill-state"></span>
+        <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">Assigned: <strong style="color:var(--text)" id="detail-assigned">—</strong></span>
+      </div>
+
+      <div class="detail-scroll">
+
+        <!-- ★ CUSTOMER AT-A-GLANCE BANNER ★ -->
+        <div class="cust-banner">
+          <div class="cust-banner-head">
+            <div class="cust-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div>
+              <div class="cust-bn-name" id="detail-cust-name">—</div>
+              <div class="cust-bn-id" id="detail-cust-id">—</div>
+            </div>
+            <div class="cust-tier" id="detail-cust-tier">—</div>
+          </div>
+          <div class="cust-banner-grid">
+            <div class="cust-field">
+              <div class="cf-label">Service Address</div>
+              <div class="cf-val addr" id="detail-cust-addr">—</div>
+            </div>
+            <div class="cust-field">
+              <div class="cf-label">On-site Contact</div>
+              <div class="cf-val" id="detail-cust-contact">—</div>
+            </div>
+            <div class="cust-field">
+              <div class="cf-label">Phone</div>
+              <div class="cf-val mono" id="detail-cust-phone">—</div>
+            </div>
+            <div class="cust-field">
+              <div class="cf-label">SLA Response</div>
+              <div class="cf-val sla" id="detail-cust-sla">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+          <button class="btn btn-ghost" style="gap:5px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17l.19-.08z"/></svg>
+            Call
+          </button>
+          <button class="btn btn-ghost" style="gap:5px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+            Navigate
+          </button>
+          <button class="btn btn-success" style="flex:1;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Close Ticket
+          </button>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="section">
+          <div class="section-title">Issue Description</div>
+          <div class="card"><div class="card-body"><p class="desc-text" id="detail-description">—</p></div></div>
+        </div>
+
+        <!-- UPDATE -->
+        <div class="section">
+          <div class="section-title">Update Ticket</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="form-col">
+                <select class="select-field" id="detail-state-select">
+                  <option value="2">In Progress</option><option value="3">Pending Parts</option><option value="4">Awaiting Customer</option><option value="6">Resolved</option><option value="7">Closed</option>
+                </select>
+                <select class="select-field">
+                  <option>-- Resolution Code --</option><option>Hardware Replaced</option><option>Config Corrected</option><option>Line Repaired</option><option>No Fault Found</option><option>Escalated</option>
+                </select>
+                <textarea class="notes-area" placeholder="Work notes — what did you find on site? What steps were taken?"></textarea>
+                <div class="form-btns">
+                  <button class="btn btn-ghost">Draft</button>
+                  <button class="btn btn-accent">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Submit Update
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERVICES & EQUIPMENT (collapsible) -->
+        <div class="section">
+          <div class="section-title">Services &amp; Equipment</div>
+          <div class="card" style="overflow:visible;">
+
+            <!-- ── INTERNET ── -->
+            <div class="accordion" id="acc-internet">
+              <button class="acc-header" onclick="toggleAcc('internet')">
+                <div class="acc-icon-wrap acc-internet">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+                </div>
+                <div class="acc-header-info">
+                  <span class="acc-title">Internet</span>
+                  <span class="acc-sub">10 Gbps / 1 Gbps · 2 connections</span>
+                </div>
+                <div class="acc-badges">
+                  <span class="svc-dot off" style="margin-right:4px;" title="WAN 1 Offline"></span>
+                  <span class="svc-dot on" title="WAN 2 Online"></span>
+                </div>
+                <svg class="acc-chevron" id="chev-internet" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="acc-body open" id="body-internet">
+
+                <!-- WAN 1 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">WAN 1</span>
+                    <span class="pill pill-critical" style="font-size:10px;">OFFLINE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">CIRC-NX-0041</div></div>
+                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Dedicated Fiber</div></div>
+                    <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">10 Gbps</div></div>
+                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Zayo</div></div>
+                    <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">198.51.100.0/28</div></div>
+                    <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">198.51.100.1</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <!-- WAN 2 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">WAN 2</span>
+                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">CIRC-NX-0042</div></div>
+                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Cable Backup</div></div>
+                    <div class="edg-item"><div class="edg-label">Speed</div><div class="edg-val">1 Gbps</div></div>
+                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Comcast</div></div>
+                    <div class="edg-item"><div class="edg-label">Static IP Range</div><div class="edg-val mono">203.0.113.64/29</div></div>
+                    <div class="edg-item"><div class="edg-label">Interface IP</div><div class="edg-val mono">203.0.113.65</div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="acc-divider"></div>
+
+            <!-- ── FIREWALL ── -->
+            <div class="accordion" id="acc-firewall">
+              <button class="acc-header" onclick="toggleAcc('firewall')">
+                <div class="acc-icon-wrap acc-firewall">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="acc-header-info">
+                  <span class="acc-title">Firewall</span>
+                  <span class="acc-sub">2 devices · HA pair</span>
+                </div>
+                <div class="acc-badges">
+                  <span class="svc-dot on" title="FW-01 Online"></span>
+                  <span class="svc-dot on" style="margin-left:4px;" title="FW-02 Online"></span>
+                </div>
+                <svg class="acc-chevron" id="chev-firewall" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="acc-body" id="body-firewall">
+
+                <!-- FW 1 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">FW-01 <span style="font-weight:400;color:var(--text-muted);font-size:11px;">Primary</span></span>
+                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Fortinet FG-200E</div></div>
+                    <div class="edg-item"><div class="edg-label">Role</div><div class="edg-val">Primary / Active</div></div>
+                    <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">FGT2H0E18900041</div></div>
+                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">FortiOS 7.4.1</div></div>
+                    <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">10.0.0.1</div></div>
+                    <div class="edg-item"><div class="edg-label">Uptime</div><div class="edg-val">47d 6h</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">MDF Room · Rack U1</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <!-- FW 2 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">FW-02 <span style="font-weight:400;color:var(--text-muted);font-size:11px;">Secondary</span></span>
+                    <span class="pill pill-resolved" style="font-size:10px;">STANDBY</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Fortinet FG-200E</div></div>
+                    <div class="edg-item"><div class="edg-label">Role</div><div class="edg-val">Secondary / Passive</div></div>
+                    <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">FGT2H0E18900042</div></div>
+                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">FortiOS 7.4.1</div></div>
+                    <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">10.0.0.2</div></div>
+                    <div class="edg-item"><div class="edg-label">Sync</div><div class="edg-val" style="color:var(--success);">In Sync</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">MDF Room · Rack U2</div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="acc-divider"></div>
+
+            <!-- ── VOIP / PHONES ── -->
+            <div class="accordion" id="acc-voip">
+              <button class="acc-header" onclick="toggleAcc('voip')">
+                <div class="acc-icon-wrap acc-voip">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17l.19-.08z"/></svg>
+                </div>
+                <div class="acc-header-info">
+                  <span class="acc-title">VoIP Phones</span>
+                  <span class="acc-sub">48 lines · 3 phone models</span>
+                </div>
+                <div class="acc-badges">
+                  <span class="svc-dot off" title="SIP Trunk offline"></span>
+                </div>
+                <svg class="acc-chevron" id="chev-voip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="acc-body" id="body-voip">
+
+                <!-- SIP Trunk -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">SIP Trunk</span>
+                    <span class="pill pill-critical" style="font-size:10px;">OFFLINE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Twilio Flex</div></div>
+                    <div class="edg-item"><div class="edg-label">Lines</div><div class="edg-val">48 active</div></div>
+                    <div class="edg-item"><div class="edg-label">DID Range</div><div class="edg-val mono">555-200 – 248</div></div>
+                    <div class="edg-item"><div class="edg-label">Codec</div><div class="edg-val">G.711 / G.729</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <!-- Phone model 1 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">Polycom VVX 450</span>
+                    <span style="font-size:11px;color:var(--text-muted);">×32 units</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Desktop IP Phone</div></div>
+                    <div class="edg-item"><div class="edg-label">Lines/Unit</div><div class="edg-val">12 line keys</div></div>
+                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">6.4.3.5768</div></div>
+                    <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · 802.3af</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Provisioning</div><div class="edg-val mono">prov.nexus-corp.local</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <!-- Phone model 2 -->
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">Cisco 8851</span>
+                    <span style="font-size:11px;color:var(--text-muted);">×12 units</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Executive Phone</div></div>
+                    <div class="edg-item"><div class="edg-label">Lines/Unit</div><div class="edg-val">5 line keys</div></div>
+                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">14.2(1)SR2</div></div>
+                    <div class="edg-item"><div class="edg-label">PoE</div><div class="edg-val">Yes · 802.3at</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">C-Suite / Conf Rooms</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <!-- Phone model 3 -->
+                <div class="wan-block" style="margin-bottom:0;">
+                  <div class="wan-label-row">
+                    <span class="wan-label">Yealink CP960</span>
+                    <span style="font-size:11px;color:var(--text-muted);">×4 units</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Type</div><div class="edg-val">Conference Phone</div></div>
+                    <div class="edg-item"><div class="edg-label">Coverage</div><div class="edg-val">360° / 20 ft</div></div>
+                    <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">73.85.0.15</div></div>
+                    <div class="edg-item"><div class="edg-label">WiFi</div><div class="edg-val">802.11 a/b/g/n</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">Board Room, Conf A–C</div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="acc-divider"></div>
+
+            <!-- ── DDOS / OTHER ── -->
+            <div class="accordion" id="acc-ddos">
+              <button class="acc-header" onclick="toggleAcc('ddos')">
+                <div class="acc-icon-wrap acc-ddos">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </div>
+                <div class="acc-header-info">
+                  <span class="acc-title">Network Infrastructure</span>
+                  <span class="acc-sub">Switch · DDoS protection</span>
+                </div>
+                <div class="acc-badges">
+                  <span class="svc-dot on"></span>
+                </div>
+                <svg class="acc-chevron" id="chev-ddos" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="acc-body" id="body-ddos">
+
+                <div class="wan-block">
+                  <div class="wan-label-row">
+                    <span class="wan-label">Core Switch</span>
+                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Cisco Catalyst 9300</div></div>
+                    <div class="edg-item"><div class="edg-label">Ports</div><div class="edg-val">48-port PoE+</div></div>
+                    <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">FCW2239G0BL</div></div>
+                    <div class="edg-item"><div class="edg-label">IOS-XE</div><div class="edg-val">17.9.3</div></div>
+                    <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">MDF Room · Rack U8</div></div>
+                  </div>
+                </div>
+
+                <div class="wan-divider"></div>
+
+                <div class="wan-block" style="margin-bottom:0;">
+                  <div class="wan-label-row">
+                    <span class="wan-label">DDoS Protection</span>
+                    <span class="pill pill-resolved" style="font-size:10px;">ACTIVE</span>
+                  </div>
+                  <div class="equip-detail-grid">
+                    <div class="edg-item"><div class="edg-label">Provider</div><div class="edg-val">Cloudflare Magic</div></div>
+                    <div class="edg-item"><div class="edg-label">Capacity</div><div class="edg-val">100 Gbps</div></div>
+                    <div class="edg-item"><div class="edg-label">Mode</div><div class="edg-val">Always-on</div></div>
+                    <div class="edg-item"><div class="edg-label">Clean pipe</div><div class="edg-val">GRE tunnel</div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="section">
+          <div class="section-title">Activity Log</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="tl" id="detail-timeline">
+                <div class="list-loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /screen-detail -->
+
+
+    <!-- ══ CUSTOMERS ══ -->
+    <div class="screen" id="screen-customers">
+      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Customers</span></div>
+      <div class="placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <h3>Customers</h3>
+        <p>Full customer directory including service history, subscriptions, and contact details will display here.</p>
+      </div>
+    </div>
+
+    <!-- ══ MAP ══ -->
+    <div class="screen" id="screen-map">
+      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Route Map</span></div>
+      <div class="placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+        <h3>Route Map</h3>
+        <p>Job sites plotted on a map with turn-by-turn routing between your assigned tickets will appear here.</p>
+      </div>
+    </div>
+
+    <!-- ══ MORE ══ -->
+    <div class="screen" id="screen-more">
+      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">More</span></div>
+      <div class="placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <h3>Settings & More</h3>
+        <p>Reports, equipment lookup, settings, and profile management will be available here.</p>
+      </div>
+    </div>
+
+  </div><!-- /screen-wrap -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" id="bnav-tickets" onclick="showScreen('list',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="bnav-label">Tickets</span>
+    </button>
+    <button class="bnav-btn" id="bnav-customers" onclick="showScreen('customers',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="bnav-label">Customers</span>
+      <span class="bnav-dot"></span>
+    </button>
+    <button class="bnav-btn" id="bnav-map" onclick="showScreen('map',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      <span class="bnav-label">Map</span>
+    </button>
+    <button class="bnav-btn" id="bnav-more" onclick="showScreen('more',this)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      <span class="bnav-label">More</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  // ── ServiceNow Configuration ──────────────────────────────────────────────
+  const SN = {
+    instance: 'https://dev183548.service-now.com',
+    username: 'fieldops_api',
+    password: '&-H<Go>O*.H*(+8Ib+jX*Y=-IwFScxx3pK?{lToooX,qv4wb?R0GC}bR#imMF$uGSzQ-&$xXU5aNDnMz(}M+s1JBMI:km7,5ZKxg',
+    // Assigned-to sys_id of the logged-in technician — filters tickets to this user.
+    // Leave blank to pull all open incidents during testing.
+    technicianId: ''
+  };
+
+  // ── Field mappings ────────────────────────────────────────────────────────
+  const PRIORITY_MAP = {
+    '1': { label: 'Critical', cls: 'pill-critical' },
+    '2': { label: 'High',     cls: 'pill-high'     },
+    '3': { label: 'Medium',   cls: 'pill-medium'   },
+    '4': { label: 'Low',      cls: 'pill-low'       },
+    '5': { label: 'Low',      cls: 'pill-low'       }
+  };
+
+  const STATE_MAP = {
+    '1': { label: 'Open',        cls: 'pill-open'     },
+    '2': { label: 'In Progress', cls: 'pill-progress' },
+    '3': { label: 'On Hold',     cls: 'pill-medium'   },
+    '6': { label: 'Resolved',    cls: 'pill-resolved' },
+    '7': { label: 'Closed',      cls: 'pill-resolved' }
+  };
+
+  // ── Auth header ───────────────────────────────────────────────────────────
+  function authHeader() {
+    return 'Basic ' + btoa(SN.username + ':' + SN.password);
+  }
+
+  // ── Fetch incidents from ServiceNow ──────────────────────────────────────
+  async function fetchTickets(filterState) {
+    const list = document.getElementById('ticket-list');
+    list.innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading tickets…</span></div>';
+
+    // Build query — scope to technician if ID provided, otherwise pull all non-closed
+    let query = 'active=true^state!=7^state!=6^ORDERBYDESCsys_created_on';
+    if (SN.technicianId) query = `assigned_to=${SN.technicianId}^active=true^ORDERBYDESCsys_created_on`;
+    if (filterState === 'assigned') query += '^state=2';
+    if (filterState === 'closed')   query = `active=false^state=7^ORDERBYDESCsys_created_on${SN.technicianId ? '^assigned_to=' + SN.technicianId : ''}`;
+
+    const fields = 'number,short_description,priority,state,sys_created_on,opened_at,company,location,caller_id,assigned_to,u_scheduled_start';
+    const url = `${SN.instance}/api/now/table/incident?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
+
+    try {
+      const res = await fetch(url, {
+        headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+      const data = await res.json();
+      renderTickets(data.result);
+    } catch (err) {
+      list.innerHTML = `
+        <div class="list-error">
+          <strong>Could not load tickets</strong>
+          ${err.message}<br><br>
+          Check your instance URL, credentials, and that CORS is enabled in ServiceNow
+          (System Web Services → REST API → CORS Rules).
+          <br><button class="retry-btn" onclick="fetchTickets()">Retry</button>
+        </div>`;
+    }
+  }
+
+  // ── Render ticket cards grouped by date ──────────────────────────────────
+  function renderTickets(incidents) {
+    const list = document.getElementById('ticket-list');
+    if (!incidents || incidents.length === 0) {
+      list.innerHTML = '<div class="list-loading"><span>No tickets found.</span></div>';
+      return;
+    }
+
+    // Group by calendar date
+    const groups = {};
+    incidents.forEach(inc => {
+      const d = new Date(inc.sys_created_on || inc.opened_at);
+      const key = d.toDateString();
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(inc);
+    });
+
+    const today     = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+    let html = '';
+    Object.entries(groups).forEach(([dateStr, tickets]) => {
+      const d = new Date(dateStr);
+      let label;
+      if (dateStr === today)     label = `Today — ${formatDate(d)}`;
+      else if (dateStr === yesterday) label = `Yesterday — ${formatDate(d)}`;
+      else label = formatDate(d);
+
+      html += `<div class="date-divider"><span class="date-divider-label">${label}</span><span class="date-divider-line"></span></div>`;
+
+      tickets.forEach(inc => {
+        const pri   = PRIORITY_MAP[inc.priority]  || { label: 'Unknown', cls: 'pill-low' };
+        const state = STATE_MAP[inc.state]         || { label: 'Open',    cls: 'pill-open' };
+        const company  = inc.company?.display_value  || inc.company  || 'Unknown Customer';
+        const location = inc.location?.display_value || inc.location || '';
+        const startRaw = inc.u_scheduled_start;
+        const startStr = startRaw ? formatTime(new Date(startRaw)) : '—';
+        const createdTime = formatTime(new Date(inc.sys_created_on || inc.opened_at));
+
+        html += `
+        <div class="ticket-card" onclick="openDetail('${inc.number}')">
+          <div class="ticket-inner">
+            <div class="cust-glance">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--accent);flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span class="cust-glance-name">${escHtml(company)}</span>
+              <span class="cust-glance-sep">·</span>
+              <span class="cust-glance-addr">${escHtml(location)}</span>
+            </div>
+            <div class="ticket-body">
+              <div class="ticket-row1">
+                <span class="ticket-id">${escHtml(inc.number)}</span>
+                <div class="ticket-meta">
+                  <span class="ticket-start"><span class="ticket-start-label">Start </span>${startStr}</span>
+                </div>
+              </div>
+              <div class="ticket-title">${escHtml(inc.short_description)}</div>
+              <div class="ticket-pills">
+                <span class="pill ${pri.cls}">${pri.label}</span>
+                <span class="pill ${state.cls}">${state.label}</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+
+    list.innerHTML = html;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function formatDate(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  function formatTime(d) {
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  function escHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Fetch and populate the detail screen ─────────────────────────────────
+  let currentIncidentSysId = null;
+
+  async function fetchIncidentDetail(number) {
+    // Reset fields to loading state
+    ['detail-tb-id','detail-tb-title','detail-cust-name','detail-cust-id',
+     'detail-cust-tier','detail-cust-addr','detail-cust-contact',
+     'detail-cust-phone','detail-cust-sla','detail-description','detail-assigned'
+    ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '…'; });
+    document.getElementById('detail-timeline').innerHTML = '<div class="list-loading"><div class="spinner"></div></div>';
+
+    const fields = 'sys_id,number,short_description,priority,state,opened_at,description,' +
+                   'assigned_to,caller_id,company,location,sla_due,contract,business_service,u_account_tier';
+    const url = `${SN.instance}/api/now/table/incident?sysparm_query=number=${number}&sysparm_fields=${fields}&sysparm_display_value=both&sysparm_limit=1`;
+
+    try {
+      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const inc = data.result[0];
+      if (!inc) throw new Error('Incident not found');
+
+      currentIncidentSysId = inc.sys_id?.value || inc.sys_id;
+
+      // Topbar
+      const openedDate = new Date(inc.opened_at?.value || inc.opened_at);
+      const dateStr = openedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('detail-tb-id').textContent       = `${inc.number} · ${dateStr}`;
+      document.getElementById('detail-tb-title').textContent    = inc.short_description || '—';
+
+      // Priority & state pills
+      const pri   = PRIORITY_MAP[inc.priority?.value || inc.priority] || { label: 'Unknown', cls: 'pill-low' };
+      const state = STATE_MAP[inc.state?.value || inc.state]          || { label: 'Open', cls: 'pill-open' };
+      const priEl = document.getElementById('detail-pill-priority');
+      priEl.textContent = pri.label; priEl.className = `pill ${pri.cls}`;
+      const stateEl = document.getElementById('detail-pill-state');
+      stateEl.textContent = state.label; stateEl.className = `pill ${state.cls}`;
+
+      // Assigned to
+      document.getElementById('detail-assigned').textContent = inc.assigned_to?.display_value || 'Unassigned';
+
+      // Pre-select current state in update form
+      const sel = document.getElementById('detail-state-select');
+      const stateVal = inc.state?.value || inc.state;
+      [...sel.options].forEach(o => o.selected = (o.value === stateVal));
+
+      // Customer banner
+      document.getElementById('detail-cust-name').textContent    = inc.company?.display_value || '—';
+      document.getElementById('detail-cust-id').textContent      = inc.company?.value ? `SYS-${inc.company.value.slice(0,8).toUpperCase()}` : '—';
+      document.getElementById('detail-cust-tier').textContent    = inc.u_account_tier?.display_value || inc.business_service?.display_value || 'Standard';
+      document.getElementById('detail-cust-addr').textContent    = inc.location?.display_value || '—';
+      document.getElementById('detail-cust-contact').textContent = inc.caller_id?.display_value || '—';
+      document.getElementById('detail-cust-sla').textContent     = inc.sla_due?.display_value
+        ? formatTime(new Date(inc.sla_due.value)) + ' SLA due'
+        : '—';
+
+      // Fetch caller phone separately if we have a caller sys_id
+      const callerSysId = inc.caller_id?.value;
+      if (callerSysId) {
+        fetch(`${SN.instance}/api/now/table/sys_user/${callerSysId}?sysparm_fields=phone,mobile_phone`, {
+          headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
+        }).then(r => r.json()).then(u => {
+          const phone = u.result?.phone || u.result?.mobile_phone || '—';
+          document.getElementById('detail-cust-phone').textContent = phone;
+        }).catch(() => {});
+      }
+
+      // Description
+      document.getElementById('detail-description').textContent = inc.description || inc.short_description || '—';
+
+      // Fetch journal / work notes
+      fetchTimeline(currentIncidentSysId);
+
+    } catch (err) {
+      document.getElementById('detail-tb-title').textContent = 'Error loading ticket: ' + err.message;
+    }
+  }
+
+  async function fetchTimeline(sysId) {
+    const tl = document.getElementById('detail-timeline');
+    const url = `${SN.instance}/api/now/table/sys_journal_field?sysparm_query=element_id=${sysId}^element_nameSTARTSWITHincident^ORDERBYDESCsys_created_on&sysparm_fields=sys_created_by,sys_created_on,value,element&sysparm_limit=20`;
+    try {
+      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const entries = data.result;
+
+      if (!entries || entries.length === 0) {
+        tl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:4px 0;">No activity recorded yet.</div>';
+        return;
+      }
+
+      const dotClass = e => e.element === 'work_notes' ? 'a' : e.element === 'comments' ? 's' : 'w';
+      tl.innerHTML = entries.map((e, i) => {
+        const isLast = i === entries.length - 1;
+        const ts = new Date(e.sys_created_on);
+        return `<div class="tl-item">
+          <div class="tl-track">
+            <div class="tl-dot ${dotClass(e)}"></div>
+            ${!isLast ? '<div class="tl-line"></div>' : ''}
+          </div>
+          <div>
+            <div><span class="tl-actor">${escHtml(e.sys_created_by)}</span><span class="tl-ts">${formatTime(ts)}</span></div>
+            <div class="tl-body">${escHtml(e.value)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(err) {
+      tl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">Could not load activity log.</div>`;
+    }
+  }
+
+  // ── Active filter state ───────────────────────────────────────────────────
+  let activeFilter = 'all';
+
+  const screenMap = { list:'screen-list', customers:'screen-customers', map:'screen-map', more:'screen-more' };
+
+  function showScreen(name, btn) {
+    document.getElementById('screen-detail').classList.remove('active');
+    Object.values(screenMap).forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(screenMap[name]).classList.add('active');
+    document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+
+  function openDetail(ticketNumber) {
+    if (window.innerWidth < 800) {
+      document.getElementById('screen-list').classList.remove('active');
+      document.getElementById('screen-detail').classList.add('active');
+    }
+    if (ticketNumber) fetchIncidentDetail(ticketNumber);
+  }
+
+  function closeDetail() {
+    document.getElementById('screen-detail').classList.remove('active');
+    document.getElementById('screen-list').classList.add('active');
+    document.getElementById('bnav-tickets').classList.add('active');
+  }
+
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      activeFilter = this.textContent.trim().toLowerCase();
+      fetchTickets(activeFilter);
+    });
+  });
+
+  // Initial load
+  fetchTickets('all');
+
+  function toggleAcc(id) {
+    const body = document.getElementById('body-' + id);
+    const chev = document.getElementById('chev-' + id);
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+  }
+  // Sync default-open chevron
+  document.getElementById('chev-internet').classList.add('open');
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isCspire = html.getAttribute('data-theme') === 'cspire';
+    html.setAttribute('data-theme', isCspire ? 'dark' : 'cspire');
+    const activeLabel = isCspire ? 'DARK' : 'LIGHT';
+    const inactiveLabel = isCspire ? 'Light' : 'Dark';
+    document.querySelectorAll('.tt-active').forEach(el => el.textContent = activeLabel);
+    document.querySelectorAll('.tt-inactive').forEach(el => el.textContent = inactiveLabel);
+  }
+</script>
+</body>
+</html>
