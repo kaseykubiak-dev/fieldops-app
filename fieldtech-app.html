@@ -2128,7 +2128,7 @@
     // Group by calendar date
     const groups = {};
     incidents.forEach(inc => {
-      const d = new Date(inc.sys_created_on || inc.opened_at);
+      const d = new Date(inc.u_scheduled_start || inc.opened_at);
       const key = d.toDateString();
       if (!groups[key]) groups[key] = [];
       groups[key].push(inc);
