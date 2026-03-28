@@ -1381,8 +1381,14 @@
         <div class="section" id="service-order-section" style="display:none;">
           <div class="section-title">Service Order</div>
           <div class="card" style="overflow:visible;">
-            <div style="padding:10px 16px 8px;border-bottom:1px solid var(--border);">
-              <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Work Items</span>
+            <div class="cust-banner-head">
+              <div class="cust-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+              </div>
+              <div>
+                <div class="cust-bn-name">Work Items</div>
+                <div class="cust-bn-id">Pending Installation</div>
+              </div>
             </div>
             <div class="card-body" style="padding:0;">
               <div id="service-order-items"></div>
@@ -1445,7 +1451,7 @@
                 </div>
                 <svg class="acc-chevron" id="chev-internet" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
-              <div class="acc-body open" id="body-internet">
+              <div class="acc-body" id="body-internet">
 
                 <!-- WAN 1 -->
                 <div class="wan-block">
