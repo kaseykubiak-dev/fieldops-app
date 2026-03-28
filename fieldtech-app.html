@@ -2086,13 +2086,13 @@
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
     let query;
     if (filterState === 'today') {
-      query = `${assignedTo}opened_atONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()^state!=4^state!=5^ORDERBYDESCopened_at`;
+      query = `${assignedTo}u_scheduled_startONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()^state!=4^state!=5^ORDERBYu_scheduled_start`;
     } else if (filterState === 'assigned') {
-      query = `${assignedTo}state!=4^state!=5^ORDERBYDESCopened_at`;
+      query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
     } else if (filterState === 'closed') {
-      query = `${assignedTo}state=4^ORDERBYDESCopened_at`;
+      query = `${assignedTo}state=4^ORDERBYu_scheduled_start`;
     } else {
-      query = `${assignedTo}state!=4^state!=5^ORDERBYDESCopened_at`;
+      query = `${assignedTo}state!=4^state!=5^ORDERBYu_scheduled_start`;
     }
 
     const fields = 'number,short_description,priority,state,opened_at,account,account.number,contact,location,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
@@ -2104,7 +2104,7 @@
       });
       if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
       const data = await res.json();
-      renderTickets(data.result);
+      renderTickets(data.result, filterState);
     } catch (err) {
       list.innerHTML = `
         <div class="list-error">
@@ -2118,7 +2118,7 @@
   }
 
   // ── Render ticket cards grouped by date ──────────────────────────────────
-  function renderTickets(incidents) {
+  function renderTickets(incidents, filterState) {
     const list = document.getElementById('ticket-list');
     if (!incidents || incidents.length === 0) {
       list.innerHTML = '<div class="list-loading"><span>No tickets found.</span></div>';
@@ -2137,8 +2137,11 @@
     const today     = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
 
+    // Sort groups chronologically ascending (oldest → newest)
+    const sortedEntries = Object.entries(groups).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+
     let html = '';
-    Object.entries(groups).forEach(([dateStr, tickets]) => {
+    sortedEntries.forEach(([dateStr, tickets]) => {
       const d = new Date(dateStr);
       let label;
       if (dateStr === today)     label = `Today — ${formatDate(d)}`;
@@ -2187,6 +2190,15 @@
     });
 
     list.innerHTML = html;
+
+    // For assigned/closed views, scroll to today's section if it exists
+    if (filterState === 'assigned' || filterState === 'closed') {
+      const todayDivider = [...list.querySelectorAll('.date-divider-label')]
+        .find(el => el.textContent.startsWith('Today'));
+      if (todayDivider) {
+        requestAnimationFrame(() => todayDivider.closest('.date-divider').scrollIntoView({ behavior: 'instant', block: 'start' }));
+      }
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
