@@ -1008,6 +1008,30 @@
     padding:24px;
   }
   #login-screen.hidden { display:none; }
+
+  /* ── DISCLAIMER MODAL ── */
+  #disclaimer-modal {
+    position:fixed; inset:0; z-index:900;
+    background:var(--bg);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  #disclaimer-modal.hidden { display:none; }
+  .disc-card {
+    width:100%; max-width:420px;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.5);
+  }
+  .disc-header {
+    padding:18px 22px 14px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(90deg, rgba(255,103,32,0.1) 0%, rgba(255,103,32,0.03) 100%);
+    border-left:3px solid var(--accent2);
+    display:flex; align-items:center; gap:10px;
+  }
+  .disc-title { font-size:15px; font-weight:700; color:var(--text); }
+  .disc-body { padding:20px 22px; display:flex; flex-direction:column; gap:16px; }
+  .disc-text { font-size:13px; line-height:1.7; color:var(--text-dim); }
   .login-card {
     width:100%; max-width:380px;
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
@@ -1188,6 +1212,20 @@
       </div>
       <div class="login-error" id="login-error"></div>
       <button class="login-btn" id="login-btn" onclick="attemptLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DISCLAIMER MODAL ── -->
+<div id="disclaimer-modal" class="hidden">
+  <div class="disc-card">
+    <div class="disc-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent2);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="disc-title">Disclaimer</span>
+    </div>
+    <div class="disc-body">
+      <p class="disc-text">This application is intended for demonstration purposes only. No internal C Spire systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources. This application was developed exclusively using Claude Code.</p>
+      <button class="login-btn" onclick="dismissDisclaimer()">I Understand</button>
     </div>
   </div>
 </div>
@@ -2072,12 +2110,15 @@
     const mobileRow = document.getElementById('more-mobile-row');
     if (mobileRow && window.innerWidth < 800) mobileRow.style.display = 'none';
 
-    // Hide login screen, show app
+    // Hide login screen, show disclaimer before entering app
     document.getElementById('login-screen').classList.add('hidden');
-    if (!isMobileView()) document.getElementById('desktop-topbar').style.display = 'flex';
-
-    // Allow enter key on password field
     document.getElementById('login-password').removeEventListener('keydown', loginOnEnter);
+    document.getElementById('disclaimer-modal').classList.remove('hidden');
+  }
+
+  function dismissDisclaimer() {
+    document.getElementById('disclaimer-modal').classList.add('hidden');
+    if (!isMobileView()) document.getElementById('desktop-topbar').style.display = 'flex';
 
     // Restore last active tab, fallback to tickets
     const savedTab = localStorage.getItem('ft_tab') || 'list';
