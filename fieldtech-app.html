@@ -2407,20 +2407,25 @@
   // ── Open current case directly in ServiceNow (auto-login as test_fieldtech) ─
   function openInServiceNow() {
     if (!currentCaseSysId) return;
-    const gotoUrl = `/sn_customerservice_case.do?sys_id=${encodeURIComponent(currentCaseSysId)}`;
-    const html = '<!DOCTYPE html><html><head><title>Opening ServiceNow\u2026</title></head><body>'
-      + '<p style="font-family:sans-serif;color:#555;margin:40px auto;text-align:center;">Signing in to ServiceNow\u2026</p>'
-      + '<form id="f" method="POST" action="' + SN.instance + '/login.do">'
-      + '<input type="hidden" name="user_name"        value="test_fieldtech">'
-      + '<input type="hidden" name="user_password"    value="TestFieldTech1!">'
-      + '<input type="hidden" name="sysparm_goto_url" value="' + gotoUrl + '">'
-      + '<\/form>'
-      + '<script>document.getElementById("f").submit();<\/script>'
-      + '<\/body><\/html>';
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    const winName = 'sn_case_' + Date.now();
+    window.open('about:blank', winName);
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = SN.instance + '/login.do';
+    form.target = winName;
+    form.style.display = 'none';
+    [
+      ['user_name',        'test_fieldtech'],
+      ['user_password',    'TestFieldTech1!'],
+      ['sysparm_goto_url', '/now/cwf/agent/record/sn_customerservice_case/' + currentCaseSysId],
+    ].forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden'; input.name = name; input.value = value;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
   }
 
   async function fetchCaseDetail(number) {
