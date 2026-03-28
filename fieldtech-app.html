@@ -866,7 +866,7 @@
   }
   .cal-nav-btn:active { background:var(--surface2); }
   .cal-month-label {
-    flex:1; text-align:center; font-family:var(--sans); font-size:22px;
+    font-family:var(--sans); font-size:22px;
     font-weight:800; color:var(--text); letter-spacing:-.02em;
   }
   /* Calendar date picker dropdown */
@@ -874,7 +874,7 @@
   .cal-picker-btn  { width:34px; height:34px; border:1px solid rgba(0,192,243,0.25); border-radius:8px; background:rgba(0,192,243,0.08); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .12s; }
   .cal-picker-btn:hover { background:rgba(0,192,243,0.16); }
   .cal-picker-btn.open  { background:rgba(0,192,243,0.2); border-color:rgba(0,192,243,0.5); }
-  .cal-picker-drop { position:absolute; top:calc(100% + 8px); right:0; z-index:200; width:260px; background:var(--surface); border:1px solid rgba(0,192,243,0.25); border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); overflow:hidden; display:none; }
+  .cal-picker-drop { position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%); z-index:200; width:260px; background:var(--surface); border:1px solid rgba(0,192,243,0.25); border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); overflow:hidden; display:none; }
   .cal-picker-drop.open { display:block; }
   .cal-picker-head { display:flex; align-items:center; padding:10px 10px 8px; background:linear-gradient(135deg,#162236 0%,#0e1a2a 100%); border-bottom:1px solid rgba(0,192,243,0.15); }
   .cal-picker-nav  { width:30px; height:30px; border:none; background:transparent; color:var(--text-dim); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -1868,19 +1868,12 @@
     <!-- ══ CALENDAR ══ -->
     <div class="screen" id="screen-calendar">
       <div class="topbar">
-        <div class="cal-month-nav" style="flex:1;display:flex;align-items:center;gap:0;background:none;border:none;box-shadow:none;padding:0;">
-          <button class="cal-nav-btn" onclick="navigateCalMonth(-1)" title="Previous month">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
-          <button class="cal-nav-btn" onclick="navigateCalMonth(1)" title="Next month">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-        </div>
-        <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-right:6px;">
-          <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </button>
+          <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
+            <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
           <div class="cal-picker-drop" id="cal-picker-drop">
             <div class="cal-picker-head">
               <button class="cal-picker-nav" onclick="pickerNavigate(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -1891,6 +1884,7 @@
               <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
             </div>
             <div class="cal-picker-grid" id="cal-picker-grid"></div>
+          </div>
           </div>
         </div>
         <button class="icon-btn" onclick="loadCalendarScreen(true)" title="Refresh">
