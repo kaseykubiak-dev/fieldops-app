@@ -869,6 +869,26 @@
     flex:1; text-align:center; font-family:var(--sans); font-size:22px;
     font-weight:800; color:var(--text); letter-spacing:-.02em;
   }
+  /* Calendar date picker dropdown */
+  .cal-picker-wrap { position:relative; flex-shrink:0; }
+  .cal-picker-btn  { width:34px; height:34px; border:1px solid rgba(0,192,243,0.25); border-radius:8px; background:rgba(0,192,243,0.08); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .12s; }
+  .cal-picker-btn:hover { background:rgba(0,192,243,0.16); }
+  .cal-picker-btn.open  { background:rgba(0,192,243,0.2); border-color:rgba(0,192,243,0.5); }
+  .cal-picker-drop { position:absolute; top:calc(100% + 8px); right:0; z-index:200; width:260px; background:var(--surface); border:1px solid rgba(0,192,243,0.25); border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); overflow:hidden; display:none; }
+  .cal-picker-drop.open { display:block; }
+  .cal-picker-head { display:flex; align-items:center; padding:10px 10px 8px; background:linear-gradient(135deg,#162236 0%,#0e1a2a 100%); border-bottom:1px solid rgba(0,192,243,0.15); }
+  .cal-picker-nav  { width:30px; height:30px; border:none; background:transparent; color:var(--text-dim); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .cal-picker-nav:hover { background:var(--surface2); color:var(--text); }
+  .cal-picker-lbl  { flex:1; text-align:center; font-family:var(--sans); font-size:14px; font-weight:700; color:var(--text); }
+  .cal-picker-dow  { display:grid; grid-template-columns:repeat(7,1fr); padding:6px 8px 4px; }
+  .cal-picker-dow span { text-align:center; font-size:10px; font-weight:600; color:var(--text-dim); letter-spacing:.04em; text-transform:uppercase; padding:2px 0; }
+  .cal-picker-grid { display:grid; grid-template-columns:repeat(7,1fr); padding:4px 8px 10px; gap:2px; }
+  .cal-picker-cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:var(--text); border-radius:6px; cursor:pointer; border:none; background:transparent; transition:background .1s; }
+  .cal-picker-cell:hover { background:rgba(0,192,243,0.15); color:var(--accent); }
+  .cal-picker-cell.today { color:var(--accent); font-weight:800; border:1px solid rgba(0,192,243,0.4); }
+  .cal-picker-cell.selected { background:var(--accent); color:#000; font-weight:800; }
+  .cal-picker-cell.other-month { color:var(--text-dim); opacity:.4; }
+  .cal-picker-cell.empty { cursor:default; }
 
   .cal-dow-row {
     display:grid; grid-template-columns:repeat(7,1fr);
@@ -1856,6 +1876,22 @@
           <button class="cal-nav-btn" onclick="navigateCalMonth(1)" title="Next month">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
           </button>
+        </div>
+        <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-right:6px;">
+          <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <div class="cal-picker-drop" id="cal-picker-drop">
+            <div class="cal-picker-head">
+              <button class="cal-picker-nav" onclick="pickerNavigate(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <span class="cal-picker-lbl" id="cal-picker-lbl"></span>
+              <button class="cal-picker-nav" onclick="pickerNavigate(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+            <div class="cal-picker-dow">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="cal-picker-grid" id="cal-picker-grid"></div>
+          </div>
         </div>
         <button class="icon-btn" onclick="loadCalendarScreen(true)" title="Refresh">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -3613,6 +3649,86 @@
     closeCalDayPanel();
     loadCalendarScreen();
   }
+
+  // ── Calendar date picker ─────────────────────────────────────────────────
+  const _picker = { year: null, month: null };
+
+  function toggleCalPicker() {
+    const drop = document.getElementById('cal-picker-drop');
+    const btn  = document.getElementById('cal-picker-btn');
+    const isOpen = drop.classList.contains('open');
+    if (isOpen) {
+      drop.classList.remove('open');
+      btn.classList.remove('open');
+    } else {
+      if (_cal.year === null) initCalState();
+      _picker.year  = _cal.year;
+      _picker.month = _cal.month;
+      renderPickerGrid();
+      drop.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+
+  function closeCalPicker() {
+    document.getElementById('cal-picker-drop').classList.remove('open');
+    document.getElementById('cal-picker-btn').classList.remove('open');
+  }
+
+  function pickerNavigate(delta) {
+    _picker.month += delta;
+    if (_picker.month < 0)  { _picker.month = 11; _picker.year--; }
+    if (_picker.month > 11) { _picker.month = 0;  _picker.year++; }
+    renderPickerGrid();
+  }
+
+  function renderPickerGrid() {
+    const { year, month } = _picker;
+    document.getElementById('cal-picker-lbl').textContent =
+      new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const today    = new Date();
+    const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+    const daysInMonth  = new Date(year, month + 1, 0).getDate();
+    const daysInPrev   = new Date(year, month, 0).getDate();
+
+    let cells = '';
+    // Leading cells from previous month
+    for (let i = firstDow - 1; i >= 0; i--) {
+      cells += `<button class="cal-picker-cell other-month" onclick="pickerPickDay(${year},${month - 1},${daysInPrev - i})">${daysInPrev - i}</button>`;
+    }
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday    = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+      const isSelected = d === _cal.selectedDay && month === _cal.month && year === _cal.year;
+      const cls = isSelected ? 'selected' : isToday ? 'today' : '';
+      cells += `<button class="cal-picker-cell ${cls}" onclick="pickerPickDay(${year},${month},${d})">${d}</button>`;
+    }
+    // Trailing cells to fill last row
+    const totalCells = firstDow + daysInMonth;
+    const trailing = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for (let d = 1; d <= trailing; d++) {
+      cells += `<button class="cal-picker-cell other-month" onclick="pickerPickDay(${year},${month + 1},${d})">${d}</button>`;
+    }
+    document.getElementById('cal-picker-grid').innerHTML = cells;
+  }
+
+  function pickerPickDay(year, month, day) {
+    // Normalise month overflow from prev/next month clicks
+    const d = new Date(year, month, day);
+    _cal.year        = d.getFullYear();
+    _cal.month       = d.getMonth();
+    _cal.selectedDay = d.getDate();
+    _cal.tickets     = null;
+    closeCalDayPanel();
+    closeCalPicker();
+    loadCalendarScreen();
+  }
+
+  // Close picker when clicking outside
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.cal-picker-wrap')) closeCalPicker();
+  }, true);
 
   async function loadCalendarScreen(forceRefresh) {
     if (_cal.year === null) initCalState();
