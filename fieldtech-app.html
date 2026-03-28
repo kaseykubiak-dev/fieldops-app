@@ -491,6 +491,10 @@
   .detail-tb-info { flex:1; min-width:0; }
   .detail-tb-id { font-family:var(--mono); font-size:11px; color:var(--accent); }
   .detail-tb-title { font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sn-link-btn { display:flex; align-items:center; gap:5px; padding:5px 10px; border:1px solid rgba(0,192,243,0.3); border-radius:7px; background:rgba(0,192,243,0.08); color:var(--accent); font-family:var(--sans); font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0; white-space:nowrap; transition:background .15s, border-color .15s; }
+  .sn-link-btn:hover { background:rgba(0,192,243,0.16); border-color:rgba(0,192,243,0.5); }
+  html[data-theme="cspire"] .sn-link-btn { border-color:rgba(0,96,140,0.4); background:rgba(0,96,140,0.1); color:#0a5a7a; }
+  html[data-theme="cspire"] .sn-link-btn:hover { background:rgba(0,96,140,0.18); }
 
   .detail-pills { display:flex; gap:6px; padding:10px 14px; flex-shrink:0; align-items:center; flex-wrap:wrap; }
 
@@ -1361,6 +1365,10 @@
           <div class="detail-tb-id" id="detail-tb-id">—</div>
           <div class="detail-tb-title" id="detail-tb-title">—</div>
         </div>
+        <button class="sn-link-btn" id="sn-link-btn" onclick="openInServiceNow()" title="Open in ServiceNow" style="display:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>ServiceNow</span>
+        </button>
       </div>
 
       <div class="detail-pills">
@@ -2396,6 +2404,25 @@
   let currentCaseNumber  = null;
   const _closedThisSession = new Set();
 
+  // ── Open current case directly in ServiceNow (auto-login as test_fieldtech) ─
+  function openInServiceNow() {
+    if (!currentCaseSysId) return;
+    const gotoUrl = `/sn_customerservice_case.do?sys_id=${encodeURIComponent(currentCaseSysId)}`;
+    const html = `<!DOCTYPE html><html><head><title>Opening ServiceNow…</title></head><body>
+<p style="font-family:sans-serif;color:#555;margin:40px auto;text-align:center;">Signing in to ServiceNow…</p>
+<form id="f" method="POST" action="${SN.instance}/login.do">
+  <input type="hidden" name="user_name"        value="test_fieldtech">
+  <input type="hidden" name="user_password"    value="TestFieldTech1!">
+  <input type="hidden" name="sysparm_goto_url" value="${gotoUrl}">
+</form>
+<script>document.getElementById('f').submit();</script>
+</body></html>`;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
   async function fetchCaseDetail(number) {
     ['detail-tb-id','detail-tb-title','detail-cust-name','detail-cust-id',
      'detail-cust-tier','detail-cust-addr','detail-cust-contact',
@@ -2416,6 +2443,7 @@
 
       currentCaseSysId  = c.sys_id?.value  || c.sys_id;
       currentCaseNumber = c.number?.display_value || c.number?.value || c.number;
+      document.getElementById('sn-link-btn').style.display = 'flex';
 
       // Topbar
       const openedDate = parseSNDate(c.opened_at?.value || c.opened_at);
