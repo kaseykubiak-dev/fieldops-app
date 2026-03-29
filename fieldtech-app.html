@@ -104,8 +104,8 @@
   html[data-theme="cspire"] .cf-val.sla   { color: #0f3d58; }
   html[data-theme="cspire"] .detail-tb-id { color: #ffffff; }
   html[data-theme="cspire"] .back-btn     { color: #ffffff; }
-  html[data-theme="cspire"] .ticket-id    { color: #7a5598; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff; }
-  html[data-theme="cspire"] .cust-bn-id   { color: #7a5598; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff; }
+  html[data-theme="cspire"] .ticket-id    { color: #7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
+  html[data-theme="cspire"] .cust-bn-id   { color: #7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
 
   /* ── C SPIRE GRADIENT OVERRIDES ── */
   html[data-theme="cspire"] body,
@@ -220,9 +220,9 @@
   html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #e8f5fd 0%, #ddeef9 100%); }
   html[data-theme="cspire"] .avatar-sm { background: linear-gradient(135deg, #00c0f3, #7a5598); color: #fff; border-color: rgba(255,255,255,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
 
-  /* Orange note text (inline color:var(--accent2)) gets a thin black border */
+  /* Orange note text (inline color:var(--accent2)) gets a thin white border */
   html[data-theme="cspire"] [style*="--accent2"] {
-    text-shadow: -1px 0 0 rgba(0,0,0,0.45), 1px 0 0 rgba(0,0,0,0.45), 0 -1px 0 rgba(0,0,0,0.45), 0 1px 0 rgba(0,0,0,0.45);
+    text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9);
   }
 
   /* ── Light-text outline: thin dark shadow on any accent-blue text so it
@@ -314,7 +314,7 @@
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { background:radial-gradient(ellipse at 50% 0%, #162436 0%, #0e1620 65%); background-color:#0e1a2a; color:var(--text); font-family:var(--sans); height:100%; overflow:hidden; overscroll-behavior:none; }
 
-  .app { display:flex; flex-direction:column; height:100vh; height:100dvh; background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.1) 0%, transparent 40%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.09) 0%, transparent 38%); }
+  .app { display:flex; flex-direction:column; height:100vh; height:100dvh; background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.17) 0%, transparent 42%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(0,192,243,0.05) 0%, transparent 55%); }
 
   /* TOP BAR */
   .topbar { min-height:var(--top-bar); background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); border-bottom:2px solid rgba(0,192,243,0.32); display:flex; align-items:center; padding:env(safe-area-inset-top) 16px 0; gap:12px; flex-shrink:0; z-index:20; box-shadow:0 1px 3px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,192,243,0.15); }
@@ -1063,9 +1063,12 @@
     border-bottom-color:rgba(0,152,220,0.45);
   }
   html[data-theme="cspire"] .cal-month-label { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  /* Center the month/year label relative to the full topbar width */
+  #screen-calendar .topbar { position: relative; }
+  #screen-calendar .cal-month-label { position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
   html[data-theme="cspire"] .cal-dow-row {
-    background:linear-gradient(90deg, rgba(15,61,88,0.78) 0%, rgba(0,120,180,0.62) 50%, rgba(0,192,243,0.75) 100%);
-    border-bottom-color:rgba(0,152,220,0.38);
+    background: #85A7CA;
+    border-bottom-color: rgba(0,0,0,0.08);
   }
   html[data-theme="cspire"] .cal-week  { border-bottom-color:rgba(0,80,160,0.15); }
   html[data-theme="cspire"] .cal-day   { border-right-color:rgba(0,80,160,0.15); }
@@ -1189,12 +1192,18 @@
   .cust-detail-banner { position:relative; margin:12px 14px; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.18); border-left:3px solid var(--accent); border-radius:13px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
   /* ── C SPIRE BRAND PATTERNS ── */
   /* Burst orb — light theme override */
-  html[data-theme="cspire"] .app { background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.16) 0%, transparent 38%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.1) 0%, transparent 35%); }
-  /* Brand shape corner accents — derived from C Burst rounded-rect forms */
-  .ticket-inner::after, .device-card::after { content:''; position:absolute; top:-14px; right:-14px; width:68px; height:34px; border-radius:17px; background:rgba(0,192,243,0.065); transform:rotate(26deg); pointer-events:none; }
-  .cust-banner::after, .cust-detail-banner::after { content:''; position:absolute; top:-18px; right:-16px; width:96px; height:44px; border-radius:22px; background:rgba(0,192,243,0.055); transform:rotate(26deg); pointer-events:none; }
-  html[data-theme="cspire"] .ticket-inner::after, html[data-theme="cspire"] .device-card::after { background:rgba(0,192,243,0.1); }
-  html[data-theme="cspire"] .cust-banner::after, html[data-theme="cspire"] .cust-detail-banner::after { background:rgba(0,192,243,0.09); }
+  html[data-theme="cspire"] .app { background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.22) 0%, transparent 40%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 37%), radial-gradient(circle at 50% 50%, rgba(0,192,243,0.07) 0%, transparent 52%); }
+  /* Brand shape corner accents — primary ray */
+  .ticket-inner::after, .device-card::after { content:''; position:absolute; top:-14px; right:-14px; width:68px; height:34px; border-radius:17px; background:rgba(0,192,243,0.1); transform:rotate(26deg); pointer-events:none; }
+  .cust-banner::after, .cust-detail-banner::after { content:''; position:absolute; top:-18px; right:-16px; width:96px; height:44px; border-radius:22px; background:rgba(0,192,243,0.09); transform:rotate(26deg); pointer-events:none; }
+  /* Brand shape corner accents — secondary crossing ray */
+  .ticket-inner::before, .device-card::before { content:''; position:absolute; top:-8px; right:-22px; width:58px; height:28px; border-radius:14px; background:rgba(0,192,243,0.065); transform:rotate(56deg); pointer-events:none; }
+  .cust-banner::before, .cust-detail-banner::before { content:''; position:absolute; top:-10px; right:-26px; width:80px; height:38px; border-radius:19px; background:rgba(0,192,243,0.06); transform:rotate(56deg); pointer-events:none; }
+  /* Light mode — slightly more visible */
+  html[data-theme="cspire"] .ticket-inner::after, html[data-theme="cspire"] .device-card::after { background:rgba(0,192,243,0.13); }
+  html[data-theme="cspire"] .cust-banner::after, html[data-theme="cspire"] .cust-detail-banner::after { background:rgba(0,192,243,0.12); }
+  html[data-theme="cspire"] .ticket-inner::before, html[data-theme="cspire"] .device-card::before { background:rgba(0,192,243,0.09); }
+  html[data-theme="cspire"] .cust-banner::before, html[data-theme="cspire"] .cust-detail-banner::before { background:rgba(0,192,243,0.08); }
 
   .cust-detail-banner-head { display:flex; align-items:center; gap:10px; padding:12px 14px; background:linear-gradient(90deg,rgba(0,192,243,0.14) 0%,rgba(0,192,243,0.04) 100%); border-bottom:1px solid rgba(0,192,243,0.12); border-left:3px solid var(--accent); }
   .cust-detail-banner-name { font-size:16px; font-weight:700; color:var(--text); }
@@ -1213,11 +1222,11 @@
   .cust-sub-item-meta span { display:flex; align-items:center; gap:3px; }
   .cust-empty-msg { padding:18px 14px; text-align:center; color:var(--text-muted); font-size:13px; }
   html[data-theme="cspire"] .cust-alpha-hd { color:#7a5598; background:var(--surface); border-left-color:#7a5598; }
-  html[data-theme="cspire"] .cust-card-num { color:#7a5598; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff; }
+  html[data-theme="cspire"] .cust-card-num { color:#7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
   html[data-theme="cspire"] .cust-card-inner { background:rgba(255,255,255,0.78); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.22); border-left:3px solid var(--accent); box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,192,243,0.1), 0 10px 28px rgba(122,85,152,0.07), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04); }
   html[data-theme="cspire"] .cust-detail-banner-head { background:linear-gradient(90deg,#00c0f3 0%,#009dd6 55%,#7a5598 100%); border-left-color:#00c0f3; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.25); }
   html[data-theme="cspire"] .cust-detail-label { color:#0f3d58; }
-  html[data-theme="cspire"] .cust-detail-banner-num { color:#7a5598; text-shadow: -1px 0 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff; }
+  html[data-theme="cspire"] .cust-detail-banner-num { color:#7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
   html[data-theme="cspire"] .cust-detail-banner { background:rgba(255,255,255,0.78); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.22); border-left:3px solid var(--accent); box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,192,243,0.1), 0 10px 28px rgba(122,85,152,0.07), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04); }
   html[data-theme="cspire"] .cust-sub-card { background:linear-gradient(155deg,#ffffff 0%,#f4f9fe 100%); border-color:rgba(0,192,243,0.2); box-shadow:0 2px 12px rgba(122,85,152,0.08), 0 0 0 1px rgba(255,255,255,0.6); }
 
@@ -1256,7 +1265,8 @@
   .cal-chip.chip-install { border-left-color:var(--success); color:var(--success); background:rgba(0,201,106,0.11); }
   html[data-theme="cspire"] .cal-chip.chip-repair  { background:rgba(255,103,32,0.13); }
   html[data-theme="cspire"] .cal-chip.chip-install { background:rgba(0,135,90,0.14); color:var(--success); border-left-color:var(--success); }
-  html[data-theme="cspire"] .cal-dow-cell { color:var(--text-dim); }
+  html[data-theme="cspire"] .cal-dow-cell { color:#ffffff; }
+  html[data-theme="cspire"] .cal-dow-cell:first-child, html[data-theme="cspire"] .cal-dow-cell:last-child { color:rgba(255,255,255,0.75); opacity:1; }
 
   /* ── CAL PANEL DRAG HANDLE ── */
   .cal-panel-resize-handle {
@@ -1936,9 +1946,9 @@
     <!-- ══ CALENDAR ══ -->
     <div class="screen" id="screen-calendar">
       <div class="topbar">
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
-          <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
+          <div class="cal-picker-wrap" id="cal-picker-wrap">
             <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
