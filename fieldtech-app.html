@@ -3987,7 +3987,7 @@
     if (scrollTarget) {
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const el = grid.querySelector(`.cal-agenda-day[data-date="${scrollTarget}"]`);
-        if (el) el.scrollIntoView({ block: 'start' });
+        if (el) grid.scrollTop += el.getBoundingClientRect().top - grid.getBoundingClientRect().top;
       }));
     }
   }
