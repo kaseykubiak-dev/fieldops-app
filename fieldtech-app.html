@@ -53,7 +53,7 @@
     --surface2: #d8eef9;
     --border: rgba(0,192,243,0.25);
     --accent: #00c0f3;
-    --accent2: #884d9d;
+    --accent2: #FF6720;
     --success: #00875a;
     --warning: #b86e00;
     --danger: #c0392b;
@@ -77,7 +77,7 @@
 
   /* C Spire overrides for things that hardcode rgba */
   html[data-theme="cspire"] .cust-banner { border-color: var(--cust-banner-border); background: var(--cust-banner-bg); }
-  html[data-theme="cspire"] .cust-banner-head { background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%); border-bottom-color: rgba(136,77,157,0.3); border-left-color: var(--accent); color: #fff; }
+  html[data-theme="cspire"] .cust-banner-head { background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%); border-bottom-color: rgba(122,85,152,0.3); border-left-color: var(--accent); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.25); }
   html[data-theme="cspire"] .cust-banner-head * { color: #fff; }
   html[data-theme="cspire"] .cust-icon { background: var(--cust-icon-bg); border-color: var(--cust-icon-border); }
   html[data-theme="cspire"] .cust-glance { background: var(--cust-glance-bg); border-color: var(--cust-glance-border); }
@@ -100,12 +100,12 @@
   html[data-theme="cspire"] .icon-btn .badge { background: #FF6720; border-color: var(--surface); }
   html[data-theme="cspire"] .svc-dot.on   { box-shadow: 0 0 5px var(--success); }
   html[data-theme="cspire"] .dot-live     { background: var(--success); }
-  html[data-theme="cspire"] .cust-tier    { background: rgba(0,192,243,0.12); color: #0f3d58; }
+  html[data-theme="cspire"] .cust-tier    { background: rgba(122,85,152,0.1); color: #7a5598; }
   html[data-theme="cspire"] .cf-val.sla   { color: #0f3d58; }
-  html[data-theme="cspire"] .detail-tb-id { color: var(--accent2); }
-  html[data-theme="cspire"] .back-btn     { color: var(--accent2); }
-  html[data-theme="cspire"] .ticket-id    { color: var(--accent2); }
-  html[data-theme="cspire"] .cust-bn-id   { color: var(--accent2); }
+  html[data-theme="cspire"] .detail-tb-id { color: #ffffff; }
+  html[data-theme="cspire"] .back-btn     { color: #ffffff; }
+  html[data-theme="cspire"] .ticket-id    { color: #7a5598; text-shadow: 0 0 4px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7); }
+  html[data-theme="cspire"] .cust-bn-id   { color: #7a5598; text-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.7); }
 
   /* ── C SPIRE GRADIENT OVERRIDES ── */
   html[data-theme="cspire"] body,
@@ -113,19 +113,21 @@
 
   html[data-theme="cspire"] .screen { background: linear-gradient(160deg, #f3f9fe 0%, #eaf4fb 100%); }
 
-  /* Headers — Consumer Gradient: C Spire Blue → Magnetic Purple */
+  /* Headers — Consumer Gradient: C Spire Blue dominant → soft Magnetic Purple */
   html[data-theme="cspire"] .topbar {
-    background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%);
+    background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%);
     color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.12);
     border-bottom: none;
-    box-shadow: 0 2px 20px rgba(136,77,157,0.28), 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 2px 20px rgba(122,85,152,0.22), 0 1px 0 rgba(255,255,255,0.1);
   }
   html[data-theme="cspire"] .topbar * { color: #ffffff; }
   html[data-theme="cspire"] .detail-topbar {
-    background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%);
+    background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%);
     color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.12);
     border-bottom: none;
-    box-shadow: 0 2px 20px rgba(136,77,157,0.28), 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 2px 20px rgba(122,85,152,0.22), 0 1px 0 rgba(255,255,255,0.1);
   }
   html[data-theme="cspire"] .detail-topbar * { color: #ffffff; }
   html[data-theme="cspire"] .topbar-logo {
@@ -191,8 +193,8 @@
     box-shadow: inset 0 1px 0 rgba(0,192,243,0.3);
   }
   html[data-theme="cspire"] .bnav-btn.active::after {
-    background: linear-gradient(90deg, #00c0f3, #884d9d);
-    box-shadow: 0 0 8px rgba(136,77,157,0.4);
+    background: linear-gradient(90deg, #00c0f3, #7a5598);
+    box-shadow: 0 0 8px rgba(122,85,152,0.35);
   }
   html[data-theme="cspire"] .dev-section-title,
   html[data-theme="cspire"] .dev-section-chevron { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
@@ -203,11 +205,10 @@
   html[data-theme="cspire"] .iface-ip,
   html[data-theme="cspire"] .topo-info-ip,
   html[data-theme="cspire"] .cal-mini-time { color: #0f3d58; text-shadow: none; }
-  html[data-theme="cspire"] .dev-section-hd { background: linear-gradient(90deg, rgba(0,192,243,0.88) 0%, rgba(136,77,157,0.78) 100%); }
-  html[data-theme="cspire"] .dev-section-hd:hover { background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%); }
+  html[data-theme="cspire"] .dev-section-hd { background: linear-gradient(90deg, rgba(0,192,243,0.88) 0%, rgba(0,157,214,0.75) 55%, rgba(122,85,152,0.7) 100%); }
+  html[data-theme="cspire"] .dev-section-hd:hover { background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%); }
   html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #e8f5fd 0%, #ddeef9 100%); }
-  html[data-theme="cspire"] .avatar-sm { background: linear-gradient(135deg, #00c0f3, #884d9d); color: #fff; border-color: rgba(255,255,255,0.3); }
-  html[data-theme="cspire"] .cust-tier { background: rgba(136,77,157,0.1); color: #884d9d; }
+  html[data-theme="cspire"] .avatar-sm { background: linear-gradient(135deg, #00c0f3, #7a5598); color: #fff; border-color: rgba(255,255,255,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
 
   /* ── Light-text outline: thin dark shadow on any accent-blue text so it
         reads clearly against the light blue surface                     ── */
@@ -1187,14 +1188,14 @@
   .cust-sub-item-meta { display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--text-muted); }
   .cust-sub-item-meta span { display:flex; align-items:center; gap:3px; }
   .cust-empty-msg { padding:18px 14px; text-align:center; color:var(--text-muted); font-size:13px; }
-  html[data-theme="cspire"] .cust-alpha-hd { color:#0a5a7a; background:var(--surface); border-left-color:#0a5a7a; }
-  html[data-theme="cspire"] .cust-card-num { color:#0a5a7a; }
-  html[data-theme="cspire"] .cust-card-inner { background:linear-gradient(155deg,#dceef8 0%,#cee4f4 100%); border:1px solid rgba(0,80,160,0.2); box-shadow:0 4px 16px rgba(0,60,140,0.12), 0 0 0 1px rgba(255,255,255,0.5), inset 0 1px 0 rgba(255,255,255,0.75); }
-  html[data-theme="cspire"] .cust-detail-banner-head { background:linear-gradient(90deg,rgba(0,192,243,0.35) 0%,rgba(0,192,243,0.18) 100%); border-left-color:#0a5a7a; }
-  html[data-theme="cspire"] .cust-detail-label { color:#0a5a7a; }
-  html[data-theme="cspire"] .cust-detail-banner-num { color:#0a5a7a; }
-  html[data-theme="cspire"] .cust-detail-banner { box-shadow:0 4px 16px rgba(0,60,140,0.1), 0 0 0 1px rgba(255,255,255,0.4); }
-  html[data-theme="cspire"] .cust-sub-card { background:linear-gradient(155deg,#dceef8 0%,#cee4f4 100%); border-color:rgba(0,80,160,0.2); box-shadow:0 4px 16px rgba(0,60,140,0.1), 0 0 0 1px rgba(255,255,255,0.5); }
+  html[data-theme="cspire"] .cust-alpha-hd { color:#7a5598; background:var(--surface); border-left-color:#7a5598; }
+  html[data-theme="cspire"] .cust-card-num { color:#7a5598; text-shadow: 0 0 4px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7); }
+  html[data-theme="cspire"] .cust-card-inner { background:linear-gradient(155deg,#ffffff 0%,#f4f9fe 100%); border:1px solid rgba(0,192,243,0.2); box-shadow:0 2px 12px rgba(122,85,152,0.09), 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9); }
+  html[data-theme="cspire"] .cust-detail-banner-head { background:linear-gradient(90deg,#00c0f3 0%,#009dd6 55%,#7a5598 100%); border-left-color:#00c0f3; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.25); }
+  html[data-theme="cspire"] .cust-detail-label { color:#0f3d58; }
+  html[data-theme="cspire"] .cust-detail-banner-num { color:#7a5598; text-shadow: 0 0 4px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7); }
+  html[data-theme="cspire"] .cust-detail-banner { box-shadow:0 2px 12px rgba(122,85,152,0.1), 0 0 0 1px rgba(255,255,255,0.5); }
+  html[data-theme="cspire"] .cust-sub-card { background:linear-gradient(155deg,#ffffff 0%,#f4f9fe 100%); border-color:rgba(0,192,243,0.2); box-shadow:0 2px 12px rgba(122,85,152,0.08), 0 0 0 1px rgba(255,255,255,0.6); }
 
   /* ── CALENDAR MOBILE AGENDA VIEW ── */
   @media(max-width:799px) {
