@@ -104,8 +104,8 @@
   html[data-theme="cspire"] .cf-val.sla   { color: #0f3d58; }
   html[data-theme="cspire"] .detail-tb-id { color: #ffffff; }
   html[data-theme="cspire"] .back-btn     { color: #ffffff; }
-  html[data-theme="cspire"] .ticket-id    { color: #7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
-  html[data-theme="cspire"] .cust-bn-id   { color: #7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
+  html[data-theme="cspire"] .ticket-id    { color: #ffffff; text-shadow: none; }
+  html[data-theme="cspire"] .cust-bn-id   { color: #ffffff; text-shadow: none; }
 
   /* ── C SPIRE GRADIENT OVERRIDES ── */
   html[data-theme="cspire"] body,
@@ -220,9 +220,10 @@
   html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #e8f5fd 0%, #ddeef9 100%); }
   html[data-theme="cspire"] .avatar-sm { background: linear-gradient(135deg, #00c0f3, #7a5598); color: #fff; border-color: rgba(255,255,255,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
 
-  /* Orange note text (inline color:var(--accent2)) gets a thin white border */
+  /* Orange note text (inline color:var(--accent2)) — solid white for readability */
   html[data-theme="cspire"] [style*="--accent2"] {
-    text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9);
+    color: #ffffff !important;
+    text-shadow: none;
   }
 
   /* ── Light-text outline: thin dark shadow on any accent-blue text so it
@@ -483,15 +484,15 @@
   .ticket-pills { display:flex; gap:5px; }
 
   .pill { padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; font-family:var(--mono); }
-  .pill-critical { background:rgba(255,82,82,0.15); color:var(--danger); }
-  .pill-high { background:rgba(255,103,32,0.15); color:var(--accent2); }
-  .pill-medium { background:rgba(255,215,64,0.15); color:var(--warning); }
-  .pill-low { background:rgba(0,230,118,0.12); color:var(--success); }
-  .pill-open { background:rgba(0,192,243,0.1); color:var(--accent); }
-  .pill-progress { background:rgba(255,103,32,0.1); color:var(--accent2); }
-  .pill-resolved { background:rgba(0,230,118,0.1); color:var(--success); }
-  .pill-enroute  { background:rgba(0,192,243,0.12); color:var(--accent); }
-  .pill-pending  { background:rgba(255,215,64,0.12); color:var(--warning); }
+  .pill-critical { background:rgba(255,82,82,0.18);   color:var(--danger);   border:1.5px solid rgba(255,82,82,0.42);   box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-high     { background:rgba(255,103,32,0.18);  color:var(--accent2);  border:1.5px solid rgba(255,103,32,0.44);  box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-medium   { background:rgba(255,215,64,0.18);  color:var(--warning);  border:1.5px solid rgba(255,215,64,0.42);  box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-low      { background:rgba(0,230,118,0.15);   color:var(--success);  border:1.5px solid rgba(0,230,118,0.42);   box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-open     { background:rgba(0,192,243,0.14);   color:var(--accent);   border:1.5px solid rgba(0,192,243,0.44);   box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-progress { background:rgba(255,103,32,0.14);  color:var(--accent2);  border:1.5px solid rgba(255,103,32,0.42);  box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-resolved { background:rgba(0,230,118,0.13);   color:var(--success);  border:1.5px solid rgba(0,230,118,0.4);    box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-enroute  { background:rgba(0,192,243,0.15);   color:var(--accent);   border:1.5px solid rgba(0,192,243,0.42);   box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
+  .pill-pending  { background:rgba(255,215,64,0.15);  color:var(--warning);  border:1.5px solid rgba(255,215,64,0.4);   box-shadow:0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14); }
 
   /* ── SERVICE ORDER ── */
   .so-item { display:flex; align-items:center; gap:12px; padding:12px 16px; }
@@ -1070,6 +1071,13 @@
     background: #85A7CA;
     border-bottom-color: rgba(0,0,0,0.08);
   }
+  /* Calendar picker dropdown — reset non-header text to dark (topbar * sets all white) */
+  html[data-theme="cspire"] .cal-picker-drop { background: var(--surface); color: var(--text); }
+  html[data-theme="cspire"] .cal-picker-dow span { color: var(--text-dim) !important; }
+  html[data-theme="cspire"] .cal-picker-cell { color: var(--text) !important; }
+  html[data-theme="cspire"] .cal-picker-cell.today { color: var(--accent) !important; }
+  html[data-theme="cspire"] .cal-picker-cell.selected { color: #000 !important; }
+  html[data-theme="cspire"] .cal-picker-cell.other-month { color: var(--text-muted) !important; }
   html[data-theme="cspire"] .cal-week  { border-bottom-color:rgba(0,80,160,0.15); }
   html[data-theme="cspire"] .cal-day   { border-right-color:rgba(0,80,160,0.15); }
   html[data-theme="cspire"] .cal-day.selected { background:rgba(0,192,243,0.12); }
@@ -1194,11 +1202,11 @@
   /* Burst orb — light theme override */
   html[data-theme="cspire"] .app { background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.22) 0%, transparent 40%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 37%), radial-gradient(circle at 50% 50%, rgba(0,192,243,0.07) 0%, transparent 52%); }
   /* Brand shape corner accents — primary ray */
-  .ticket-inner::after, .device-card::after { content:''; position:absolute; top:-14px; right:-14px; width:68px; height:34px; border-radius:17px; background:rgba(0,192,243,0.1); transform:rotate(26deg); pointer-events:none; }
-  .cust-banner::after, .cust-detail-banner::after { content:''; position:absolute; top:-18px; right:-16px; width:96px; height:44px; border-radius:22px; background:rgba(0,192,243,0.09); transform:rotate(26deg); pointer-events:none; }
+  .ticket-inner::after, .device-card::after { content:''; position:absolute; top:-14px; right:-14px; width:68px; height:34px; border-radius:17px; background:rgba(0,192,243,0.1); transform:rotate(26deg); pointer-events:none; z-index:-1; }
+  .cust-banner::after, .cust-detail-banner::after { content:''; position:absolute; top:-18px; right:-16px; width:96px; height:44px; border-radius:22px; background:rgba(0,192,243,0.09); transform:rotate(26deg); pointer-events:none; z-index:-1; }
   /* Brand shape corner accents — secondary crossing ray */
-  .ticket-inner::before, .device-card::before { content:''; position:absolute; top:-8px; right:-22px; width:58px; height:28px; border-radius:14px; background:rgba(0,192,243,0.065); transform:rotate(56deg); pointer-events:none; }
-  .cust-banner::before, .cust-detail-banner::before { content:''; position:absolute; top:-10px; right:-26px; width:80px; height:38px; border-radius:19px; background:rgba(0,192,243,0.06); transform:rotate(56deg); pointer-events:none; }
+  .ticket-inner::before, .device-card::before { content:''; position:absolute; top:-8px; right:-22px; width:58px; height:28px; border-radius:14px; background:rgba(0,192,243,0.065); transform:rotate(56deg); pointer-events:none; z-index:-1; }
+  .cust-banner::before, .cust-detail-banner::before { content:''; position:absolute; top:-10px; right:-26px; width:80px; height:38px; border-radius:19px; background:rgba(0,192,243,0.06); transform:rotate(56deg); pointer-events:none; z-index:-1; }
   /* Light mode — slightly more visible */
   html[data-theme="cspire"] .ticket-inner::after, html[data-theme="cspire"] .device-card::after { background:rgba(0,192,243,0.13); }
   html[data-theme="cspire"] .cust-banner::after, html[data-theme="cspire"] .cust-detail-banner::after { background:rgba(0,192,243,0.12); }
@@ -1222,11 +1230,11 @@
   .cust-sub-item-meta span { display:flex; align-items:center; gap:3px; }
   .cust-empty-msg { padding:18px 14px; text-align:center; color:var(--text-muted); font-size:13px; }
   html[data-theme="cspire"] .cust-alpha-hd { color:#7a5598; background:var(--surface); border-left-color:#7a5598; }
-  html[data-theme="cspire"] .cust-card-num { color:#7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
+  html[data-theme="cspire"] .cust-card-num { color:#ffffff; text-shadow:none; }
   html[data-theme="cspire"] .cust-card-inner { background:rgba(255,255,255,0.78); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.22); border-left:3px solid var(--accent); box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,192,243,0.1), 0 10px 28px rgba(122,85,152,0.07), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04); }
   html[data-theme="cspire"] .cust-detail-banner-head { background:linear-gradient(90deg,#00c0f3 0%,#009dd6 55%,#7a5598 100%); border-left-color:#00c0f3; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.25); }
   html[data-theme="cspire"] .cust-detail-label { color:#0f3d58; }
-  html[data-theme="cspire"] .cust-detail-banner-num { color:#7a5598; text-shadow: -0.5px 0 0 rgba(255,255,255,0.9), 0.5px 0 0 rgba(255,255,255,0.9), 0 -0.5px 0 rgba(255,255,255,0.9), 0 0.5px 0 rgba(255,255,255,0.9); }
+  html[data-theme="cspire"] .cust-detail-banner-num { color:#ffffff; text-shadow:none; }
   html[data-theme="cspire"] .cust-detail-banner { background:rgba(255,255,255,0.78); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.22); border-left:3px solid var(--accent); box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,192,243,0.1), 0 10px 28px rgba(122,85,152,0.07), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04); }
   html[data-theme="cspire"] .cust-sub-card { background:linear-gradient(155deg,#ffffff 0%,#f4f9fe 100%); border-color:rgba(0,192,243,0.2); box-shadow:0 2px 12px rgba(122,85,152,0.08), 0 0 0 1px rgba(255,255,255,0.6); }
 
@@ -1946,9 +1954,9 @@
     <!-- ══ CALENDAR ══ -->
     <div class="screen" id="screen-calendar">
       <div class="topbar">
-        <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;">
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
-          <div class="cal-picker-wrap" id="cal-picker-wrap">
+          <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
             <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
