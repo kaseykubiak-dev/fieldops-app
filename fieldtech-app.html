@@ -296,6 +296,7 @@
   html,body { background:radial-gradient(ellipse at 50% 0%, #162436 0%, #0e1620 65%); background-color:#0e1a2a; color:var(--text); font-family:var(--sans); height:100%; overflow:hidden; overscroll-behavior:none; }
 
   .app { display:flex; flex-direction:column; height:100vh; height:100dvh; }
+  @supports (-webkit-touch-callout: none) { .app { height: -webkit-fill-available; } }
 
   /* TOP BAR */
   .topbar { min-height:var(--top-bar); background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); border-bottom:2px solid rgba(0,192,243,0.32); display:flex; align-items:center; padding:env(safe-area-inset-top) 16px 0; gap:12px; flex-shrink:0; z-index:20; box-shadow:0 2px 16px rgba(0,0,0,0.5), 0 1px 0 rgba(0,192,243,0.07); }
