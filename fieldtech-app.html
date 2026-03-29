@@ -81,8 +81,15 @@
   html[data-theme="cspire"] .acc-firewall  { background:rgba(0,135,90,0.1);  border-color:rgba(0,135,90,0.25);  color:var(--success); }
   html[data-theme="cspire"] .acc-voip      { background:rgba(7,74,117,0.1);  border-color:rgba(7,74,117,0.25);  color:var(--accent2); }
   html[data-theme="cspire"] .acc-ddos      { background:rgba(184,110,0,0.1); border-color:rgba(184,110,0,0.25); color:var(--warning); }
-  html[data-theme="cspire"] .pill-open     { background:rgba(0,192,243,0.12); color:#0f3d58; }
-  html[data-theme="cspire"] .pill-progress { background:rgba(7,74,117,0.12); color:var(--accent2); }
+  html[data-theme="cspire"] .pill-critical { background: linear-gradient(135deg, rgba(220,38,38,0.22) 0%, rgba(192,57,43,0.1) 100%);  border: 1.5px solid rgba(192,57,43,0.45);  color: #8b1a1a; }
+  html[data-theme="cspire"] .pill-high     { background: linear-gradient(135deg, rgba(255,103,32,0.28) 0%, rgba(204,82,24,0.12) 100%); border: 1.5px solid rgba(204,82,24,0.48); color: #7c2d00; }
+  html[data-theme="cspire"] .pill-medium   { background: linear-gradient(135deg, rgba(184,110,0,0.24) 0%, rgba(184,110,0,0.1) 100%);   border: 1.5px solid rgba(184,110,0,0.44);  color: #6b3a00; }
+  html[data-theme="cspire"] .pill-low      { background: linear-gradient(135deg, rgba(0,135,90,0.22) 0%, rgba(0,135,90,0.09) 100%);    border: 1.5px solid rgba(0,135,90,0.42);   color: #004d32; }
+  html[data-theme="cspire"] .pill-open     { background: linear-gradient(135deg, rgba(0,192,243,0.32) 0%, rgba(0,96,200,0.14) 100%);   border: 1.5px solid rgba(0,152,210,0.52);  color: #0f3d58; }
+  html[data-theme="cspire"] .pill-progress { background: linear-gradient(135deg, rgba(255,103,32,0.26) 0%, rgba(255,103,32,0.1) 100%); border: 1.5px solid rgba(255,103,32,0.46);  color: #7c2d00; }
+  html[data-theme="cspire"] .pill-resolved { background: linear-gradient(135deg, rgba(0,135,90,0.22) 0%, rgba(0,135,90,0.09) 100%);    border: 1.5px solid rgba(0,135,90,0.42);   color: #004d32; }
+  html[data-theme="cspire"] .pill-enroute  { background: linear-gradient(135deg, rgba(0,192,243,0.3) 0%, rgba(136,77,157,0.18) 100%);  border: 1.5px solid rgba(0,152,210,0.44);  color: #0f3d58; }
+  html[data-theme="cspire"] .pill-pending  { background: linear-gradient(135deg, rgba(184,110,0,0.24) 0%, rgba(184,110,0,0.1) 100%);   border: 1.5px solid rgba(184,110,0,0.44);  color: #6b3a00; }
   html[data-theme="cspire"] .topbar-logo   { background: var(--accent2); }
   html[data-theme="cspire"] .avatar-sm     { background: linear-gradient(135deg, #c2dff0, #a5cbdf); color: var(--accent2); border-color: var(--border); }
   html[data-theme="cspire"] .select-field  { background-color: var(--surface2); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a90aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
@@ -104,9 +111,14 @@
   html[data-theme="cspire"] .screen { background: linear-gradient(165deg, #d4eaf8 0%, #c4dcf0 100%); }
 
   html[data-theme="cspire"] .topbar {
-    background: linear-gradient(90deg, rgba(0,192,243,0.35) 0%, rgba(0,192,243,0.18) 100%);
-    border-bottom: 1px solid rgba(0,96,140,0.2);
-    box-shadow: 0 2px 14px rgba(0,60,140,0.14), 0 1px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(90deg, rgba(0,192,243,0.7) 0%, rgba(0,152,220,0.45) 55%, rgba(15,61,88,0.22) 100%);
+    border-bottom: 1px solid rgba(0,152,220,0.35);
+    box-shadow: 0 2px 14px rgba(0,60,140,0.18), 0 1px 0 rgba(255,255,255,0.5);
+  }
+  html[data-theme="cspire"] .detail-topbar {
+    background: linear-gradient(90deg, rgba(0,192,243,0.7) 0%, rgba(0,152,220,0.45) 55%, rgba(15,61,88,0.22) 100%);
+    border-bottom: 2px solid #00c0f3;
+    box-shadow: 0 2px 14px rgba(0,60,140,0.18), 0 1px 0 rgba(255,255,255,0.5);
   }
   html[data-theme="cspire"] .topbar-logo {
     background: linear-gradient(135deg, #0f3d58 0%, #0f3d58 100%);
@@ -121,8 +133,8 @@
   html[data-theme="cspire"] .stat-strip,
   html[data-theme="cspire"] .filter-tabs,
   html[data-theme="cspire"] .refresh-bar {
-    background: linear-gradient(135deg, #c4dff5 0%, #b8d6ee 100%);
-    border-bottom-color: rgba(0,80,160,0.28);
+    background: linear-gradient(135deg, rgba(0,192,243,0.52) 0%, rgba(0,152,220,0.3) 55%, rgba(15,61,88,0.12) 100%);
+    border-bottom-color: rgba(0,152,220,0.35);
   }
   html[data-theme="cspire"] .stat-chip {
     background: linear-gradient(150deg, #d4eaf8 0%, #c8e2f4 100%);
@@ -147,9 +159,9 @@
     background: linear-gradient(135deg, rgba(0,192,243,0.16) 0%, rgba(0,192,243,0.06) 100%);
     border-bottom: 1px solid rgba(0,80,160,0.3);
   }
-  html[data-theme="cspire"] .type-badge.repair       { background: linear-gradient(135deg, rgba(255,103,32,0.2) 0%, rgba(255,103,32,0.07) 100%); }
-  html[data-theme="cspire"] .type-badge.installation { background: linear-gradient(135deg, rgba(0,135,90,0.2)   0%, rgba(0,135,90,0.07)   100%); }
-  html[data-theme="cspire"] .type-badge.service-call { background: linear-gradient(135deg, rgba(0,192,243,0.2)  0%, rgba(0,192,243,0.07)  100%); }
+  html[data-theme="cspire"] .type-badge.repair       { background: linear-gradient(135deg, rgba(255,103,32,0.28) 0%, rgba(204,82,24,0.12) 100%); border: 1.5px solid rgba(204,82,24,0.48); color: #7c2d00; }
+  html[data-theme="cspire"] .type-badge.installation { background: linear-gradient(135deg, rgba(0,135,90,0.24)   0%, rgba(0,135,90,0.1) 100%);   border: 1.5px solid rgba(0,135,90,0.42);  color: #004d32; }
+  html[data-theme="cspire"] .type-badge.service-call { background: linear-gradient(135deg, rgba(0,192,243,0.32)  0%, rgba(0,96,200,0.14) 100%);  border: 1.5px solid rgba(0,152,210,0.52); color: #0f3d58; }
   html[data-theme="cspire"] .device-card {
     background: linear-gradient(155deg, #daeef8 0%, #cce4f4 100%);
     border: 1px solid rgba(0,80,160,0.28);
@@ -186,9 +198,32 @@
   html[data-theme="cspire"] .iface-ip,
   html[data-theme="cspire"] .topo-info-ip,
   html[data-theme="cspire"] .cal-mini-time { color: #0f3d58; text-shadow: none; }
-  html[data-theme="cspire"] .dev-section-hd { background:linear-gradient(90deg, rgba(0,192,243,0.35) 0%, rgba(0,192,243,0.18) 100%); }
-  html[data-theme="cspire"] .dev-section-hd:hover { background:linear-gradient(90deg, rgba(0,192,243,0.45) 0%, rgba(0,192,243,0.25) 100%); }
+  html[data-theme="cspire"] .dev-section-hd { background:linear-gradient(90deg, rgba(0,192,243,0.58) 0%, rgba(0,152,220,0.32) 60%, rgba(0,192,243,0.08) 100%); }
+  html[data-theme="cspire"] .dev-section-hd:hover { background:linear-gradient(90deg, rgba(0,192,243,0.68) 0%, rgba(0,152,220,0.42) 60%, rgba(0,192,243,0.14) 100%); }
   html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #cce4f6 0%, #bcd8ee 100%); }
+
+  /* ── Light-text outline: thin dark shadow on any accent-blue text so it
+        reads clearly against the light blue surface                     ── */
+  html[data-theme="cspire"] .bnav-btn.active,
+  html[data-theme="cspire"] .stat-val.accent,
+  html[data-theme="cspire"] .sn-link-btn,
+  html[data-theme="cspire"] .order-link,
+  html[data-theme="cspire"] .portal-link,
+  html[data-theme="cspire"] .acc-internet,
+  html[data-theme="cspire"] .device-role-badge,
+  html[data-theme="cspire"] .cal-agenda-today .cal-agenda-date-hd,
+  html[data-theme="cspire"] .cal-picker-btn,
+  html[data-theme="cspire"] .cal-picker-cell.today,
+  html[data-theme="cspire"] .cust-alpha-hd,
+  html[data-theme="cspire"] .cust-card-num,
+  html[data-theme="cspire"] .cust-detail-banner-num,
+  html[data-theme="cspire"] .cust-detail-label,
+  html[data-theme="cspire"] .cust-sort-btn.active,
+  html[data-theme="cspire"] .desktop-nav-btn.active,
+  html[data-theme="cspire"] .notif-num,
+  html[data-theme="cspire"] .cspire-c {
+    text-shadow: 0 0 1px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.18);
+  }
 
   /* C Spire SVG logo */
   .cspire-logo-svg { display:flex; align-items:center; flex-shrink:0; }
@@ -542,9 +577,9 @@
   /* SECTIONS */
   .section { margin:0 14px 12px; }
   .section-title { font-family:var(--sans); font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; padding:7px 14px; background:linear-gradient(90deg, rgba(0,192,243,0.12) 0%, rgba(0,192,243,0.04) 100%); border-left:3px solid var(--accent); border-radius:0 4px 4px 0; }
-  html[data-theme="cspire"] .section-title { background:linear-gradient(90deg, rgba(0,192,243,0.35) 0%, rgba(0,192,243,0.18) 100%); border-left-color:#0a5a7a; }
+  html[data-theme="cspire"] .section-title { background:linear-gradient(90deg, rgba(0,192,243,0.58) 0%, rgba(0,152,220,0.32) 60%, rgba(0,192,243,0.08) 100%); border-left-color:#00c0f3; }
   html[data-theme="cspire"] .date-divider { background:var(--surface); border-top-color:rgba(0,96,140,0.2); border-bottom-color:rgba(0,96,140,0.2); }
-  html[data-theme="cspire"] .cust-banner-head { background:linear-gradient(90deg, rgba(0,192,243,0.35) 0%, rgba(0,192,243,0.18) 100%); border-bottom-color:rgba(0,96,140,0.2); border-left-color:#0a5a7a; }
+  html[data-theme="cspire"] .cust-banner-head { background:linear-gradient(90deg, rgba(0,192,243,0.58) 0%, rgba(0,152,220,0.32) 60%, rgba(0,192,243,0.08) 100%); border-bottom-color:rgba(0,96,140,0.25); border-left-color:#00c0f3; }
   .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
   .card-body { padding:14px; }
   .desc-text { font-size:14px; line-height:1.65; color:var(--text-dim); }
@@ -1002,12 +1037,12 @@
 
   /* C Spire light mode calendar overrides */
   html[data-theme="cspire"] .cal-month-nav {
-    background:linear-gradient(135deg, #c4dff5 0%, #b8d6ee 100%);
-    border-bottom-color:rgba(0,80,160,0.28);
+    background:linear-gradient(90deg, rgba(0,192,243,0.62) 0%, rgba(0,152,220,0.38) 55%, rgba(15,61,88,0.16) 100%);
+    border-bottom-color:rgba(0,152,220,0.35);
   }
   html[data-theme="cspire"] .cal-dow-row {
-    background:linear-gradient(135deg, #c4dff5 0%, #b8d6ee 100%);
-    border-bottom-color:rgba(0,80,160,0.28);
+    background:linear-gradient(90deg, rgba(0,192,243,0.5) 0%, rgba(0,152,220,0.28) 55%, rgba(15,61,88,0.1) 100%);
+    border-bottom-color:rgba(0,152,220,0.3);
   }
   html[data-theme="cspire"] .cal-week  { border-bottom-color:rgba(0,80,160,0.15); }
   html[data-theme="cspire"] .cal-day   { border-right-color:rgba(0,80,160,0.15); }
@@ -1179,6 +1214,7 @@
     padding:2px 8px; border-radius:99px; flex-shrink:0;
   }
   .cal-agenda-cards { display:flex; flex-direction:column; gap:7px; padding:0 14px 12px; }
+  .cal-agenda-empty { font-size:11px; color:var(--text-muted); font-style:italic; padding:2px 0 4px; }
   html[data-theme="cspire"] .cal-agenda-date-hd { background:var(--bg); }
   html[data-theme="cspire"] .cal-agenda-today .cal-agenda-date-hd { color:var(--accent2); }
   html[data-theme="cspire"] .cal-agenda-today-badge { background:var(--accent2); color:#fff; }
@@ -3710,13 +3746,19 @@
 
   function pickerPickDay(year, month, day) {
     // Normalise month overflow from prev/next month clicks
-    const d = new Date(year, month, day);
-    _cal.year        = d.getFullYear();
-    _cal.month       = d.getMonth();
-    _cal.selectedDay = d.getDate();
-    _cal.tickets     = null;
-    closeCalDayPanel();
+    const d          = new Date(year, month, day);
+    const newYear    = d.getFullYear();
+    const newMonth   = d.getMonth();
+    const sameMonth  = (newYear === _cal.year && newMonth === _cal.month);
+
+    closeCalDayPanel();   // clears _cal.selectedDay — must be before we set it
     closeCalPicker();
+
+    _cal.year        = newYear;
+    _cal.month       = newMonth;
+    _cal.selectedDay = d.getDate();
+    if (!sameMonth) _cal.tickets = null;  // only refetch if month actually changed
+
     loadCalendarScreen();
   }
 
@@ -3879,15 +3921,11 @@
     const totalDays = new Date(year, month + 1, 0).getDate();
 
     let html = '<div class="cal-agenda">';
-    let hasAny = false;
 
     for (let day = 1; day <= totalDays; day++) {
       const d      = new Date(year, month, day);
       const dStr   = calDateStr(d);
       const dayTix = byDay[dStr] || [];
-      if (dayTix.length === 0) continue;
-      hasAny = true;
-
       const isToday   = dStr === todayStr;
       const dateLabel = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
@@ -3898,39 +3936,36 @@
       </div>`;
       html += '<div class="cal-agenda-cards">';
 
-      dayTix.forEach(inc => {
-        const pri      = PRIORITY_MAP[inc.priority] || { label:'Low',  cls:'pill-low'  };
-        const state    = STATE_MAP[inc.state]        || { label:'Open', cls:'pill-open' };
-        const caseType = getCaseType(inc);
-        const company  = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || 'Unknown';
-        const startRaw = inc.u_scheduled_start;
-        const timeStr  = startRaw
-          ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
-          : '—';
-        html += `
-        <div class="cal-mini-card" onclick="openDetail('${escHtml(inc.number)}')">
-          <div class="cal-mini-top">
-            <span class="cal-mini-company">${escHtml(company)}</span>
-            <span class="cal-mini-time">${timeStr}</span>
-          </div>
-          <div class="cal-mini-desc">${escHtml(inc.short_description || '—')}</div>
-          <div class="cal-mini-pills">
-            <span class="pill ${pri.cls}">${pri.label}</span>
-            <span class="pill ${state.cls}">${state.label}</span>
-            <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
-            <span class="cal-mini-num">${escHtml(inc.number)}</span>
-          </div>
-        </div>`;
-      });
+      if (dayTix.length === 0) {
+        html += `<div class="cal-agenda-empty">No tickets assigned</div>`;
+      } else {
+        dayTix.forEach(inc => {
+          const pri      = PRIORITY_MAP[inc.priority] || { label:'Low',  cls:'pill-low'  };
+          const state    = STATE_MAP[inc.state]        || { label:'Open', cls:'pill-open' };
+          const caseType = getCaseType(inc);
+          const company  = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || 'Unknown';
+          const startRaw = inc.u_scheduled_start;
+          const timeStr  = startRaw
+            ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
+            : '—';
+          html += `
+          <div class="cal-mini-card" onclick="openDetail('${escHtml(inc.number)}')">
+            <div class="cal-mini-top">
+              <span class="cal-mini-company">${escHtml(company)}</span>
+              <span class="cal-mini-time">${timeStr}</span>
+            </div>
+            <div class="cal-mini-desc">${escHtml(inc.short_description || '—')}</div>
+            <div class="cal-mini-pills">
+              <span class="pill ${pri.cls}">${pri.label}</span>
+              <span class="pill ${state.cls}">${state.label}</span>
+              <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
+              <span class="cal-mini-num">${escHtml(inc.number)}</span>
+            </div>
+          </div>`;
+        });
+      }
 
       html += '</div></div>';
-    }
-
-    if (!hasAny) {
-      html += `<div class="cal-empty-day" style="padding:32px 16px;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span>No tickets scheduled this month</span>
-      </div>`;
     }
 
     html += '</div>';
@@ -3946,10 +3981,10 @@
         : null;
 
     if (scrollTarget) {
-      setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
         const el = grid.querySelector(`.cal-agenda-day[data-date="${scrollTarget}"]`);
-        if (el) grid.scrollTop = el.offsetTop;
-      }, 50);
+        if (el) el.scrollIntoView({ block: 'start' });
+      }));
     }
   }
 
