@@ -48,41 +48,42 @@
 
   /* ── C SPIRE LIGHT THEME ── */
   html[data-theme="cspire"] {
-    --bg: #B9DEF3;
-    --surface: #d0eaf8;
-    --surface2: #a8d4ee;
-    --border: #0f3d58;
+    --bg: #edf7fd;
+    --surface: #ffffff;
+    --surface2: #d8eef9;
+    --border: rgba(0,192,243,0.25);
     --accent: #00c0f3;
-    --accent2: #0f3d58;
+    --accent2: #884d9d;
     --success: #00875a;
     --warning: #b86e00;
     --danger: #c0392b;
     --violet: #543161;
     --text: #131e29;
     --text-dim: #0f3d58;
-    --text-muted: #2a5a7a;
-    --toggle-bg: #a8d4ee;
-    --toggle-border: #6aaad0;
-    --toggle-knob: #00c0f3;
-    --toggle-label: #2a5a7a;
-    --cust-banner-bg: rgba(0,192,243,0.1);
-    --cust-banner-border: rgba(0,192,243,0.4);
-    --cust-banner-head-bg: rgba(0,192,243,0.12);
-    --cust-banner-head-border: rgba(0,192,243,0.3);
-    --cust-icon-bg: rgba(0,192,243,0.18);
-    --cust-icon-border: rgba(0,192,243,0.4);
-    --cust-glance-bg: rgba(0,192,243,0.1);
-    --cust-glance-border: rgba(0,192,243,0.35);
+    --text-muted: #7a6090;
+    --toggle-bg: #e4f2fb;
+    --toggle-border: rgba(0,192,243,0.3);
+    --toggle-knob: #884d9d;
+    --toggle-label: #6b4a7e;
+    --cust-banner-bg: rgba(136,77,157,0.05);
+    --cust-banner-border: rgba(136,77,157,0.22);
+    --cust-banner-head-bg: rgba(0,192,243,0.08);
+    --cust-banner-head-border: rgba(0,192,243,0.22);
+    --cust-icon-bg: rgba(136,77,157,0.08);
+    --cust-icon-border: rgba(136,77,157,0.25);
+    --cust-glance-bg: rgba(0,192,243,0.06);
+    --cust-glance-border: rgba(0,192,243,0.2);
   }
 
   /* C Spire overrides for things that hardcode rgba */
   html[data-theme="cspire"] .cust-banner { border-color: var(--cust-banner-border); background: var(--cust-banner-bg); }
-  html[data-theme="cspire"] .cust-banner-head { background: linear-gradient(90deg, rgba(15,61,88,0.78) 0%, rgba(0,120,180,0.62) 50%, rgba(0,192,243,0.75) 100%); border-bottom-color: var(--cust-banner-head-border); border-left-color: var(--accent); }
+  html[data-theme="cspire"] .cust-banner-head { background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%); border-bottom-color: rgba(136,77,157,0.3); border-left-color: var(--accent); color: #fff; }
+  html[data-theme="cspire"] .cust-banner-head * { color: #fff; }
   html[data-theme="cspire"] .cust-icon { background: var(--cust-icon-bg); border-color: var(--cust-icon-border); }
   html[data-theme="cspire"] .cust-glance { background: var(--cust-glance-bg); border-color: var(--cust-glance-border); }
   html[data-theme="cspire"] .acc-internet { background:rgba(0,192,243,0.1); border-color:rgba(0,192,243,0.25); color:var(--accent); }
   html[data-theme="cspire"] .acc-firewall  { background:rgba(0,135,90,0.1);  border-color:rgba(0,135,90,0.25);  color:var(--success); }
-  html[data-theme="cspire"] .acc-voip      { background:rgba(7,74,117,0.1);  border-color:rgba(7,74,117,0.25);  color:var(--accent2); }
+  html[data-theme="cspire"] .acc-voip      { background:rgba(136,77,157,0.08); border-color:rgba(136,77,157,0.22); color:var(--accent2); }
   html[data-theme="cspire"] .acc-ddos      { background:rgba(184,110,0,0.1); border-color:rgba(184,110,0,0.25); color:var(--warning); }
   html[data-theme="cspire"] .pill-critical { background: linear-gradient(135deg, rgba(220,38,38,0.22) 0%, rgba(192,57,43,0.1) 100%);  border: 1.5px solid rgba(192,57,43,0.45);  color: #8b1a1a; }
   html[data-theme="cspire"] .pill-high     { background: linear-gradient(135deg, rgba(255,103,32,0.28) 0%, rgba(204,82,24,0.12) 100%); border: 1.5px solid rgba(204,82,24,0.48); color: #7c2d00; }
@@ -93,8 +94,7 @@
   html[data-theme="cspire"] .pill-resolved { background: linear-gradient(135deg, rgba(0,135,90,0.22) 0%, rgba(0,135,90,0.09) 100%);    border: 1.5px solid rgba(0,135,90,0.42);   color: #004d32; }
   html[data-theme="cspire"] .pill-enroute  { background: linear-gradient(135deg, rgba(0,192,243,0.3) 0%, rgba(136,77,157,0.18) 100%);  border: 1.5px solid rgba(0,152,210,0.44);  color: #0f3d58; }
   html[data-theme="cspire"] .pill-pending  { background: linear-gradient(135deg, rgba(184,110,0,0.24) 0%, rgba(184,110,0,0.1) 100%);   border: 1.5px solid rgba(184,110,0,0.44);  color: #6b3a00; }
-  html[data-theme="cspire"] .topbar-logo   { background: var(--accent2); }
-  html[data-theme="cspire"] .avatar-sm     { background: linear-gradient(135deg, #c2dff0, #a5cbdf); color: var(--accent2); border-color: var(--border); }
+  html[data-theme="cspire"] .topbar-logo   { background: rgba(19,30,41,0.45); }
   html[data-theme="cspire"] .select-field  { background-color: var(--surface2); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a90aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
   html[data-theme="cspire"] .bnav-dot      { border-color: var(--surface); background: #FF6720; }
   html[data-theme="cspire"] .icon-btn .badge { background: #FF6720; border-color: var(--surface); }
@@ -109,44 +109,49 @@
 
   /* ── C SPIRE GRADIENT OVERRIDES ── */
   html[data-theme="cspire"] body,
-  html[data-theme="cspire"] html { background: radial-gradient(ellipse at 50% 0%, #cce4f6 0%, #b8d4ec 65%); }
+  html[data-theme="cspire"] html { background: radial-gradient(ellipse at 50% -10%, #b8e2f8 0%, #edf7fd 55%); }
 
-  html[data-theme="cspire"] .screen { background: linear-gradient(165deg, #d4eaf8 0%, #c4dcf0 100%); }
+  html[data-theme="cspire"] .screen { background: linear-gradient(160deg, #f3f9fe 0%, #eaf4fb 100%); }
 
+  /* Headers — Consumer Gradient: C Spire Blue → Magnetic Purple */
   html[data-theme="cspire"] .topbar {
-    background: linear-gradient(90deg, rgba(15,61,88,0.88) 0%, rgba(0,120,180,0.72) 50%, rgba(0,192,243,0.85) 100%);
-    border-bottom: 1px solid rgba(0,152,220,0.45);
-    box-shadow: 0 2px 14px rgba(0,60,140,0.22), 0 1px 0 rgba(255,255,255,0.4);
+    background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%);
+    color: #ffffff;
+    border-bottom: none;
+    box-shadow: 0 2px 20px rgba(136,77,157,0.28), 0 1px 0 rgba(255,255,255,0.1);
   }
+  html[data-theme="cspire"] .topbar * { color: #ffffff; }
   html[data-theme="cspire"] .detail-topbar {
-    background: linear-gradient(90deg, rgba(15,61,88,0.88) 0%, rgba(0,120,180,0.72) 50%, rgba(0,192,243,0.85) 100%);
-    border-bottom: 2px solid #00c0f3;
-    box-shadow: 0 2px 14px rgba(0,60,140,0.22), 0 1px 0 rgba(255,255,255,0.4);
+    background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%);
+    color: #ffffff;
+    border-bottom: none;
+    box-shadow: 0 2px 20px rgba(136,77,157,0.28), 0 1px 0 rgba(255,255,255,0.1);
   }
+  html[data-theme="cspire"] .detail-topbar * { color: #ffffff; }
   html[data-theme="cspire"] .topbar-logo {
-    background: linear-gradient(135deg, #0f3d58 0%, #0f3d58 100%);
-    box-shadow: 0 2px 10px rgba(15,61,88,0.3);
+    background: rgba(19,30,41,0.45);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   }
   html[data-theme="cspire"] .bottom-nav {
-    background: linear-gradient(180deg, #c4dff5 0%, #b8d4ee 100%);
-    border-top: 1px solid rgba(0,80,160,0.3);
-    box-shadow: 0 -2px 14px rgba(0,60,140,0.14), 0 -1px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(180deg, #ffffff 0%, #f2f8fd 100%);
+    border-top: 1.5px solid rgba(0,192,243,0.25);
+    box-shadow: 0 -2px 16px rgba(136,77,157,0.1), 0 -1px 0 rgba(0,192,243,0.1);
   }
   html[data-theme="cspire"] .list-header,
   html[data-theme="cspire"] .stat-strip,
   html[data-theme="cspire"] .filter-tabs,
   html[data-theme="cspire"] .refresh-bar {
-    background: linear-gradient(90deg, rgba(15,61,88,0.82) 0%, rgba(0,120,180,0.65) 50%, rgba(0,192,243,0.78) 100%);
-    border-bottom-color: rgba(0,152,220,0.45);
+    background: linear-gradient(90deg, rgba(0,192,243,0.1) 0%, rgba(136,77,157,0.07) 100%);
+    border-bottom-color: rgba(0,192,243,0.18);
   }
   html[data-theme="cspire"] .stat-chip {
-    background: linear-gradient(150deg, rgba(0,192,243,0.42) 0%, rgba(0,152,220,0.22) 55%, rgba(15,61,88,0.08) 100%);
-    border: 1px solid rgba(0,152,220,0.38);
-    box-shadow: 0 2px 8px rgba(0,60,140,0.14), inset 0 1px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(135deg, rgba(0,192,243,0.1) 0%, rgba(136,77,157,0.07) 100%);
+    border: 1px solid rgba(0,192,243,0.22);
+    box-shadow: 0 1px 6px rgba(136,77,157,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
   }
   html[data-theme="cspire"] .filter-tab.active {
-    background: linear-gradient(135deg, #b4d2ea 0%, #a6c8e0 100%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    background: linear-gradient(135deg, rgba(0,192,243,0.18) 0%, rgba(136,77,157,0.1) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
   }
   html[data-theme="cspire"] .search-btn {
     background: linear-gradient(135deg, #FF6720 0%, #cc5218 100%);
@@ -154,55 +159,55 @@
     color: #fff;
   }
   html[data-theme="cspire"] .ticket-inner {
-    background: linear-gradient(155deg, rgba(0,192,243,0.44) 0%, rgba(0,152,220,0.24) 55%, rgba(15,61,88,0.1) 100%);
-    border: 1px solid rgba(0,152,220,0.38);
-    box-shadow: 0 4px 16px rgba(0,60,140,0.15), 0 0 0 1px rgba(255,255,255,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+    background: linear-gradient(155deg, #ffffff 0%, #f4f9fe 100%);
+    border: 1px solid rgba(0,192,243,0.2);
+    box-shadow: 0 2px 12px rgba(136,77,157,0.09), 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9);
   }
   html[data-theme="cspire"] .cust-glance {
-    background: linear-gradient(135deg, rgba(0,192,243,0.16) 0%, rgba(0,192,243,0.06) 100%);
-    border-bottom: 1px solid rgba(0,80,160,0.3);
+    background: linear-gradient(135deg, rgba(0,192,243,0.07) 0%, rgba(136,77,157,0.04) 100%);
+    border-bottom: 1px solid rgba(0,192,243,0.15);
   }
-  html[data-theme="cspire"] .type-badge.repair       { background: linear-gradient(135deg, rgba(255,103,32,0.28) 0%, rgba(204,82,24,0.12) 100%); border: 1.5px solid rgba(204,82,24,0.48); color: #7c2d00; }
-  html[data-theme="cspire"] .type-badge.installation { background: linear-gradient(135deg, rgba(0,135,90,0.24)   0%, rgba(0,135,90,0.1) 100%);   border: 1.5px solid rgba(0,135,90,0.42);  color: #004d32; }
-  html[data-theme="cspire"] .type-badge.service-call { background: linear-gradient(135deg, rgba(0,192,243,0.32)  0%, rgba(0,96,200,0.14) 100%);  border: 1.5px solid rgba(0,152,210,0.52); color: #0f3d58; }
+  html[data-theme="cspire"] .type-badge.repair       { background: linear-gradient(135deg, rgba(255,103,32,0.18) 0%, rgba(204,82,24,0.08) 100%); border: 1.5px solid rgba(204,82,24,0.38); color: #7c2d00; }
+  html[data-theme="cspire"] .type-badge.installation { background: linear-gradient(135deg, rgba(0,135,90,0.16)   0%, rgba(0,135,90,0.07) 100%);   border: 1.5px solid rgba(0,135,90,0.34);  color: #004d32; }
+  html[data-theme="cspire"] .type-badge.service-call { background: linear-gradient(135deg, rgba(136,77,157,0.14) 0%, rgba(84,49,97,0.07) 100%);   border: 1.5px solid rgba(136,77,157,0.35); color: #543161; }
   html[data-theme="cspire"] .device-card {
-    background: linear-gradient(155deg, rgba(0,192,243,0.42) 0%, rgba(0,152,220,0.22) 55%, rgba(15,61,88,0.08) 100%);
-    border: 1px solid rgba(0,152,220,0.36);
-    box-shadow: 0 4px 16px rgba(0,60,140,0.15), 0 0 0 1px rgba(255,255,255,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+    background: linear-gradient(155deg, #ffffff 0%, #f4f9fe 100%);
+    border: 1px solid rgba(0,192,243,0.2);
+    box-shadow: 0 2px 12px rgba(136,77,157,0.09), 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9);
   }
-  html[data-theme="cspire"] .device-card-header:hover { background: linear-gradient(135deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.01) 100%); }
+  html[data-theme="cspire"] .device-card-header:hover { background: rgba(136,77,157,0.04); }
   html[data-theme="cspire"] .net-summary {
-    background: linear-gradient(135deg, rgba(0,192,243,0.44) 0%, rgba(0,152,220,0.24) 55%, rgba(15,61,88,0.1) 100%);
-    border: 1px solid rgba(0,152,220,0.38);
-    box-shadow: 0 2px 12px rgba(0,60,140,0.15), 0 0 0 1px rgba(255,255,255,0.4), inset 0 1px 0 rgba(255,255,255,0.55);
+    background: linear-gradient(135deg, rgba(0,192,243,0.1) 0%, rgba(136,77,157,0.07) 100%);
+    border: 1px solid rgba(0,192,243,0.22);
+    box-shadow: 0 2px 12px rgba(136,77,157,0.09), 0 0 0 1px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.7);
   }
-  html[data-theme="cspire"] .net-view-toggle { background: rgba(0,0,0,0.06); border-color: rgba(0,192,243,0.25); }
+  html[data-theme="cspire"] .net-view-toggle { background: rgba(0,192,243,0.06); border-color: rgba(0,192,243,0.22); }
   html[data-theme="cspire"] .net-view-btn.active {
-    background: linear-gradient(135deg, #c0dcf0 0%, #b2d0ea 100%);
-    box-shadow: 0 1px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(135deg, rgba(0,192,243,0.18) 0%, rgba(136,77,157,0.1) 100%);
+    box-shadow: 0 1px 6px rgba(136,77,157,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
   }
   html[data-theme="cspire"] .desktop-nav-btn.active {
-    background: linear-gradient(135deg, #b4d2ec 0%, #a6c8e2 100%);
+    background: linear-gradient(135deg, rgba(0,192,243,0.18) 0%, rgba(136,77,157,0.1) 100%);
     box-shadow: inset 0 1px 0 rgba(0,192,243,0.3);
   }
   html[data-theme="cspire"] .bnav-btn.active::after {
-    background: linear-gradient(90deg, #00c0f3, #0f3d58);
-    box-shadow: 0 0 8px rgba(0,192,243,0.45);
+    background: linear-gradient(90deg, #00c0f3, #884d9d);
+    box-shadow: 0 0 8px rgba(136,77,157,0.4);
   }
   html[data-theme="cspire"] .dev-section-title,
   html[data-theme="cspire"] .dev-section-chevron { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
   html[data-theme="cspire"] .cf-label,
   html[data-theme="cspire"] .date-divider-label,
   html[data-theme="cspire"] .cust-glance-name,
-  html[data-theme="cspire"] .cust-bn-id,
-  html[data-theme="cspire"] .detail-tb-id,
   html[data-theme="cspire"] .travel-box-time,
   html[data-theme="cspire"] .iface-ip,
   html[data-theme="cspire"] .topo-info-ip,
   html[data-theme="cspire"] .cal-mini-time { color: #0f3d58; text-shadow: none; }
-  html[data-theme="cspire"] .dev-section-hd { background:linear-gradient(90deg, rgba(15,61,88,0.78) 0%, rgba(0,120,180,0.62) 50%, rgba(0,192,243,0.75) 100%); }
-  html[data-theme="cspire"] .dev-section-hd:hover { background:linear-gradient(90deg, rgba(15,61,88,0.88) 0%, rgba(0,120,180,0.72) 50%, rgba(0,192,243,0.85) 100%); }
-  html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #cce4f6 0%, #bcd8ee 100%); }
+  html[data-theme="cspire"] .dev-section-hd { background: linear-gradient(90deg, rgba(0,192,243,0.88) 0%, rgba(136,77,157,0.78) 100%); }
+  html[data-theme="cspire"] .dev-section-hd:hover { background: linear-gradient(90deg, #00c0f3 0%, #884d9d 100%); }
+  html[data-theme="cspire"] .topo-canvas { background: linear-gradient(165deg, #e8f5fd 0%, #ddeef9 100%); }
+  html[data-theme="cspire"] .avatar-sm { background: linear-gradient(135deg, #00c0f3, #884d9d); color: #fff; border-color: rgba(255,255,255,0.3); }
+  html[data-theme="cspire"] .cust-tier { background: rgba(136,77,157,0.1); color: #884d9d; }
 
   /* ── Light-text outline: thin dark shadow on any accent-blue text so it
         reads clearly against the light blue surface                     ── */
@@ -221,10 +226,8 @@
   html[data-theme="cspire"] .cust-detail-banner-num,
   html[data-theme="cspire"] .cust-detail-label,
   html[data-theme="cspire"] .cust-sort-btn.active,
-  html[data-theme="cspire"] .desktop-nav-btn.active,
-  html[data-theme="cspire"] .notif-num,
-  html[data-theme="cspire"] .cspire-c {
-    text-shadow: 0 0 1px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.18);
+  html[data-theme="cspire"] .notif-num {
+    text-shadow: 0 0 1px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.15);
   }
 
   /* C Spire SVG logo */
@@ -285,9 +288,9 @@
   }
 
   /* C Spire branded header bar */
-  html[data-theme="cspire"] .topbar { border-bottom: 2px solid var(--accent); }
-  html[data-theme="cspire"] .detail-topbar { border-bottom: 2px solid var(--accent); }
-  html[data-theme="cspire"] .bottom-nav { border-top: 2px solid var(--accent); }
+  html[data-theme="cspire"] .topbar { border-bottom: none; }
+  html[data-theme="cspire"] .detail-topbar { border-bottom: none; }
+  html[data-theme="cspire"] .bottom-nav { border-top: 1.5px solid rgba(136,77,157,0.25); }
   html[data-theme="cspire"] .cspire-wordmark { display: flex !important; }
   .cspire-wordmark { display: none; align-items: baseline; gap: 0px; }
   .cspire-c { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--sans); letter-spacing: -.5px; }
