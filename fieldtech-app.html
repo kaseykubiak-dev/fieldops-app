@@ -2344,6 +2344,7 @@
     document.getElementById('ticket-search').value = '';
     const list = document.getElementById('ticket-list');
     list.innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading cases…</span></div>';
+    list.scrollTop = 0; // prevent iOS PWA from scrolling window on DOM replace
 
     // CSM case states: 1=Open, 2=Pending, 3=Solution Proposed, 4=Closed, 5=Cancelled
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
@@ -2456,18 +2457,7 @@
     });
 
     list.innerHTML = html;
-
-    // For assigned/closed views, scroll to today's section if it exists
-    if (filterState === 'assigned' || filterState === 'closed') {
-      const todayDivider = [...list.querySelectorAll('.date-divider-label')]
-        .find(el => el.textContent.startsWith('Today'));
-      if (todayDivider) {
-        const divider = todayDivider.closest('.date-divider');
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          list.scrollTop += divider.getBoundingClientRect().top - list.getBoundingClientRect().top;
-        }));
-      }
-    }
+    list.scrollTop = 0; // prevent iOS PWA from scrolling window on DOM replace
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
