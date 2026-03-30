@@ -492,7 +492,7 @@
   .filter-tab { flex:1; padding:7px 0; border:none; border-radius:7px; background:transparent; color:var(--text-muted); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; }
   .filter-tab.active { background:linear-gradient(135deg, #1e3050 0%, #162440 100%); color:var(--text); box-shadow:inset 0 1px 0 rgba(255,255,255,0.06); }
 
-  .ticket-list { overflow-y:auto; flex:1; min-height:0; -webkit-overflow-scrolling:touch; }
+  .ticket-list { overflow-y:auto; flex:1; min-height:0; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior:contain; }
 
   /* TICKET CARD */
   .ticket-card { padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; }
