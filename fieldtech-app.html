@@ -2311,6 +2311,11 @@
     await fetchTickets(activeFilter);
     btn.classList.remove('spinning');
     btn.disabled = false;
+    // Resume notification polling if it was paused due to failures
+    if (_notifFailCount >= _NOTIF_MAX_FAILS && !_notifPollTimer) {
+      _notifFailCount = 0;
+      startNotifPolling();
+    }
   }
 
   // ── Field mappings ────────────────────────────────────────────────────────
@@ -2344,6 +2349,26 @@
     return 'Basic ' + btoa(SN.username + ':' + SN.password);
   }
 
+  /** Fetch with AbortController timeout (default 12s). Rejects on timeout or non-ok status. */
+  async function snFetch(url, opts = {}, timeoutMs = 12000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, {
+        ...opts,
+        headers: { 'Authorization': authHeader(), 'Accept': 'application/json', ...(opts.headers || {}) },
+        signal: ctrl.signal
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+      return res;
+    } catch (err) {
+      if (err.name === 'AbortError') throw new Error('Request timed out — the server may be slow or unreachable.');
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   // ── Fetch CSM cases from ServiceNow ──────────────────────────────────────
   async function fetchTickets(filterState) {
     cachedAssignedTickets = null;
@@ -2370,17 +2395,14 @@
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=false`;
 
     try {
-      const res = await fetch(url, {
-        headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+      const res = await snFetch(url);
       const data = await res.json();
       renderTickets(data.result, filterState);
     } catch (err) {
       list.innerHTML = `
         <div class="list-error">
           <strong>Could not load cases</strong>
-          ${err.message}<br><br>
+          ${escHtml(err.message)}<br><br>
           Ensure the CSM plugin is active and the Table API CORS rule covers
           <em>sn_customerservice_case</em>.
           <br><button class="retry-btn" onclick="fetchTickets('${filterState || 'today'}')">Retry</button>
@@ -2530,8 +2552,7 @@
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=number=${number}&sysparm_fields=${fields}&sysparm_display_value=both&sysparm_limit=1`;
 
     try {
-      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await snFetch(url);
       const data = await res.json();
       const c = data.result[0];
       if (!c) throw new Error('Case not found');
@@ -2557,9 +2578,8 @@
       // Assigned to — fetch name from sys_user since display_value isn't expanding
       const assignedSysId = c.assigned_to?.value;
       if (assignedSysId) {
-        fetch(`${SN.instance}/api/now/table/sys_user/${assignedSysId}?sysparm_fields=name`, {
-          headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-        }).then(r => r.json()).then(u => {
+        snFetch(`${SN.instance}/api/now/table/sys_user/${assignedSysId}?sysparm_fields=name`)
+        .then(r => r.json()).then(u => {
           document.getElementById('detail-assigned').textContent = u.result?.name || 'Unassigned';
         }).catch(() => { document.getElementById('detail-assigned').textContent = 'Unassigned'; });
       } else {
@@ -2600,9 +2620,8 @@
 
       // SLA — fetch from task_sla for rich data
       const caseSysId = c.sys_id?.value || c.sys_id;
-      fetch(`${SN.instance}/api/now/table/task_sla?sysparm_query=task=${caseSysId}^active=true&sysparm_fields=sla.name,stage,has_breached,planned_end_time,time_left&sysparm_limit=1`, {
-        headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-      }).then(r => r.json()).then(sd => {
+      snFetch(`${SN.instance}/api/now/table/task_sla?sysparm_query=task=${caseSysId}^active=true&sysparm_fields=sla.name,stage,has_breached,planned_end_time,time_left&sysparm_limit=1`)
+      .then(r => r.json()).then(sd => {
         const sla = sd.result?.[0];
         const el  = document.getElementById('detail-cust-sla');
         if (!sla) { el.textContent = '—'; return; }
@@ -2621,9 +2640,8 @@
       renderFirewallSection(accountSysId || currentCaseSysId);
       renderVoipSection(accountSysId || currentCaseSysId);
       if (accountSysId) {
-        fetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`, {
-          headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-        }).then(r => r.json()).then(a => {
+        snFetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`)
+        .then(r => r.json()).then(a => {
           const acct = a.result;
           document.getElementById('detail-cust-name').textContent = acct?.name || c.account?.display_value || '—';
           document.getElementById('detail-cust-id').textContent   = acct?.number || '—';
@@ -2638,9 +2656,8 @@
       // Fetch contact name and phone from customer_contact record
       const contactSysId = c.contact?.value;
       if (contactSysId) {
-        fetch(`${SN.instance}/api/now/table/customer_contact/${contactSysId}?sysparm_fields=name,first_name,last_name,phone,mobile_phone,email`, {
-          headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-        }).then(r => r.json()).then(ct => {
+        snFetch(`${SN.instance}/api/now/table/customer_contact/${contactSysId}?sysparm_fields=name,first_name,last_name,phone,mobile_phone,email`)
+        .then(r => r.json()).then(ct => {
           const contact = ct.result;
           const name  = contact?.name || [contact?.first_name, contact?.last_name].filter(Boolean).join(' ') || '—';
           const phone = contact?.phone || contact?.mobile_phone || contact?.email || '—';
@@ -2659,9 +2676,8 @@
       const ciSysId = c.cmdb_ci?.value;
       const ciSection = document.getElementById('affected-device-section');
       if (ciSysId) {
-        fetch(`${SN.instance}/api/now/table/cmdb_ci_netgear/${ciSysId}?sysparm_fields=name,ip_address,mac_address,serial_number,model_number,device_type`, {
-          headers: { 'Authorization': authHeader(), 'Accept': 'application/json' }
-        }).then(r => r.json()).then(d => {
+        snFetch(`${SN.instance}/api/now/table/cmdb_ci_netgear/${ciSysId}?sysparm_fields=name,ip_address,mac_address,serial_number,model_number,device_type`)
+        .then(r => r.json()).then(d => {
           const ci = d.result;
           if (!ci) { ciSection.style.display = 'none'; return; }
           document.getElementById('ci-name').textContent   = ci.name         || '—';
@@ -2692,8 +2708,7 @@
     const tl = document.getElementById('detail-timeline');
     const url = `${SN.instance}/api/now/table/sys_journal_field?sysparm_query=element_id=${sysId}^ORDERBYDESCsys_created_on&sysparm_fields=sys_created_by,sys_created_on,value,element&sysparm_limit=50`;
     try {
-      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await snFetch(url);
       const data = await res.json();
       const entries = data.result;
 
@@ -2748,20 +2763,11 @@
     hideFeedback(feedback);
 
     try {
-      const res = await fetch(`${SN.instance}/api/now/table/sn_customerservice_case/${currentCaseSysId}`, {
+      const res = await snFetch(`${SN.instance}/api/now/table/sn_customerservice_case/${currentCaseSysId}`, {
         method: 'PATCH',
-        headers: {
-          'Authorization': authHeader(),
-          'Content-Type':  'application/json',
-          'Accept':        'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.error?.message || `HTTP ${res.status}`);
-      }
+      }, 15000);
 
       const updated = await res.json();
       const newStateKey = String(updated.result?.state || state);
@@ -2819,13 +2825,12 @@
     if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
     try {
       const url = `${SN.instance}/api/now/table/customer_account?sysparm_fields=sys_id,name,number,city,state,zip,phone&sysparm_limit=500&sysparm_display_value=true&sysparm_query=ORDERBYname`;
-      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await snFetch(url);
       _custAccounts = (await res.json()).result || [];
       _custLoaded = true;
       renderAccountList(_custAccounts);
     } catch (err) {
-      list.innerHTML = `<div class="list-error"><strong>Could not load accounts</strong><br>${escHtml(err.message)}</div>`;
+      list.innerHTML = `<div class="list-error"><strong>Could not load accounts</strong><br>${escHtml(err.message)}<br><button class="retry-btn" onclick="loadCustomersScreen(true)">Retry</button></div>`;
     } finally {
       if (btn) { btn.classList.remove('spinning'); btn.disabled = false; }
     }
@@ -2918,11 +2923,10 @@
   async function fetchCustomerDetail(sysId) {
     const scroll = document.getElementById('cust-detail-scroll');
     try {
-      const h = { 'Authorization': authHeader(), 'Accept': 'application/json' };
       const [accRes, contactRes, locRes] = await Promise.all([
-        fetch(`${SN.instance}/api/now/table/customer_account?sysparm_query=sys_id=${sysId}&sysparm_fields=sys_id,name,number,city,state,zip,phone,account_type&sysparm_display_value=true&sysparm_limit=1`, { headers: h }),
-        fetch(`${SN.instance}/api/now/table/customer_contact?sysparm_query=account=${sysId}&sysparm_fields=sys_id,name,title,email,phone,mobile_phone&sysparm_display_value=true&sysparm_limit=100`, { headers: h }),
-        fetch(`${SN.instance}/api/now/table/account_address_relationship?sysparm_query=account=${sysId}&sysparm_fields=location,location.name,location.street,location.city,location.state,location.zip,location.phone,primary&sysparm_display_value=true&sysparm_limit=100`, { headers: h })
+        snFetch(`${SN.instance}/api/now/table/customer_account?sysparm_query=sys_id=${sysId}&sysparm_fields=sys_id,name,number,city,state,zip,phone,account_type&sysparm_display_value=true&sysparm_limit=1`),
+        snFetch(`${SN.instance}/api/now/table/customer_contact?sysparm_query=account=${sysId}&sysparm_fields=sys_id,name,title,email,phone,mobile_phone&sysparm_display_value=true&sysparm_limit=100`),
+        snFetch(`${SN.instance}/api/now/table/account_address_relationship?sysparm_query=account=${sysId}&sysparm_fields=location,location.name,location.street,location.city,location.state,location.zip,location.phone,primary&sysparm_display_value=true&sysparm_limit=100`)
       ]);
       const acc       = ((await accRes.json()).result     || [])[0] || {};
       const contacts  = (await contactRes.json()).result  || [];
@@ -3502,20 +3506,13 @@
     hideFeedback(feedback);
 
     try {
-      const res = await fetch(`${SN.instance}/api/1965000/field_tech_case/close`, {
+      const res = await snFetch(`${SN.instance}/api/1965000/field_tech_case/close`, {
         method: 'POST',
-        headers: {
-          'Authorization': authHeader(),
-          'Content-Type':  'application/json',
-          'Accept':        'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      });
+      }, 15000);
 
       const responseData = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(responseData?.error?.message || `HTTP ${res.status}`);
-      }
 
       // Always mark pill as Closed on success — don't rely on response state value
       const pill = document.getElementById('detail-pill-state');
@@ -3654,11 +3651,9 @@
     const fields = 'number,short_description,priority,state,opened_at,resolved_at,account,account.name,account.number,contact,location,location.name,location.street,location.city,location.state,assigned_to,u_scheduled_start,u_ticket_type';
     const url = `${SN.instance}/api/now/table/sn_customerservice_case?sysparm_query=${encodeURIComponent(query)}&sysparm_fields=${fields}&sysparm_limit=200&sysparm_display_value=false`;
     try {
-      const res = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
-      if (res.ok) {
-        const data = await res.json();
-        cachedAssignedTickets = data.result || [];
-      }
+      const res = await snFetch(url);
+      const data = await res.json();
+      cachedAssignedTickets = data.result || [];
     } catch (e) { cachedAssignedTickets = []; }
   }
 
@@ -3845,11 +3840,11 @@
 
     try {
       const [r1, r2] = await Promise.all([
-        fetch(mkUrl(qSched),  { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } }),
-        fetch(mkUrl(qOpened), { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } })
+        snFetch(mkUrl(qSched)),
+        snFetch(mkUrl(qOpened))
       ]);
-      const d1 = r1.ok ? (await r1.json()).result || [] : [];
-      const d2 = r2.ok ? (await r2.json()).result || [] : [];
+      const d1 = (await r1.json()).result || [];
+      const d2 = (await r2.json()).result || [];
       // Merge, de-dupe by number
       const seen = new Set();
       _cal.tickets = [...d1, ...d2].filter(t => seen.has(t.number) ? false : seen.add(t.number));
@@ -4737,6 +4732,9 @@
   // ── Notifications ──────────────────────────────────────────────────────────
   // _notifs, _notifSeen, _notifLastCheck, _notifPollTimer declared at top of script
 
+  let _notifFailCount = 0;
+  const _NOTIF_MAX_FAILS = 3;
+
   function startNotifPolling() {
     // First check: look back 24 hours to catch anything already assigned
     checkNewNotifs();
@@ -4746,6 +4744,14 @@
 
   async function checkNewNotifs() {
     if (!SN.technicianId) return;
+
+    // Back off after consecutive failures to avoid hammering a dead endpoint
+    if (_notifFailCount >= _NOTIF_MAX_FAILS) {
+      clearInterval(_notifPollTimer);
+      _notifPollTimer = null;
+      console.warn(`Notification polling paused after ${_NOTIF_MAX_FAILS} consecutive failures. Will resume on next manual refresh.`);
+      return;
+    }
 
     // Build cutoff: last check time, or 24 h ago on first run
     const now = new Date();
@@ -4762,9 +4768,9 @@
                  + `&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
 
     try {
-      const res  = await fetch(url, { headers: { 'Authorization': authHeader(), 'Accept': 'application/json' } });
-      if (!res.ok) return;
+      const res = await snFetch(url, {}, 8000);
       const data = await res.json();
+      _notifFailCount = 0; // reset on success
       const fresh = (data.result || []).filter(t => !_notifSeen.has(t.number));
       fresh.forEach(t => {
         _notifSeen.add(t.number);
@@ -4778,7 +4784,9 @@
         });
       });
       if (fresh.length > 0) updateNotifBadge();
-    } catch (_) { /* silent — no connectivity shouldn't break the app */ }
+    } catch (_) {
+      _notifFailCount++;
+    }
   }
 
   function updateNotifBadge() {
