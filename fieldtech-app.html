@@ -28,7 +28,7 @@
     --violet: #543161;
     --text: #EDF1F7;
     --text-dim: #85A7CA;
-    --text-muted: #3d5c78;
+    --text-muted: #6889a5;
     --mono: 'IBM Plex Mono', monospace;
     --sans: 'Nunito', sans-serif;
     --body: 'Source Sans 3', sans-serif;
@@ -4513,7 +4513,7 @@
       if (st === 'Reachable')      return '#00c96a';
       if (st === 'Ping Reachable') return '#f59e0b';
       if (st === 'Unreachable')    return '#ff5252';
-      return '#3d5c78';
+      return '#6889a5';
     };
 
     const typeAbbr = n => {
@@ -4538,13 +4538,13 @@
     topoLinks.forEach(l => {
       const s = nodeById[l.source], t = nodeById[l.target];
       if (!s || !t) return;
-      const color = l.linkStatus === 'UP' ? '#00c96a' : l.linkStatus === 'DOWN' ? '#ff5252' : '#3d5c78';
+      const color = l.linkStatus === 'UP' ? '#00c96a' : l.linkStatus === 'DOWN' ? '#ff5252' : '#6889a5';
       const mx = (s.x + t.x) / 2, my = (s.y + t.y) / 2;
       svg += `<line x1="${s.x.toFixed(1)}" y1="${s.y.toFixed(1)}" x2="${t.x.toFixed(1)}" y2="${t.y.toFixed(1)}"
         stroke="${color}" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="${l.linkStatus === 'DOWN' ? '6,4' : 'none'}"/>`;
       if (l.startPortName) {
         svg += `<text x="${mx.toFixed(1)}" y="${(my - 5).toFixed(1)}" text-anchor="middle"
-          font-size="8" fill="#3d5c78" font-family="IBM Plex Mono, monospace"
+          font-size="8" fill="#6889a5" font-family="IBM Plex Mono, monospace"
           style="pointer-events:none">${escHtml(l.startPortName)}</text>`;
       }
     });
@@ -4567,7 +4567,7 @@
       font-size="11" font-weight="600" fill="#EDF1F7"
       font-family="Nunito, sans-serif" style="pointer-events:none">${lbl}</text>
     <text x="${x}" y="${(+y + 49).toFixed(1)}" text-anchor="middle"
-      font-size="9" fill="#3d5c78"
+      font-size="9" fill="#6889a5"
       font-family="IBM Plex Mono, monospace" style="pointer-events:none">${ip}</text>
   </g>`;
     });
