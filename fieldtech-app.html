@@ -483,6 +483,12 @@
   /* TICKET CARD */
   .ticket-card { padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; }
   .ticket-card:active { background:var(--surface2); }
+  @media(max-width:799px){
+    .ticket-card { transition:transform .12s ease; }
+    .ticket-card:active { transform:scale(0.98); }
+    .cal-mini-card { transition:transform .12s ease; }
+    .cal-mini-card:active { transform:scale(0.98); }
+  }
   .ticket-inner { position:relative; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-left:3px solid var(--accent); border-radius:11px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
 
   /* Customer header inside card */
@@ -561,6 +567,99 @@
   .retry-btn { margin-top:10px; padding:7px 14px; background:transparent; border:1px solid var(--danger); border-radius:7px; color:var(--danger); font-size:12px; cursor:pointer; }
   .retry-btn:active { opacity:.7; }
 
+  /* ── SKELETON LOADING SCREENS ── */
+  @keyframes skeleton-shimmer {
+    0%   { background-position:200% 0; }
+    100% { background-position:-200% 0; }
+  }
+  .skeleton {
+    background:linear-gradient(90deg, var(--surface2) 25%, var(--surface) 50%, var(--surface2) 75%);
+    background-size:200% 100%;
+    animation:skeleton-shimmer 1.8s ease-in-out infinite;
+    border-radius:8px;
+  }
+  .skeleton-card {
+    height:110px; margin:6px 14px; border-radius:11px;
+    border-left:3px solid transparent;
+  }
+  .skeleton-card-sm { height:72px; margin:6px 14px; border-radius:11px; }
+  .skeleton-line { height:14px; border-radius:6px; margin:6px 14px; }
+  .skeleton-line-short { height:14px; border-radius:6px; margin:6px 14px; width:55%; }
+  .skeleton-divider { height:34px; margin:0; border-radius:0; }
+  html[data-theme="cspire"] .skeleton {
+    background:linear-gradient(90deg, rgba(0,192,243,0.06) 25%, rgba(255,255,255,0.5) 50%, rgba(0,192,243,0.06) 75%);
+    background-size:200% 100%;
+    animation:skeleton-shimmer 1.8s ease-in-out infinite;
+  }
+
+  /* ── ENHANCED EMPTY STATES ── */
+  .empty-state {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; padding:48px 24px; text-align:center;
+  }
+  .empty-state-icon {
+    width:56px; height:56px; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,192,243,0.08); border:1px dashed rgba(0,192,243,0.2);
+    border-radius:14px; color:var(--text-muted);
+  }
+  .empty-state-title { font-family:var(--sans); font-size:15px; font-weight:600; color:var(--text); }
+  .empty-state-sub { font-family:var(--body); font-size:13px; color:var(--text-muted); line-height:1.5; max-width:260px; }
+  html[data-theme="cspire"] .empty-state-icon {
+    background:rgba(136,77,157,0.06); border-color:rgba(136,77,157,0.2);
+  }
+
+  /* ── BUTTON LOADING STATE ── */
+  .btn.is-loading { pointer-events:none; opacity:0.7; position:relative; }
+  .btn.is-loading .btn-label { visibility:hidden; }
+  .btn.is-loading::after {
+    content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,0.3); border-top-color:#fff;
+    border-radius:50%; animation:spin .7s linear infinite;
+  }
+  .btn-success.is-loading::after { border-top-color:#fff; }
+  .btn-ghost.is-loading::after { border-color:rgba(0,192,243,0.2); border-top-color:var(--accent); }
+
+  /* ── CARD HOVER CONSISTENCY (desktop only) ── */
+  @media(min-width:800px){
+    .ticket-inner,
+    .cal-mini-card,
+    .cust-card-inner { transition:transform .15s ease, box-shadow .15s ease; }
+    .ticket-card:hover .ticket-inner,
+    .cal-mini-card:hover,
+    .cust-card:hover .cust-card-inner {
+      transform:translateY(-1px);
+      box-shadow:0 4px 20px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.18);
+    }
+    html[data-theme="cspire"] .ticket-card:hover .ticket-inner,
+    html[data-theme="cspire"] .cal-mini-card:hover,
+    html[data-theme="cspire"] .cust-card:hover .cust-card-inner {
+      box-shadow:0 4px 20px rgba(0,80,160,0.12), 0 8px 32px rgba(122,85,152,0.08), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04);
+    }
+  }
+
+  /* ── PREFERS-REDUCED-MOTION ── */
+  @media(prefers-reduced-motion: reduce){
+    *, *::before, *::after {
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+    }
+    .skeleton { animation:none !important; background:var(--surface2) !important; }
+  }
+
+  /* ── DATA VIZ — stat bar (for uptime %, signal strength, etc.) ── */
+  @keyframes statBarFill { from { width:0; } }
+  .stat-bar-wrap { height:3px; background:var(--surface2); border-radius:2px; margin-top:5px; overflow:hidden; }
+  .stat-bar {
+    height:100%; border-radius:2px;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    animation:statBarFill .6s ease-out;
+  }
+  .stat-bar.bar-good  { background:linear-gradient(90deg, var(--success), #00e676); }
+  .stat-bar.bar-warn  { background:linear-gradient(90deg, var(--warning), #ffab00); }
+  .stat-bar.bar-bad   { background:linear-gradient(90deg, var(--danger), #ff8a80); }
+
   /* DATE DIVIDER */
   .date-divider { display:flex; align-items:center; justify-content:center; padding:8px 16px; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; isolation:isolate; }
   .date-divider-label { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
@@ -598,7 +697,12 @@
   .cf-val { font-size:13px; font-weight:500; color:var(--text); line-height:1.3; }
   .cf-val.mono { font-family:var(--mono); font-size:12px; color:var(--text-dim); }
   .cf-val.addr { font-size:12px; color:var(--text-dim); }
-  .cf-val.sla { color:var(--accent2); font-weight:600; }
+  .cf-val.sla { color:var(--accent2); font-weight:600; transition:color .3s; }
+  @keyframes slaPulse {
+    0%, 100% { color:var(--accent2); }
+    50%      { color:var(--danger); text-shadow:0 0 6px rgba(255,82,82,0.4); }
+  }
+  .cf-val.sla.sla-urgent { animation:slaPulse 2s ease-in-out infinite; }
 
   /* QUICK ACTIONS */
   .quick-actions { display:flex; gap:8px; padding:0 14px 12px; align-items:center; }
@@ -719,6 +823,9 @@
   .acc-chevron.open { transform:rotate(180deg); }
 
   /* Body */
+  .accordion { transition:box-shadow .28s ease; }
+  .accordion.acc-expanded { box-shadow:0 4px 20px rgba(0,0,0,0.25); }
+  html[data-theme="cspire"] .accordion.acc-expanded { box-shadow:0 4px 20px rgba(0,80,160,0.12); }
   .acc-body {
     max-height:0; overflow:hidden;
     transition:max-height .28s ease;
@@ -1097,7 +1204,7 @@
   .cal-mini-desc { font-size:12px; color:var(--text-dim); line-height:1.3; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cal-mini-pills { display:flex; align-items:center; gap:5px; }
   .cal-mini-num { font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-left:auto; }
-  .cal-empty-day { display:flex; align-items:center; gap:10px; padding:10px 2px 4px; color:var(--text-muted); font-family:var(--sans); font-size:13px; font-weight:500; }
+  .cal-empty-day { display:flex; align-items:center; gap:10px; padding:10px 2px 4px; color:var(--text-muted); font-family:var(--sans); font-size:13px; font-weight:500; font-style:italic; opacity:.7; }
 
   /* C Spire light mode calendar overrides */
   html[data-theme="cspire"] .cal-month-nav {
@@ -1154,17 +1261,24 @@
   #login-screen.hidden { display:none; }
 
   /* ── DISCLAIMER MODAL ── */
+  @keyframes modalFadeIn { from { background:rgba(6,20,32,0); } to { background:var(--bg); } }
+  @keyframes modalCardIn {
+    from { opacity:0; transform:scale(0.92) translateY(10px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
   #disclaimer-modal {
     position:fixed; inset:0; z-index:900;
     background:var(--bg);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:24px;
+    animation:modalFadeIn .3s ease;
   }
   #disclaimer-modal.hidden { display:none; }
   .disc-card {
     width:100%; max-width:420px;
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
     overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    animation:modalCardIn .35s cubic-bezier(0.34,1.56,0.64,1);
   }
   .disc-header {
     padding:18px 22px 14px;
@@ -1389,8 +1503,11 @@
   </div>
   <div class="notif-list" id="notif-list" role="list" aria-live="polite">
     <div class="notif-empty">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      No New Notifications
+      <div class="empty-state-icon" style="width:44px;height:44px;border-radius:11px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <span style="font-size:13px;font-weight:500;">No New Notifications</span>
+      <span style="font-size:11px;color:var(--text-muted);opacity:.7;">You're all caught up</span>
     </div>
   </div>
 </div>
@@ -1476,7 +1593,13 @@
       </div>
 
       <div class="ticket-list" id="ticket-list">
-        <div class="list-loading"><div class="spinner"></div><span>Loading tickets…</span></div>
+        <div class="skeleton-divider skeleton"></div>
+        <div class="skeleton-card skeleton"></div>
+        <div class="skeleton-card skeleton" style="animation-delay:.15s;opacity:.8;"></div>
+        <div class="skeleton-card skeleton" style="animation-delay:.3s;opacity:.6;"></div>
+        <div class="skeleton-divider skeleton" style="animation-delay:.35s;"></div>
+        <div class="skeleton-card skeleton" style="animation-delay:.45s;opacity:.7;"></div>
+        <div class="skeleton-card skeleton" style="animation-delay:.6s;opacity:.5;"></div>
       </div>
     </div><!-- /screen-list -->
 
@@ -1485,7 +1608,9 @@
     <!-- ══ DETAIL SCREEN ══ -->
     <div class="screen" id="screen-detail">
       <div id="no-ticket-overlay">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h4M7 11h6"/></svg>
+        <div class="empty-state-icon" style="width:64px;height:64px;border-radius:16px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h4M7 11h6"/></svg>
+        </div>
         <div class="nto-title">No Ticket Selected</div>
         <div class="nto-sub">Choose a ticket from the list to view its details.</div>
       </div>
@@ -1895,12 +2020,10 @@
                 <div class="form-btns">
                   <button class="btn btn-ghost" onclick="saveDraft()">Draft</button>
                   <button class="btn btn-accent" id="submit-btn" onclick="submitCaseUpdate()" style="flex:1;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                    Submit Update
+                    <span class="btn-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit Update</span>
                   </button>
                   <button class="btn btn-success" id="close-btn" onclick="closeTicket()" style="flex:1;" disabled>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    Close Ticket
+                    <span class="btn-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Close Ticket</span>
                   </button>
                 </div>
               </div>
@@ -1936,7 +2059,11 @@
         <button class="cust-sort-btn"        id="csort-zip"    onclick="sortAccounts('zip')">Zip</button>
       </div>
       <div class="cust-list-body" id="cust-list">
-        <div class="list-loading"><div class="spinner"></div><span>Loading accounts…</span></div>
+        <div class="skeleton-card-sm skeleton"></div>
+        <div class="skeleton-card-sm skeleton" style="animation-delay:.12s;opacity:.85;"></div>
+        <div class="skeleton-card-sm skeleton" style="animation-delay:.24s;opacity:.7;"></div>
+        <div class="skeleton-card-sm skeleton" style="animation-delay:.36s;opacity:.55;"></div>
+        <div class="skeleton-card-sm skeleton" style="animation-delay:.48s;opacity:.4;"></div>
       </div>
     </div>
 
@@ -2021,7 +2148,12 @@
       </div>
       <div class="cal-body-wrap">
         <div class="cal-grid" id="cal-grid" role="grid" aria-label="Calendar">
-          <div class="list-loading"><div class="spinner"></div><span>Loading schedule…</span></div>
+          <div style="padding:8px;">
+            <div class="skeleton-line skeleton"></div>
+            <div class="skeleton-line-short skeleton" style="animation-delay:.1s;"></div>
+            <div class="skeleton-line skeleton" style="animation-delay:.2s;opacity:.7;"></div>
+            <div class="skeleton-line-short skeleton" style="animation-delay:.3s;opacity:.5;"></div>
+          </div>
         </div>
       </div>
       <div class="cal-day-panel" id="cal-day-panel">
@@ -2321,7 +2453,7 @@
     document.getElementById('login-btn').disabled = false;
     document.getElementById('login-btn').textContent = 'Sign In';
     // Clear ticket list
-    document.getElementById('ticket-list').innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading tickets…</span></div>';
+    document.getElementById('ticket-list').innerHTML = '<div class="skeleton-divider skeleton"></div><div class="skeleton-card skeleton"></div><div class="skeleton-card skeleton" style="animation-delay:.15s;opacity:.8;"></div><div class="skeleton-card skeleton" style="animation-delay:.3s;opacity:.6;"></div>';
     // Hide desktop topbar, show login screen
     document.getElementById('desktop-topbar').style.display = 'none';
     document.getElementById('login-screen').classList.remove('hidden');
@@ -2454,7 +2586,11 @@
   function renderTickets(incidents, filterState) {
     const list = document.getElementById('ticket-list');
     if (!incidents || incidents.length === 0) {
-      list.innerHTML = '<div class="list-loading"><span>No tickets found.</span></div>';
+      list.innerHTML = `<div class="empty-state">
+        <div class="empty-state-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h4M7 11h6"/></svg></div>
+        <div class="empty-state-title">No Tickets Found</div>
+        <div class="empty-state-sub">No matching tickets for this filter. Try refreshing or switching tabs.</div>
+      </div>`;
       return;
     }
 
@@ -2600,15 +2736,17 @@
       const res = await snFetch(`${SN.instance}/api/now/table/task_sla?sysparm_query=task=${caseSysId}^active=true&sysparm_fields=sla.name,stage,has_breached,planned_end_time,time_left&sysparm_limit=1`);
       const sd = await res.json();
       const sla = sd.result?.[0];
-      if (!sla) { el.textContent = '—'; return; }
+      if (!sla) { el.textContent = '—'; el.classList.remove('sla-urgent'); return; }
       const breached   = sla.has_breached === 'true';
       const plannedEnd = sla.planned_end_time ? new Date(sla.planned_end_time.replace(' ','T')+'Z') : null;
       const slaName    = sla['sla.name'] || 'SLA';
       const timeStr    = plannedEnd ? formatTime(plannedEnd) : '';
+      const isUrgent   = breached || (plannedEnd && (plannedEnd - Date.now()) < 3600000); // < 1hr remaining
       el.textContent   = slaName + (timeStr ? ' · ' + (breached ? 'Breached ' : 'Due ') + timeStr : '');
       el.style.color     = breached ? 'var(--danger)' : '';
       el.style.fontWeight = breached ? '700' : '';
-    } catch { el.textContent = '—'; }
+      el.classList.toggle('sla-urgent', isUrgent);
+    } catch { el.textContent = '—'; el.classList.remove('sla-urgent'); }
   }
 
   /** Fetch account name, number, and tier from customer_account */
@@ -2809,7 +2947,7 @@
     if (notes)      payload.work_notes  = notes;
 
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.classList.add('is-loading');
     hideFeedback(feedback);
 
     try {
@@ -2844,7 +2982,7 @@
       showFeedback(feedback, 'error', `Update failed: ${err.message}`);
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit Update';
+      btn.classList.remove('is-loading');
     }
   }
 
@@ -2871,7 +3009,7 @@
     if (_custLoaded && !force) return;
     const list = document.getElementById('cust-list');
     const btn  = document.getElementById('cust-refresh-btn');
-    list.innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading accounts…</span></div>';
+    list.innerHTML = '<div class="skeleton-card-sm skeleton"></div><div class="skeleton-card-sm skeleton" style="animation-delay:.12s;opacity:.85;"></div><div class="skeleton-card-sm skeleton" style="animation-delay:.24s;opacity:.7;"></div><div class="skeleton-card-sm skeleton" style="animation-delay:.36s;opacity:.55;"></div>';
     if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
     try {
       const url = `${SN.instance}/api/now/table/customer_account?sysparm_fields=sys_id,name,number,city,state,zip,phone&sysparm_limit=500&sysparm_display_value=true&sysparm_query=ORDERBYname`;
@@ -3408,7 +3546,7 @@
               <div class="edg-item"><div class="edg-label">S/N</div><div class="edg-val mono">${isNA ? 'N/A' : escHtml(serial)}</div></div>
               <div class="edg-item"><div class="edg-label">Firmware</div><div class="edg-val">${isNA ? 'N/A' : firmware}</div></div>
               <div class="edg-item"><div class="edg-label">Mgmt IP</div><div class="edg-val mono">${isNA ? 'N/A' : mgmtIp}</div></div>
-              <div class="edg-item"><div class="edg-label">${uptimeLabel}</div><div class="edg-val" ${!isNA && uptimeLabel === 'Sync' ? 'style="color:var(--success);"' : ''}>${isNA ? 'N/A' : uptimeOrSync}</div></div>
+              <div class="edg-item"><div class="edg-label">${uptimeLabel}</div><div class="edg-val" ${!isNA && uptimeLabel === 'Sync' ? 'style="color:var(--success);"' : ''}>${isNA ? 'N/A' : uptimeOrSync}</div>${!isNA && uptimeLabel === 'Uptime' ? `<div class="stat-bar-wrap"><div class="stat-bar bar-good" style="width:${Math.min(100, parseInt(uptimeOrSync) / 1.8)}%"></div></div>` : ''}</div>
               <div class="edg-item edg-full"><div class="edg-label">Location</div><div class="edg-val">${isNA ? 'N/A' : escHtml(location)}</div></div>
             </div>
           </div>
@@ -3552,7 +3690,7 @@
     const payload = { sys_id: currentCaseSysId, resolution_code: closeReason, close_notes: notes };
 
     btn.disabled = true;
-    btn.textContent = 'Closing…';
+    btn.classList.add('is-loading');
     hideFeedback(feedback);
 
     try {
@@ -3589,7 +3727,7 @@
       showFeedback(feedback, 'error', `Close failed: ${err.message}`);
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Close Ticket';
+      btn.classList.remove('is-loading');
     }
   }
 
@@ -4217,9 +4355,11 @@
     const body = document.getElementById('body-' + id);
     const chev = document.getElementById('chev-' + id);
     const header = body.previousElementSibling; // the acc-header button
+    const accordion = body.closest('.accordion');
     const isOpen = body.classList.contains('open');
     body.classList.toggle('open', !isOpen);
     chev.classList.toggle('open', !isOpen);
+    if (accordion) accordion.classList.toggle('acc-expanded', !isOpen);
     if (header && header.hasAttribute('aria-expanded')) {
       header.setAttribute('aria-expanded', String(!isOpen));
     }

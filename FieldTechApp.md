@@ -1,13 +1,13 @@
 # FieldOps — Technician Portal
 
-Single-file web app (`fieldtech-app.html`) built for C Spire field technicians. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, and equipment data. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~5090 lines) built for C Spire field technicians. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, and equipment data. There is no build step — everything is inline HTML/CSS/JS in one file.
 
 ---
 
 ## Repository Layout
 
 ```
-fieldtech-app.html       <- The entire app (HTML + CSS + JS, ~4950 lines)
+fieldtech-app.html       <- The entire app (HTML + CSS + JS, ~5090 lines)
 meraki-proxy.js          <- Node.js CORS proxy for Cisco Catalyst Center API
 package.json             <- { "start": "node meraki-proxy.js" }, Node >=18
 internet-db.json         <- Simulated ISP circuit data (fiber, cable, DSL, wireless)
@@ -415,6 +415,40 @@ The app includes ARIA attributes and semantic HTML added in March 2026:
 
 ---
 
+## Visual Polish (March 2026)
+
+### Skeleton loading screens
+All list/grid loading states use shimmer skeleton placeholders instead of spinners. The `skeleton-shimmer` keyframe animates a gradient sweep on `.skeleton` elements. Variants: `.skeleton-card` (110px, ticket shape), `.skeleton-card-sm` (72px, customer rows), `.skeleton-line` / `.skeleton-line-short`, `.skeleton-divider` (date header shape). Stagger with `animation-delay` and descending opacity for natural appearance. Light theme has its own skeleton gradient override.
+
+### Enhanced empty states
+`.empty-state` provides a centered layout with `.empty-state-icon` (dashed-border rounded box), `.empty-state-title`, and `.empty-state-sub`. Used in: ticket list (no results), notification panel (all caught up), no-ticket-selected overlay (desktop). Light theme tints the icon purple instead of cyan.
+
+### Button loading states
+`.btn.is-loading` hides child `.btn-label` via `visibility:hidden` and overlays a centered spinning border via `::after`. Buttons auto-disable during async via `pointer-events:none`. Used on Submit Update and Close Ticket buttons. The submit/close JS uses `classList.add/remove('is-loading')` instead of replacing innerHTML.
+
+### Modal entrance animations
+`#disclaimer-modal` fades in via `modalFadeIn` (background transition). `.disc-card` scales up via `modalCardIn` with a spring-like cubic-bezier (`0.34, 1.56, 0.64, 1`).
+
+### SLA urgency indicator
+`.cf-val.sla.sla-urgent` applies `slaPulse` animation — alternates between `--accent2` and `--danger` color with a soft red text-shadow. Triggers when `has_breached` is true or `planned_end_time` is < 1 hour away. The class is managed by `fetchDetailSLA()`.
+
+### Mobile card press feedback
+On `max-width:799px`, `.ticket-card` and `.cal-mini-card` scale to `0.98` on `:active` with a 120ms transition. Provides tactile confirmation of tap without affecting desktop hover behavior.
+
+### Accordion depth cues
+`.accordion.acc-expanded` gains a subtle elevated `box-shadow`. `toggleAcc()` toggles this class alongside the existing chevron rotation and body open/close. Light theme uses a blue-tinted shadow.
+
+### Card hover consistency (desktop)
+On `min-width:800px`, `.ticket-inner`, `.cal-mini-card`, and `.cust-card-inner` share a unified hover pattern: `translateY(-1px)` lift with enhanced shadow on parent `:hover`. Both themes have matching shadow definitions.
+
+### prefers-reduced-motion
+`@media(prefers-reduced-motion: reduce)` kills all animation/transition durations and replaces skeleton shimmer with a static surface color. Ensures accessibility compliance for motion-sensitive users.
+
+### Data viz stat bars
+`.stat-bar-wrap` / `.stat-bar` provide a thin (3px) animated fill bar for numeric values. Variants: `.bar-good` (green), `.bar-warn` (amber), `.bar-bad` (red). Currently used in firewall uptime display. `statBarFill` keyframe animates width from 0.
+
+---
+
 ## Important Patterns
 
 - **No framework, no build**: pure DOM manipulation. `escHtml(str)` must be used on all user/API data inserted into innerHTML.
@@ -447,9 +481,9 @@ This section governs how edits are made to `fieldtech-app.html`. The file is ~49
 
 | Section | Approximate lines | Contents |
 |---|---|---|
-| CSS | 1 - ~1340 | `<style>` block: dark theme variables, light theme overrides, all component styles |
-| HTML | ~1340 - ~2180 | All screen markup, modals, nav bars |
-| JS | ~2180 - ~4950 | `<script>` block: state, API calls, rendering, event handlers |
+| CSS | 1 - ~1458 | `<style>` block: dark theme variables, light theme overrides, all component styles |
+| HTML | ~1458 - ~2317 | All screen markup, modals, nav bars |
+| JS | ~2317 - ~5090 | `<script>` block: state, API calls, rendering, event handlers |
 
 When reading or editing, use these boundaries to target the right section. Always read the surrounding 20-30 lines of context before making an edit to avoid collisions.
 
@@ -500,3 +534,4 @@ All six planned improvements have been implemented:
 4. **Light theme CSS refactor** -- 15+ CSS variables (`--card-*`, `--header-*`, `--pill-*-text`, `--resize-*`) replacing hardcoded rgba values
 5. **Code cleanup** -- `fetchCaseDetail` broken into 6 functions (main + 5 helpers), all `.then()` chains converted to async/await, notification globals consolidated
 6. **Responsive polish** -- Tablet breakpoint (800-1024px) narrows list panel, landscape `safe-area-inset-left/right` via `@supports`
+7. **Visual polish** -- Skeleton loading screens, enhanced empty states, button loading states, modal animations, SLA urgency pulse, mobile press feedback, accordion depth, card hover consistency, prefers-reduced-motion, data viz stat bars
