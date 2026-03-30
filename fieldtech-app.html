@@ -2180,10 +2180,12 @@
   const CATALYST      = { base: (location.hostname === 'localhost' || location.protocol === 'file:') ? 'http://localhost:3001' : RAILWAY_PROXY };
   let _networkCache   = null;
   let _networkView    = 'list';
-  let _notifs         = [];
-  let _notifSeen      = new Set();
-  let _notifLastCheck = null;
-  let _notifPollTimer = null;
+  let _notifs             = [];
+  let _notifSeen          = new Set();
+  let _notifLastCheck     = null;
+  let _notifPollTimer     = null;
+  let _notifFailCount     = 0;
+  const _NOTIF_MAX_FAILS  = 3;
 
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
@@ -2561,6 +2563,89 @@
     window.open(SN.instance + '/now/cwf/agent/record/sn_customerservice_case/' + currentCaseSysId, '_blank');
   }
 
+  // ── Detail sub-fetches (extracted from fetchCaseDetail) ──────────────────
+
+  /** Fetch assigned technician name from sys_user */
+  async function fetchDetailAssignee(assignedSysId) {
+    const el = document.getElementById('detail-assigned');
+    if (!assignedSysId) { el.textContent = 'Unassigned'; return; }
+    try {
+      const res = await snFetch(`${SN.instance}/api/now/table/sys_user/${assignedSysId}?sysparm_fields=name`);
+      const u = await res.json();
+      el.textContent = u.result?.name || 'Unassigned';
+    } catch { el.textContent = 'Unassigned'; }
+  }
+
+  /** Fetch SLA status from task_sla */
+  async function fetchDetailSLA(caseSysId) {
+    const el = document.getElementById('detail-cust-sla');
+    try {
+      const res = await snFetch(`${SN.instance}/api/now/table/task_sla?sysparm_query=task=${caseSysId}^active=true&sysparm_fields=sla.name,stage,has_breached,planned_end_time,time_left&sysparm_limit=1`);
+      const sd = await res.json();
+      const sla = sd.result?.[0];
+      if (!sla) { el.textContent = '—'; return; }
+      const breached   = sla.has_breached === 'true';
+      const plannedEnd = sla.planned_end_time ? new Date(sla.planned_end_time.replace(' ','T')+'Z') : null;
+      const slaName    = sla['sla.name'] || 'SLA';
+      const timeStr    = plannedEnd ? formatTime(plannedEnd) : '';
+      el.textContent   = slaName + (timeStr ? ' · ' + (breached ? 'Breached ' : 'Due ') + timeStr : '');
+      el.style.color     = breached ? 'var(--danger)' : '';
+      el.style.fontWeight = breached ? '700' : '';
+    } catch { el.textContent = '—'; }
+  }
+
+  /** Fetch account name, number, and tier from customer_account */
+  async function fetchDetailAccount(accountSysId, fallbackName) {
+    if (!accountSysId) return;
+    try {
+      const res = await snFetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`);
+      const a = await res.json();
+      const acct = a.result;
+      document.getElementById('detail-cust-name').textContent = acct?.name || fallbackName || '—';
+      document.getElementById('detail-cust-id').textContent   = acct?.number || '—';
+      document.getElementById('detail-cust-tier').textContent = acct?.u_tier || acct?.account_type || 'Standard';
+    } catch {
+      document.getElementById('detail-cust-name').textContent = fallbackName || '—';
+      document.getElementById('detail-cust-id').textContent   = '—';
+      document.getElementById('detail-cust-tier').textContent = '—';
+    }
+  }
+
+  /** Fetch contact name and phone from customer_contact */
+  async function fetchDetailContact(contactSysId) {
+    const nameEl  = document.getElementById('detail-cust-contact');
+    const phoneEl = document.getElementById('detail-cust-phone');
+    if (!contactSysId) { nameEl.textContent = '—'; phoneEl.textContent = '—'; return; }
+    try {
+      const res = await snFetch(`${SN.instance}/api/now/table/customer_contact/${contactSysId}?sysparm_fields=name,first_name,last_name,phone,mobile_phone,email`);
+      const ct = await res.json();
+      const contact = ct.result;
+      nameEl.textContent  = contact?.name || [contact?.first_name, contact?.last_name].filter(Boolean).join(' ') || '—';
+      phoneEl.textContent = contact?.phone || contact?.mobile_phone || contact?.email || '—';
+    } catch { nameEl.textContent = '—'; phoneEl.textContent = '—'; }
+  }
+
+  /** Fetch affected CI device from cmdb_ci_netgear */
+  async function fetchDetailDevice(ciSysId) {
+    const section = document.getElementById('affected-device-section');
+    if (!ciSysId) { section.style.display = 'none'; return; }
+    try {
+      const res = await snFetch(`${SN.instance}/api/now/table/cmdb_ci_netgear/${ciSysId}?sysparm_fields=name,ip_address,mac_address,serial_number,model_number,device_type`);
+      const d = await res.json();
+      const ci = d.result;
+      if (!ci) { section.style.display = 'none'; return; }
+      document.getElementById('ci-name').textContent   = ci.name         || '—';
+      document.getElementById('ci-ip').textContent     = ci.ip_address   || '—';
+      document.getElementById('ci-model').textContent  = ci.model_number || '—';
+      document.getElementById('ci-type').textContent   = ci.device_type ? ci.device_type.charAt(0).toUpperCase() + ci.device_type.slice(1) : '—';
+      document.getElementById('ci-serial').textContent = ci.serial_number || '—';
+      document.getElementById('ci-mac').textContent    = ci.mac_address   || '—';
+      section.style.display = '';
+    } catch { section.style.display = 'none'; }
+  }
+
+  // ── Main case detail loader ────────────────────────────────────────────────
+
   async function fetchCaseDetail(number) {
     ['detail-tb-id','detail-tb-title','detail-cust-name','detail-cust-id',
      'detail-cust-tier','detail-cust-addr','detail-cust-contact',
@@ -2596,17 +2681,6 @@
       const stateEl = document.getElementById('detail-pill-state');
       stateEl.textContent = state.label; stateEl.className = `pill ${state.cls}`;
 
-      // Assigned to — fetch name from sys_user since display_value isn't expanding
-      const assignedSysId = c.assigned_to?.value;
-      if (assignedSysId) {
-        snFetch(`${SN.instance}/api/now/table/sys_user/${assignedSysId}?sysparm_fields=name`)
-        .then(r => r.json()).then(u => {
-          document.getElementById('detail-assigned').textContent = u.result?.name || 'Unassigned';
-        }).catch(() => { document.getElementById('detail-assigned').textContent = 'Unassigned'; });
-      } else {
-        document.getElementById('detail-assigned').textContent = 'Unassigned';
-      }
-
       // Pre-select current state in update form
       const sel = document.getElementById('detail-state-select');
       const stateVal = c.state?.value || c.state;
@@ -2637,81 +2711,19 @@
       ].filter(Boolean);
       document.getElementById('detail-cust-addr').textContent = addrParts.length ? addrParts.join(' · ') : '—';
 
-      // Contact name — will be populated by the customer_contact fetch below
-
-      // SLA — fetch from task_sla for rich data
-      const caseSysId = c.sys_id?.value || c.sys_id;
-      snFetch(`${SN.instance}/api/now/table/task_sla?sysparm_query=task=${caseSysId}^active=true&sysparm_fields=sla.name,stage,has_breached,planned_end_time,time_left&sysparm_limit=1`)
-      .then(r => r.json()).then(sd => {
-        const sla = sd.result?.[0];
-        const el  = document.getElementById('detail-cust-sla');
-        if (!sla) { el.textContent = '—'; return; }
-        const breached     = sla.has_breached === 'true';
-        const plannedEnd   = sla.planned_end_time ? new Date(sla.planned_end_time.replace(' ','T')+'Z') : null;
-        const slaName      = sla['sla.name'] || 'SLA';
-        const timeStr      = plannedEnd ? formatTime(plannedEnd) : '';
-        el.textContent     = slaName + (timeStr ? ' · ' + (breached ? 'Breached ' : 'Due ') + timeStr : '');
-        el.style.color     = breached ? 'var(--danger)' : '';
-        el.style.fontWeight = breached ? '700' : '';
-      }).catch(() => { document.getElementById('detail-cust-sla').textContent = '—'; });
-
-      // Fetch full account record for name, number, and tier
+      // Fire sub-fetches in parallel (each handles its own errors)
+      const caseSysId    = c.sys_id?.value || c.sys_id;
       const accountSysId = c.account?.value;
+      fetchDetailAssignee(c.assigned_to?.value);
+      fetchDetailSLA(caseSysId);
+      fetchDetailAccount(accountSysId, c.account?.display_value);
+      fetchDetailContact(c.contact?.value);
+      fetchDetailDevice(c.cmdb_ci?.value);
+
+      // Equipment mock-data sections
       renderInternetSection(accountSysId || currentCaseSysId);
       renderFirewallSection(accountSysId || currentCaseSysId);
       renderVoipSection(accountSysId || currentCaseSysId);
-      if (accountSysId) {
-        snFetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`)
-        .then(r => r.json()).then(a => {
-          const acct = a.result;
-          document.getElementById('detail-cust-name').textContent = acct?.name || c.account?.display_value || '—';
-          document.getElementById('detail-cust-id').textContent   = acct?.number || '—';
-          document.getElementById('detail-cust-tier').textContent = acct?.u_tier || acct?.account_type || 'Standard';
-        }).catch(() => {
-          document.getElementById('detail-cust-name').textContent = c.account?.display_value || '—';
-          document.getElementById('detail-cust-id').textContent   = '—';
-          document.getElementById('detail-cust-tier').textContent = '—';
-        });
-      }
-
-      // Fetch contact name and phone from customer_contact record
-      const contactSysId = c.contact?.value;
-      if (contactSysId) {
-        snFetch(`${SN.instance}/api/now/table/customer_contact/${contactSysId}?sysparm_fields=name,first_name,last_name,phone,mobile_phone,email`)
-        .then(r => r.json()).then(ct => {
-          const contact = ct.result;
-          const name  = contact?.name || [contact?.first_name, contact?.last_name].filter(Boolean).join(' ') || '—';
-          const phone = contact?.phone || contact?.mobile_phone || contact?.email || '—';
-          document.getElementById('detail-cust-contact').textContent = name;
-          document.getElementById('detail-cust-phone').textContent   = phone;
-        }).catch(() => {
-          document.getElementById('detail-cust-contact').textContent = '—';
-          document.getElementById('detail-cust-phone').textContent   = '—';
-        });
-      } else {
-        document.getElementById('detail-cust-contact').textContent = '—';
-        document.getElementById('detail-cust-phone').textContent   = '—';
-      }
-
-      // Affected Device — fetch CI from cmdb_ci_netgear
-      const ciSysId = c.cmdb_ci?.value;
-      const ciSection = document.getElementById('affected-device-section');
-      if (ciSysId) {
-        snFetch(`${SN.instance}/api/now/table/cmdb_ci_netgear/${ciSysId}?sysparm_fields=name,ip_address,mac_address,serial_number,model_number,device_type`)
-        .then(r => r.json()).then(d => {
-          const ci = d.result;
-          if (!ci) { ciSection.style.display = 'none'; return; }
-          document.getElementById('ci-name').textContent   = ci.name         || '—';
-          document.getElementById('ci-ip').textContent     = ci.ip_address   || '—';
-          document.getElementById('ci-model').textContent  = ci.model_number || '—';
-          document.getElementById('ci-type').textContent   = ci.device_type  ? ci.device_type.charAt(0).toUpperCase() + ci.device_type.slice(1) : '—';
-          document.getElementById('ci-serial').textContent = ci.serial_number || '—';
-          document.getElementById('ci-mac').textContent    = ci.mac_address   || '—';
-          ciSection.style.display = '';
-        }).catch(() => { ciSection.style.display = 'none'; });
-      } else {
-        ciSection.style.display = 'none';
-      }
 
       // Travel estimate
       fetchTravelEstimate();
@@ -4751,10 +4763,7 @@
   }
 
   // ── Notifications ──────────────────────────────────────────────────────────
-  // _notifs, _notifSeen, _notifLastCheck, _notifPollTimer declared at top of script
-
-  let _notifFailCount = 0;
-  const _NOTIF_MAX_FAILS = 3;
+  // All _notif* globals declared at top of script alongside other state
 
   function startNotifPolling() {
     // First check: look back 24 hours to catch anything already assigned
