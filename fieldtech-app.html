@@ -11,6 +11,9 @@
 <link rel="apple-touch-icon" href="cspire_burst_cyan.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ── ACCESSIBILITY ── */
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
   /* ── DARK MODE (default) ── */
   :root {
     --bg: #131e29;
@@ -361,7 +364,7 @@
   }
   .notif-panel-title {
     font-family:var(--sans); font-size:13px; font-weight:700;
-    color:var(--text); letter-spacing:.01em;
+    color:var(--text); letter-spacing:.01em; margin:0;
   }
   .notif-mark-read {
     background:none; border:none; cursor:pointer;
@@ -599,7 +602,7 @@
 
   /* SECTIONS */
   .section { margin:0 14px 12px; }
-  .section-title { font-family:var(--sans); font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; padding:7px 14px; background:linear-gradient(90deg, rgba(0,192,243,0.12) 0%, rgba(0,192,243,0.04) 100%); border-left:3px solid var(--accent); border-radius:0 4px 4px 0; }
+  .section-title { font-family:var(--sans); font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin:0 0 8px 0; padding:7px 14px; background:linear-gradient(90deg, rgba(0,192,243,0.12) 0%, rgba(0,192,243,0.04) 100%); border-left:3px solid var(--accent); border-radius:0 4px 4px 0; }
   html[data-theme="cspire"] .section-title { background:linear-gradient(90deg, rgba(15,61,88,0.78) 0%, rgba(0,120,180,0.62) 50%, rgba(0,192,243,0.75) 100%); border-left-color:#00c0f3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.2); }
   html[data-theme="cspire"] .date-divider { background:var(--surface); border-top-color:rgba(0,96,140,0.2); border-bottom-color:rgba(0,96,140,0.2); }
   html[data-theme="cspire"] .cust-banner-head { background:linear-gradient(90deg, rgba(15,61,88,0.78) 0%, rgba(0,120,180,0.62) 50%, rgba(0,192,243,0.75) 100%); border-bottom-color:rgba(0,96,140,0.3); border-left-color:#00c0f3; }
@@ -1304,33 +1307,33 @@
 </head>
 <body>
 <!-- ── LOGIN SCREEN ── -->
-<div id="login-screen">
+<div id="login-screen" role="main" aria-label="Login">
   <div class="login-card">
     <div class="login-header">
       <img src="C_Spire_Logo.png" alt="C Spire" height="40">
       <span class="login-tagline">FieldOps Technician Portal</span>
     </div>
-    <div class="login-body">
+    <form class="login-body" onsubmit="event.preventDefault();attemptLogin();" aria-label="Sign in to FieldOps">
       <div>
-        <div class="login-label">Username</div>
+        <label class="login-label" for="login-username">Username</label>
         <input class="login-input" id="login-username" type="text" placeholder="ServiceNow username" autocomplete="username" autocapitalize="none">
       </div>
       <div>
-        <div class="login-label">Password</div>
+        <label class="login-label" for="login-password">Password</label>
         <input class="login-input" id="login-password" type="password" placeholder="Password" autocomplete="current-password">
       </div>
-      <div class="login-error" id="login-error"></div>
-      <button class="login-btn" id="login-btn" onclick="attemptLogin()">Sign In</button>
-    </div>
+      <div class="login-error" id="login-error" role="alert" aria-live="assertive"></div>
+      <button class="login-btn" id="login-btn" type="submit" onclick="event.preventDefault();attemptLogin();">Sign In</button>
+    </form>
   </div>
 </div>
 
 <!-- ── DISCLAIMER MODAL ── -->
-<div id="disclaimer-modal" class="hidden">
+<div id="disclaimer-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="disc-title">
   <div class="disc-card">
     <div class="disc-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent2);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span class="disc-title">Disclaimer</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent2);flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="disc-title" id="disc-title">Disclaimer</span>
     </div>
     <div class="disc-body">
       <p class="disc-text">This application is intended for demonstration purposes only. No internal C Spire systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources.</p>
@@ -1340,15 +1343,15 @@
 </div>
 
 <!-- NOTIFICATION OVERLAY -->
-<div class="notif-backdrop" id="notif-backdrop" onclick="closeNotifPanel()"></div>
-<div class="notif-panel" id="notif-panel">
+<div class="notif-backdrop" id="notif-backdrop" onclick="closeNotifPanel()" aria-hidden="true"></div>
+<div class="notif-panel" id="notif-panel" role="region" aria-label="Notifications" aria-hidden="true">
   <div class="notif-panel-header">
-    <span class="notif-panel-title">Notifications</span>
+    <h2 class="notif-panel-title">Notifications</h2>
     <button class="notif-mark-read" onclick="markAllNotifsRead()">Mark all read</button>
   </div>
-  <div class="notif-list" id="notif-list">
+  <div class="notif-list" id="notif-list" role="list" aria-live="polite">
     <div class="notif-empty">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       No New Notifications
     </div>
   </div>
@@ -1380,8 +1383,8 @@
       </button>
     </nav>
     <div class="topbar-right">
-      <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge"></span></button>
-      <div class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out">??</div>
+      <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
+      <button class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out" aria-label="Sign out">??</button>
     </div>
   </header>
 
@@ -1408,15 +1411,15 @@
             animation:tagline-shimmer 4s linear infinite;
             filter:drop-shadow(0 1px 6px rgba(0,192,243,0.45));
           ">We Are Customer Inspired</span>
-          <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge"></span></button>
-          <div class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out">??</div>
+          <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
+          <button class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out" aria-label="Sign out">??</button>
         </div>
       </div>
 
       <div class="list-header">
         <div class="search-box">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="ticket-search" placeholder="Search by customer, account #, ticket #, address…">
+          <input type="text" id="ticket-search" placeholder="Search by customer, account #, ticket #, address…" aria-label="Search tickets">
         </div>
         <button class="search-btn" id="ticket-search-btn">Search Assigned Tickets</button>
       </div>
@@ -1449,8 +1452,8 @@
         <div class="nto-sub">Choose a ticket from the list to view its details.</div>
       </div>
       <div class="detail-topbar">
-        <button class="back-btn" onclick="closeDetail()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        <button class="back-btn" onclick="closeDetail()" aria-label="Back to ticket list">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="cspire-logo-svg" style="margin-right:4px;">
           <img src="C_Spire_Logo.png" alt="C Spire" height="45">
@@ -1534,13 +1537,13 @@
 
         <!-- DESCRIPTION (repair tickets) -->
         <div class="section" id="description-section">
-          <div class="section-title">Issue Description</div>
+          <h2 class="section-title">Issue Description</h2>
           <div class="card"><div class="card-body"><p class="desc-text" id="detail-description">—</p></div></div>
         </div>
 
         <!-- SERVICE ORDER (install tickets) -->
         <div class="section" id="service-order-section" style="display:none;">
-          <div class="section-title">Service Order</div>
+          <h2 class="section-title">Service Order</h2>
           <!-- Order numbers -->
           <div class="card" style="margin-bottom:8px;">
             <div class="card-body" style="padding:0;">
@@ -1566,7 +1569,7 @@
 
         <!-- AFFECTED DEVICE -->
         <div class="section" id="affected-device-section" style="display:none;">
-          <div class="section-title">Affected Device</div>
+          <h2 class="section-title">Affected Device</h2>
           <div class="card">
             <div class="card-body" style="padding:0;">
               <div class="cust-banner-grid" style="grid-template-columns:1fr 1fr;">
@@ -1601,12 +1604,12 @@
 
         <!-- SERVICES & EQUIPMENT (collapsible) -->
         <div class="section">
-          <div class="section-title">Services &amp; Equipment <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Built using internal databases to replicate realtime data</span></div>
+          <h2 class="section-title">Services &amp; Equipment <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Built using internal databases to replicate realtime data</span></h2>
           <div class="card" style="overflow:visible;">
 
             <!-- ── INTERNET ── -->
             <div class="accordion" id="acc-internet">
-              <button class="acc-header" onclick="toggleAcc('internet')">
+              <button class="acc-header" onclick="toggleAcc('internet')" aria-expanded="true" aria-controls="body-internet">
                 <div class="acc-icon-wrap acc-internet">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
                 </div>
@@ -1662,7 +1665,7 @@
 
             <!-- ── FIREWALL ── -->
             <div class="accordion" id="acc-firewall">
-              <button class="acc-header" onclick="toggleAcc('firewall')">
+              <button class="acc-header" onclick="toggleAcc('firewall')" aria-expanded="false" aria-controls="body-firewall">
                 <div class="acc-icon-wrap acc-firewall">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
@@ -1720,7 +1723,7 @@
 
             <!-- ── VOICE DEVICES ── -->
             <div class="accordion" id="acc-voip">
-              <button class="acc-header" onclick="toggleAcc('voip')">
+              <button class="acc-header" onclick="toggleAcc('voip')" aria-expanded="false" aria-controls="body-voip">
                 <div class="acc-icon-wrap acc-voip">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                 </div>
@@ -1742,7 +1745,7 @@
 
             <!-- ── DDOS / OTHER ── -->
             <div class="accordion" id="acc-ddos">
-              <button class="acc-header" onclick="toggleAcc('ddos')">
+              <button class="acc-header" onclick="toggleAcc('ddos')" aria-expanded="false" aria-controls="body-ddos">
                 <div class="acc-icon-wrap acc-ddos">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                 </div>
@@ -1802,7 +1805,7 @@
 
         <!-- LINKS -->
         <div class="section">
-          <div class="section-title">Links <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· All links disabled in demo</span></div>
+          <h2 class="section-title">Links <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· All links disabled in demo</span></h2>
           <div class="card">
             <div class="card-body" style="padding:0;" id="links-container-detail"></div>
           </div>
@@ -1810,7 +1813,7 @@
 
         <!-- TIMELINE -->
         <div class="section">
-          <div class="section-title">Activity Log <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pulls realtime from ServiceNow</span></div>
+          <h2 class="section-title">Activity Log <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pulls realtime from ServiceNow</span></h2>
           <div class="card">
             <div class="card-body">
               <div class="tl" id="detail-timeline">
@@ -1822,11 +1825,12 @@
 
         <!-- UPDATE -->
         <div class="section">
-          <div class="section-title">Update Ticket <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pushes updates and closures realtime to ServiceNow</span></div>
+          <h2 class="section-title">Update Ticket <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pushes updates and closures realtime to ServiceNow</span></h2>
           <div class="card">
             <div class="card-body">
               <div class="form-col">
-                <select class="select-field" id="detail-state-select" onchange="syncCloseState()">
+                <label for="detail-state-select" class="sr-only">Ticket State</label>
+                <select class="select-field" id="detail-state-select" onchange="syncCloseState()" aria-label="Ticket state">
                   <option value="1">Open</option>
                   <option value="2">Pending</option>
                   <option value="3">Solution Proposed</option>
@@ -1834,7 +1838,8 @@
                   <option value="4">Close Ticket</option>
                   <option value="5">Cancelled</option>
                 </select>
-                <select class="select-field" id="detail-resolution-select" disabled onchange="syncCloseState()">
+                <label for="detail-resolution-select" class="sr-only">Close Reason</label>
+                <select class="select-field" id="detail-resolution-select" disabled onchange="syncCloseState()" aria-label="Close reason">
                   <option value="">-- Close Reason (required to close) --</option>
                   <option value="1">Solved – Fixed by Support / Guidance provided</option>
                   <option value="2">Solved – Fixed by closing related PRB</option>
@@ -1846,7 +1851,8 @@
                   <option value="8">Duplicate Issue</option>
                   <option value="9">Voided / Canceled</option>
                 </select>
-                <textarea class="notes-area" id="detail-work-notes" placeholder="Work notes — what did you find on site? What steps were taken?" oninput="syncCloseState()"></textarea>
+                <label for="detail-work-notes" class="sr-only">Work Notes</label>
+                <textarea class="notes-area" id="detail-work-notes" placeholder="Work notes — what did you find on site? What steps were taken?" oninput="syncCloseState()" aria-label="Work notes"></textarea>
                 <div id="update-feedback" style="display:none;font-size:13px;padding:8px 10px;border-radius:8px;"></div>
                 <div class="form-btns">
                   <button class="btn btn-ghost" onclick="saveDraft()">Draft</button>
@@ -1881,7 +1887,7 @@
       <div class="cust-search-wrap">
         <div class="cust-search-wrap-inner">
           <svg class="cust-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="search" class="cust-search-input" id="cust-search" placeholder="Search by name, account #, city…" oninput="filterAccounts(this.value)">
+          <input type="search" class="cust-search-input" id="cust-search" placeholder="Search by name, account #, city…" oninput="filterAccounts(this.value)" aria-label="Search customers">
         </div>
       </div>
       <div class="cust-sort-bar">
@@ -1899,8 +1905,8 @@
     <!-- ══ CUSTOMER DETAIL ══ -->
     <div id="screen-customer-detail">
       <div class="topbar">
-        <button class="back-btn" onclick="closeCustomerDetail()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        <button class="back-btn" onclick="closeCustomerDetail()" aria-label="Back to customer list">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <span class="topbar-title" id="cust-detail-title" style="margin-left:4px;">Account</span>
       </div>
@@ -1946,7 +1952,7 @@
         <div style="flex:1;display:flex;align-items:center;justify-content:center;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
           <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
-            <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date">
+            <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date" aria-label="Jump to date" aria-expanded="false" aria-controls="cal-picker-drop">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
           <div class="cal-picker-drop" id="cal-picker-drop">
@@ -1966,17 +1972,17 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
       </div>
-      <div class="cal-dow-row">
-        <div class="cal-dow-cell">Sunday</div>
-        <div class="cal-dow-cell">Monday</div>
-        <div class="cal-dow-cell">Tuesday</div>
-        <div class="cal-dow-cell">Wednesday</div>
-        <div class="cal-dow-cell">Thursday</div>
-        <div class="cal-dow-cell">Friday</div>
-        <div class="cal-dow-cell">Saturday</div>
+      <div class="cal-dow-row" role="row" aria-hidden="true">
+        <div class="cal-dow-cell" role="columnheader">Sunday</div>
+        <div class="cal-dow-cell" role="columnheader">Monday</div>
+        <div class="cal-dow-cell" role="columnheader">Tuesday</div>
+        <div class="cal-dow-cell" role="columnheader">Wednesday</div>
+        <div class="cal-dow-cell" role="columnheader">Thursday</div>
+        <div class="cal-dow-cell" role="columnheader">Friday</div>
+        <div class="cal-dow-cell" role="columnheader">Saturday</div>
       </div>
       <div class="cal-body-wrap">
-        <div class="cal-grid" id="cal-grid">
+        <div class="cal-grid" id="cal-grid" role="grid" aria-label="Calendar">
           <div class="list-loading"><div class="spinner"></div><span>Loading schedule…</span></div>
         </div>
       </div>
@@ -2013,7 +2019,7 @@
       <div class="topbar"><span class="topbar-title" style="margin-left:4px;">More</span></div>
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;">
 
-        <div class="section-title">Appearance</div>
+        <h2 class="section-title">Appearance</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
 
@@ -2050,7 +2056,7 @@
           </div>
         </div>
 
-        <div class="section-title" style="margin-top:4px;">App</div>
+        <h2 class="section-title" style="margin-top:4px;">App</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
@@ -2066,12 +2072,12 @@
           </div>
         </div>
 
-        <div class="section-title" style="margin-top:4px;">Tools</div>
+        <h2 class="section-title" style="margin-top:4px;">Tools</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="showScreen('network',document.getElementById('bnav-more'));setDesktopNav('more');">
+            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);width:100%;background:none;border-top:none;border-left:none;border-right:none;text-align:left;" onclick="showScreen('network',document.getElementById('bnav-more'));setDesktopNav('more');">
               <div style="display:flex;align-items:center;gap:10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="16" width="6" height="6" rx="1"/><path d="M5 8v4h14V8M12 12v4"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)" aria-hidden="true"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="16" width="6" height="6" rx="1"/><path d="M5 8v4h14V8M12 12v4"/></svg>
                 <div>
                   <div style="display:flex;align-items:center;gap:8px;">
                     <span style="font-size:14px;font-weight:600;color:var(--text);">Network Equipment</span>
@@ -2080,22 +2086,22 @@
                   <div style="font-size:11px;color:var(--text-muted);">View firewall, internet, and infrastructure details</div>
                 </div>
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;" onclick="showScreen('links',document.getElementById('bnav-more'));setDesktopNav('more');">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;width:100%;background:none;border:none;text-align:left;" onclick="showScreen('links',document.getElementById('bnav-more'));setDesktopNav('more');">
               <div style="display:flex;align-items:center;gap:10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 <div>
                   <div style="font-size:14px;font-weight:600;color:var(--text);">Important Links</div>
                   <div style="font-size:11px;color:var(--text-muted);">Portals, order systems, and internal tools</div>
                 </div>
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
         </div>
 
-        <div class="section-title" style="margin-top:4px;">Account</div>
+        <h2 class="section-title" style="margin-top:4px;">Account</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
@@ -2944,7 +2950,7 @@
           <div class="cust-detail-field"><div class="cust-detail-label">Phone</div><div class="cust-detail-val">${escHtml(acc.phone || '—')}</div></div>
         </div>
       </div>
-      <div class="section-title">Locations</div>`;
+      <h2 class="section-title">Locations</h2>`;
 
       if (locations.length === 0) {
         html += `<div class="cust-empty-msg">No locations on record.</div>`;
@@ -2972,7 +2978,7 @@
         html += `</div>`;
       }
 
-      html += `<div class="section-title" style="margin-top:10px;">Contacts</div>`;
+      html += `<h2 class="section-title" style="margin-top:10px;">Contacts</h2>`;
       if (contacts.length === 0) {
         html += `<div class="cust-empty-msg">No contacts on record.</div>`;
       } else {
@@ -3723,6 +3729,7 @@
     if (isOpen) {
       drop.classList.remove('open');
       btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
     } else {
       if (_cal.year === null) initCalState();
       _picker.year  = _cal.year;
@@ -3730,12 +3737,15 @@
       renderPickerGrid();
       drop.classList.add('open');
       btn.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
     }
   }
 
   function closeCalPicker() {
     document.getElementById('cal-picker-drop').classList.remove('open');
-    document.getElementById('cal-picker-btn').classList.remove('open');
+    const btn = document.getElementById('cal-picker-btn');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
   }
 
   function pickerNavigate(delta) {
@@ -4161,9 +4171,13 @@
   function toggleAcc(id) {
     const body = document.getElementById('body-' + id);
     const chev = document.getElementById('chev-' + id);
+    const header = body.previousElementSibling; // the acc-header button
     const isOpen = body.classList.contains('open');
     body.classList.toggle('open', !isOpen);
     chev.classList.toggle('open', !isOpen);
+    if (header && header.hasAttribute('aria-expanded')) {
+      header.setAttribute('aria-expanded', String(!isOpen));
+    }
   }
   // Sync default-open chevron
   document.getElementById('chev-internet').classList.add('open');
@@ -4792,7 +4806,11 @@
 
     renderNotifList();
     panel.classList.add('show');
+    panel.setAttribute('aria-hidden', 'false');
     document.getElementById('notif-backdrop').classList.add('show');
+
+    // Sync aria-expanded on all bell buttons
+    document.querySelectorAll('.notif-bell').forEach(b => b.setAttribute('aria-expanded', 'true'));
 
     // Mark all as read on open
     _notifs.forEach(n => n.read = true);
@@ -4800,8 +4818,11 @@
   }
 
   function closeNotifPanel() {
-    document.getElementById('notif-panel').classList.remove('show');
+    const panel = document.getElementById('notif-panel');
+    panel.classList.remove('show');
+    panel.setAttribute('aria-hidden', 'true');
     document.getElementById('notif-backdrop').classList.remove('show');
+    document.querySelectorAll('.notif-bell').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
   function renderNotifList() {

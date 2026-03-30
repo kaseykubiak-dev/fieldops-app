@@ -390,3 +390,65 @@ Notification items show ticket number, time ago, company, and description. Prior
 - Mock data sections (Internet, Firewall, Voice) intentionally use local JSON rather than live APIs — this is by design for demo/training use.
 - The `u_scheduled_start` custom field on `sn_customerservice_case` drives the calendar display for install/repair appointment times. Always populate this field when seeding tickets.
 - `overflow: hidden` on card containers clips `::before`/`::after` pseudo-elements — useful for brand shape accents, but means z-index layering inside cards requires `position: relative` on the container and `z-index: -1` on pseudo-elements so they render behind content.
+
+---
+
+## Change Protocol
+
+This section governs how edits are made to `fieldtech-app.html`. The file is ~4900 lines of inline HTML + CSS + JS with no build step, so discipline around changes is critical.
+
+### File structure boundaries
+
+| Section | Approximate lines | Contents |
+|---|---|---|
+| CSS | 1 – ~1200 | `<style>` block: dark theme variables, light theme overrides, all component styles |
+| HTML | ~1200 – ~2100 | All screen markup, modals, nav bars |
+| JS | ~2100 – ~4900 | `<script>` block: state, API calls, rendering, event handlers |
+
+When reading or editing, use these boundaries to target the right section. Always read the surrounding 20–30 lines of context before making an edit to avoid collisions.
+
+### Edit rules
+
+1. **Batch size**: No more than 5–10 related changes per editing pass. After each pass, verify nothing broke before continuing.
+2. **One section at a time**: Complete all work in a logical section (e.g., "accessibility — forms/modals") before moving to the next. Do not interleave unrelated changes.
+3. **Theme parity**: Any CSS change must be checked against both dark and light themes. If a variable is added or renamed, update both `:root` and `html[data-theme="cspire"]` blocks.
+4. **No behavioral regressions**: Refactors (renaming functions, reorganizing globals, standardizing async patterns) must not change user-visible behavior. If the before/after behavior might differ, note it explicitly.
+5. **Preserve documented patterns**: The following are battle-tested and must not be reverted:
+   - Calendar agenda scroll: double-`requestAnimationFrame` + `getBoundingClientRect` delta
+   - Calendar topbar: 3-column flex layout with spacer
+   - `pickerPickDay` ordering: `closeCalDayPanel()` before setting `_cal.selectedDay`
+   - `escHtml()` on all user/API data inserted via innerHTML
+   - `calDateStr(d)` for local-time date strings
+   - `parseSNDate()` / `.replace(' ','T')+'Z'` for ServiceNow dates
+6. **innerHTML safety**: Every new `innerHTML =` assignment that includes dynamic data must use `escHtml()`. If building onclick handlers in HTML strings, prefer `data-*` attributes + delegated event listeners instead.
+
+### Verification checklist
+
+After each section of changes, confirm the following still work in both themes:
+
+- [ ] Login flow (enter credentials → disclaimer modal → ticket list)
+- [ ] Ticket list loads, search/filter works
+- [ ] Ticket detail opens, accordion sections expand/collapse
+- [ ] Calendar month view renders, day selection works, agenda view scrolls correctly on mobile
+- [ ] Customer list loads, sort toggles work
+- [ ] Customer detail opens with service summary
+- [ ] Network screen loads (or gracefully errors if proxy is down)
+- [ ] Theme toggle switches cleanly in both directions
+- [ ] Notification bell shows badge, dropdown opens/closes
+- [ ] Bottom nav (mobile) and sidebar nav (desktop) both highlight the active screen
+- [ ] No console errors on any screen
+
+### Git checkpoint strategy
+
+Commit after each verified section with a message like: `a11y: add ARIA attributes to accordion sections and modals`. This gives clean rollback points if a later section introduces a regression.
+
+### Known refactoring plan (March 2026)
+
+The following improvements are planned, in priority order. Security hardening is deferred until the app moves beyond demo/training use.
+
+1. **Accessibility pass** — ARIA attributes, form labels, heading hierarchy, focus management, keyboard navigation
+2. **Color contrast fixes** — `--text-muted` WCAG AA compliance, pill background audit
+3. **Network resilience** — AbortController timeouts (10–15s) on all fetches, inline error UI, notification polling backoff
+4. **Light theme CSS refactor** — extract hardcoded `rgba()` values into CSS variables, eliminate `!important` flags
+5. **Code cleanup** — break up `fetchCaseDetail` (~170 lines), standardize on `async/await`, group globals into feature objects
+6. **Responsive polish** — tablet breakpoint (~1024px), landscape safe-area-inset-left/right
