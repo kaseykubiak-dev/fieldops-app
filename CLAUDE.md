@@ -7,7 +7,7 @@ Single-file web app (`fieldtech-app.html`) built for C Spire field technicians. 
 ## Repository Layout
 
 ```
-fieldtech-app.html       ← The entire app (HTML + CSS + JS, ~4800 lines)
+fieldtech-app.html       ← The entire app (HTML + CSS + JS, ~4900 lines)
 meraki-proxy.js          ← Node.js CORS proxy for Cisco Catalyst Center API
 package.json             ← { "start": "node meraki-proxy.js" }, Node ≥18
 internet-db.json         ← Simulated ISP circuit data (fiber, cable, DSL, wireless)
@@ -15,6 +15,9 @@ firewall-db.json         ← Simulated firewall hardware data
 webex-phones-db.json     ← Simulated Webex/VoIP phone data (models + name lists)
 phones-db.json           ← Additional phone model reference
 cspire_burst_cyan.png    ← App icon (C Spire burst logo)
+seed_servicenow.py       ← Seeds 12 customer accounts, locations, and contacts
+seed_test_user.py        ← Creates test_fieldtech user and initial case set
+seed_next_week.py        ← Creates 10 cases for the following work week (March 31 – April 4)
 ```
 
 `.gitignore` excludes `node_modules/`, `.env`, `App History/`, and seed scripts.
@@ -73,6 +76,10 @@ Session lifecycle:
 2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`
 3. Force refresh: `forceAppRefresh()` clears `cachedAssignedTickets` and re-fetches, then navigates to the Tickets tab
 4. Logout: `logout()` clears sessionStorage and reloads the page
+
+### Test credentials
+- **Username**: `test_fieldtech` / **Password**: `TestFieldTech1!`
+- Mirrors the roles and group memberships of `kkubiak`
 
 ---
 
@@ -146,16 +153,31 @@ function pickerPickDay(year, month, day) {
 
 ### Agenda scroll
 
-`renderCalendarAgenda()` always renders **all days** in the month (empty days show "No tickets assigned"). After setting `innerHTML`, scroll uses double-`requestAnimationFrame` + `scrollIntoView` to land on the selected day (or today if no selection):
+`renderCalendarAgenda()` always renders **all days** in the month (empty days show "No tickets assigned"). After setting `innerHTML`, scroll uses double-`requestAnimationFrame` + `getBoundingClientRect` delta applied to `grid.scrollTop` to land on the selected day (or today if no selection). Do **not** revert to `scrollIntoView`, `offsetTop`, or single-`setTimeout` — these cause the entire iOS viewport to shift:
 
 ```js
 requestAnimationFrame(() => requestAnimationFrame(() => {
   const el = grid.querySelector(`.cal-agenda-day[data-date="${scrollTarget}"]`);
-  if (el) el.scrollIntoView({ block: 'start' });
+  if (el) grid.scrollTop += el.getBoundingClientRect().top - grid.getBoundingClientRect().top;
 }));
 ```
 
 `#cal-grid` has `overflow-y: auto` and is the scroll container. Its parent `.cal-body-wrap` has `overflow: hidden`.
+
+### Calendar topbar layout
+
+The calendar topbar uses a **3-column flex layout** to keep the month/year label + picker widget truly centered regardless of the refresh button on the right:
+
+```html
+<div style="width:36px;flex-shrink:0;"></div>   <!-- spacer balances refresh btn -->
+<div style="flex:1;display:flex;align-items:center;justify-content:center;">
+  <span class="cal-month-label" ...>March 2026</span>
+  <div class="cal-picker-wrap" style="margin-left:8px;">...</div>
+</div>
+<button class="icon-btn" ...>  <!-- refresh -->
+```
+
+Do not switch back to `position:absolute` on the label or move the picker to the right side — the picker dropdown clips against the screen edge when placed near the refresh button.
 
 ### Date strings
 
@@ -198,40 +220,130 @@ Toggle is stored in `localStorage` key `ft_theme`. Applied via `document.documen
 | Token | Hex | Role |
 |---|---|---|
 | C Spire Blue | `#00c0f3` | Primary — `--accent` in both themes |
-| Steel Blue | `#0f3d58` | Secondary — `--accent2` in light mode |
+| Steel Blue | `#0f3d58` | Secondary |
 | Onyx Black | `#131e29` | Secondary — `--bg`/`--surface` in dark mode |
 | Magnetic Purple | `#884d9d` | Tertiary — consumer only |
 | Quantum Violet | `#543161` | Tertiary — `--violet` |
 | Kinetic Orange | `#FF6720` | CTAs, buttons, highlights — `--accent2` in dark mode |
-| Cool Grey | `#85A7CA` | Supporting — `--text-dim` in dark mode |
-| Nano Grey | `#EDF1F7` | Supporting — `--text` in dark mode |
-| C Spire Glow | `#B9DEF3` | Supporting — `--bg` in light mode |
+| Cool Grey | `#85A7CA` | Supporting — calendar day-of-week header (light mode) |
+| Nano Grey | `#EDF1F7` | Supporting |
+| C Spire Glow | `#B9DEF3` | Supporting |
 
-### Light mode gradient system (as of latest commits)
+---
 
-**Headers** (topbar, detail-topbar, list-header, stat-strip, filter-tabs, section-title, cust-banner-head, dev-section-hd, cal-month-nav, cal-dow-row):
-```css
-linear-gradient(90deg, rgba(15,61,88,0.88) 0%, rgba(0,120,180,0.72) 50%, rgba(0,192,243,0.85) 100%)
-/* Steel Blue → mid-blue → C Spire Blue */
+## iOS PWA / Safe Area
+
+The app is configured as a full-screen iOS PWA:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e1a2a">
 ```
 
-**Containers** (ticket-inner, device-card, stat-chip, net-summary):
+Key safe-area rules:
+- `.topbar` and `.detail-topbar`: `min-height` (not `height`), `padding-top: env(safe-area-inset-top)`
+- `.bottom-nav`: `min-height`, `padding-bottom: env(safe-area-inset-bottom)`, `position: relative`
+- `.bottom-nav::after`: fills the home indicator zone below the nav bar with the background color
+
+Do not use `-webkit-fill-available` on `.app` height — it caused double-counting of the safe area inset in PWA mode.
+
+---
+
+## Visual Design System
+
+### Depth & Dimension — Cards
+
+All primary card containers use frosted glass + 3-layer box-shadow + left accent border:
+
 ```css
-linear-gradient(155deg, rgba(0,192,243,0.42) 0%, rgba(0,152,220,0.22) 55%, rgba(15,61,88,0.08) 100%)
-/* C Spire Blue → fading to Steel, diagonal */
+/* Dark mode pattern */
+background: rgba(22,34,54,0.72);
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+border: 1px solid rgba(255,255,255,0.1);
+border-left: 3px solid var(--accent);
+box-shadow:
+  0 1px 3px rgba(0,0,0,0.5),
+  0 4px 16px rgba(0,0,0,0.4),
+  0 10px 30px rgba(0,0,0,0.2),
+  inset 0 1px 0 rgba(255,255,255,0.08),
+  inset 0 -1px 0 rgba(0,0,0,0.18);
+
+/* Light mode pattern */
+background: rgba(255,255,255,0.78);
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+border: 1px solid rgba(0,192,243,0.22);
+border-left: 3px solid var(--accent);
+box-shadow:
+  0 1px 3px rgba(0,0,0,0.08),
+  0 4px 16px rgba(0,192,243,0.1),
+  0 10px 28px rgba(122,85,152,0.07),
+  inset 0 1px 0 rgba(255,255,255,0.95),
+  inset 0 -1px 0 rgba(0,0,0,0.04);
 ```
 
-**Pills** in light mode all have a per-type gradient fill + `1.5px` solid border + dark text color. The rule block lives right after the `html[data-theme="cspire"]` variable block.
+Applies to: `.ticket-inner`, `.device-card`, `.cust-banner`, `.cust-card-inner`, `.cust-detail-banner`, `.net-summary`, `.stat-chip`.
 
-**Text-shadow outline**: All accent-blue (`#00c0f3`) text elements in light mode get `text-shadow: 0 0 1px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.18)` for legibility on the light surface.
+All of these have `position: relative` and `overflow: hidden` set.
+
+### Background Burst Orbs
+
+`.app` has layered radial gradients creating ambient energy — C Spire Blue at top-right, Magnetic Purple at bottom-left, with a soft center glow. Light mode version is slightly more saturated:
+
+```css
+/* Dark mode */
+.app { background:
+  radial-gradient(circle at 82% 7%, rgba(0,192,243,0.17) 0%, transparent 42%),
+  radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 40%),
+  radial-gradient(circle at 50% 50%, rgba(0,192,243,0.05) 0%, transparent 55%); }
+
+/* Light mode */
+html[data-theme="cspire"] .app { background:
+  radial-gradient(circle at 82% 7%, rgba(0,192,243,0.22) 0%, transparent 40%),
+  radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 37%),
+  radial-gradient(circle at 50% 50%, rgba(0,192,243,0.07) 0%, transparent 52%); }
+```
+
+### Pill / Badge styling
+
+**Dark mode pills** have a colored border + 3-layer inset shadow for dimension:
+```css
+border: 1.5px solid rgba(<color>, 0.42);
+box-shadow: 0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14);
+```
+
+**Light mode pills** use per-type linear gradient fills + 1.5px solid border + dark text color.
+
+Priority severity pills (`pill-critical`, `pill-high`, `pill-medium`, `pill-low`) are intentionally **not shown** in the Calendar and Notification panel — state and type badges are sufficient context for field techs who are already assigned to the ticket. Severity pills still exist as CSS classes and may appear in other contexts (e.g. network device status).
+
+### Light Mode — Headers
+
+Topbar and detail-topbar use Consumer Hierarchy gradient (blue-dominant, soft purple tail):
+```css
+background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%);
+```
+
+The topbar `*` selector sets all children to `color: #ffffff`. This cascades into the calendar picker dropdown — override explicitly with `!important` for any picker content that should be dark text.
+
+### Light Mode — Text Colors
+
+- **Account/case numbers** (`.ticket-id`, `.cust-bn-id`, `.cust-card-num`, `.cust-detail-banner-num`): `color: #ffffff` — solid white, no text-shadow outline
+- **Orange note labels** (`[style*="--accent2"]`): `color: #ffffff !important` — solid white overrides the orange variable
+
+### Calendar Day-of-Week Header (Light Mode)
+
+Solid `#85A7CA` (Cool Grey) background, white text. Weekend cells (Sun/Sat) use `rgba(255,255,255,0.75)` and `opacity: 1` (the base dark style sets opacity for these; override it in light mode).
 
 ---
 
 ## Pill & Badge Classes
 
 ```
-Priority:  pill-critical  pill-high  pill-medium  pill-low
 State:     pill-open  pill-progress  pill-resolved  pill-pending  pill-enroute
+Priority:  pill-critical  pill-high  pill-medium  pill-low  (CSS exists; not shown in calendar/notifications)
 Type:      type-badge repair | installation | service-call
 ```
 
@@ -254,6 +366,8 @@ Pulls live data from Cisco Catalyst Center via `catalystGet(path)` → the proxy
 
 `startNotifPolling()` fires on `dismissDisclaimer()`. Polls every 60 seconds via `checkNewNotifs()`. Shows a badge on the bell icon. Notification panel is a dropdown anchored to the bell. `_notifSeen` prevents re-showing already-displayed tickets.
 
+Notification items show ticket number, time ago, company, and description. Priority pill is intentionally omitted.
+
 ---
 
 ## Important Patterns
@@ -264,12 +378,15 @@ Pulls live data from Cisco Catalyst Center via `catalystGet(path)` → the proxy
 - **Detail screen sections** (Internet, Firewall, Voice, Service Order) are conditionally shown/hidden based on ticket type (`getCaseType(inc)`).
 - **Draft notes**: `saveDraft()` / `restoreDraft(sysId)` persist the update textarea to `localStorage` keyed by ticket sys_id.
 - **`_closedThisSession`**: a Set of ticket numbers closed in this browser session. `renderTickets` and detail view check this to show closed state without waiting for a re-fetch.
+- **Seed scripts**: require `tzdata` pip package on Windows (`python -m pip install tzdata`). Use ASCII-only print statements — Windows terminal (cp1252) can't encode Unicode symbols like `✓` or `──`.
 
 ---
 
 ## Active Development Notes
 
 - The `/cspire-brand` Claude Code slash command (`~/.claude/commands/cspire-brand.md`) contains the full C Spire Brand Guidelines — invoke it when making any design/copy/color decisions.
-- Light mode is the actively refined theme; dark mode is considered stable.
-- The calendar picker scroll has had several iterations — the current implementation (double-rAF + scrollIntoView) is the stable solution. Do not revert to `offsetTop` or single-`setTimeout` approaches.
+- Both themes are actively maintained. Dark mode is the default; light mode (C Spire branded) is the secondary theme.
+- The calendar agenda scroll implementation (double-rAF + `getBoundingClientRect` delta) is the stable solution. Do not revert to `scrollIntoView`, `offsetTop`, or single-`setTimeout`.
 - Mock data sections (Internet, Firewall, Voice) intentionally use local JSON rather than live APIs — this is by design for demo/training use.
+- The `u_scheduled_start` custom field on `sn_customerservice_case` drives the calendar display for install/repair appointment times. Always populate this field when seeding tickets.
+- `overflow: hidden` on card containers clips `::before`/`::after` pseudo-elements — useful for brand shape accents, but means z-index layering inside cards requires `position: relative` on the container and `z-index: -1` on pseudo-elements so they render behind content.
