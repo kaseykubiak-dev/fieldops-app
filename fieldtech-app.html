@@ -1064,9 +1064,8 @@
     border-bottom-color:rgba(0,152,220,0.45);
   }
   html[data-theme="cspire"] .cal-month-label { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.25); }
-  /* Center the month/year label relative to the full topbar width */
+  /* 3-column topbar keeps label+picker truly centered against the refresh button */
   #screen-calendar .topbar { position: relative; }
-  #screen-calendar .cal-month-label { position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
   html[data-theme="cspire"] .cal-dow-row {
     background: #85A7CA;
     border-bottom-color: rgba(0,0,0,0.08);
@@ -1201,17 +1200,6 @@
   /* ── C SPIRE BRAND PATTERNS ── */
   /* Burst orb — light theme override */
   html[data-theme="cspire"] .app { background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.22) 0%, transparent 40%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 37%), radial-gradient(circle at 50% 50%, rgba(0,192,243,0.07) 0%, transparent 52%); }
-  /* Brand shape corner accents — primary ray */
-  .ticket-inner::after, .device-card::after { content:''; position:absolute; top:-14px; right:-14px; width:68px; height:34px; border-radius:17px; background:rgba(0,192,243,0.1); transform:rotate(26deg); pointer-events:none; z-index:-1; }
-  .cust-banner::after, .cust-detail-banner::after { content:''; position:absolute; top:-18px; right:-16px; width:96px; height:44px; border-radius:22px; background:rgba(0,192,243,0.09); transform:rotate(26deg); pointer-events:none; z-index:-1; }
-  /* Brand shape corner accents — secondary crossing ray */
-  .ticket-inner::before, .device-card::before { content:''; position:absolute; top:-8px; right:-22px; width:58px; height:28px; border-radius:14px; background:rgba(0,192,243,0.065); transform:rotate(56deg); pointer-events:none; z-index:-1; }
-  .cust-banner::before, .cust-detail-banner::before { content:''; position:absolute; top:-10px; right:-26px; width:80px; height:38px; border-radius:19px; background:rgba(0,192,243,0.06); transform:rotate(56deg); pointer-events:none; z-index:-1; }
-  /* Light mode — slightly more visible */
-  html[data-theme="cspire"] .ticket-inner::after, html[data-theme="cspire"] .device-card::after { background:rgba(0,192,243,0.13); }
-  html[data-theme="cspire"] .cust-banner::after, html[data-theme="cspire"] .cust-detail-banner::after { background:rgba(0,192,243,0.12); }
-  html[data-theme="cspire"] .ticket-inner::before, html[data-theme="cspire"] .device-card::before { background:rgba(0,192,243,0.09); }
-  html[data-theme="cspire"] .cust-banner::before, html[data-theme="cspire"] .cust-detail-banner::before { background:rgba(0,192,243,0.08); }
 
   .cust-detail-banner-head { display:flex; align-items:center; gap:10px; padding:12px 14px; background:linear-gradient(90deg,rgba(0,192,243,0.14) 0%,rgba(0,192,243,0.04) 100%); border-bottom:1px solid rgba(0,192,243,0.12); border-left:3px solid var(--accent); }
   .cust-detail-banner-name { font-size:16px; font-weight:700; color:var(--text); }
@@ -1954,6 +1942,7 @@
     <!-- ══ CALENDAR ══ -->
     <div class="screen" id="screen-calendar">
       <div class="topbar">
+        <div style="width:36px;flex-shrink:0;"></div>
         <div style="flex:1;display:flex;align-items:center;justify-content:center;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
           <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
@@ -4006,7 +3995,6 @@
             </div>
             <div class="cal-mini-desc">${escHtml(inc.short_description || '—')}</div>
             <div class="cal-mini-pills">
-              <span class="pill ${pri.cls}">${pri.label}</span>
               <span class="pill ${state.cls}">${state.label}</span>
               <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
               <span class="cal-mini-num">${escHtml(inc.number)}</span>
@@ -4092,7 +4080,6 @@
           </div>
           <div class="cal-mini-desc">${escHtml(inc.short_description || '—')}</div>
           <div class="cal-mini-pills">
-            <span class="pill ${pri.cls}">${pri.label}</span>
             <span class="pill ${state.cls}">${state.label}</span>
             <span class="cal-mini-num">${escHtml(inc.number)}</span>
           </div>
@@ -4843,7 +4830,6 @@
         </div>
         <div class="notif-company">${escHtml(n.company)}</div>
         <div class="notif-desc">${escHtml(n.desc)}</div>
-        <span class="pill ${pri.cls}" style="font-size:9px;padding:1px 6px;margin-top:2px;">${pri.label}</span>
       </div>`;
     });
     list.innerHTML = html;
