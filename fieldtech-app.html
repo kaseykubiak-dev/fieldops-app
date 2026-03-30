@@ -2462,7 +2462,10 @@
       const todayDivider = [...list.querySelectorAll('.date-divider-label')]
         .find(el => el.textContent.startsWith('Today'));
       if (todayDivider) {
-        requestAnimationFrame(() => todayDivider.closest('.date-divider').scrollIntoView({ behavior: 'instant', block: 'start' }));
+        const divider = todayDivider.closest('.date-divider');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          list.scrollTop += divider.getBoundingClientRect().top - list.getBoundingClientRect().top;
+        }));
       }
     }
   }
