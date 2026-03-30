@@ -156,7 +156,7 @@ The calendar has two views:
 - **Desktop** (>=800px): `renderCalendarGrid()` — a classic month grid with ticket chips
 - **Mobile** (<800px): `renderCalendarAgenda()` — a scrollable list of every day in the month
 
-`renderCalendar()` checks `isMobileView()` and dispatches to the right renderer.
+`renderCalendar()` checks `isMobileView()` and dispatches to the right renderer. Both the desktop day panel (`renderCalDayPanel`) and mobile agenda render type badges (Repair/Install/Service Call) via `getCaseType(inc)` alongside state pills on each ticket card.
 
 ### pickerPickDay — ordering matters
 
@@ -349,6 +349,10 @@ background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%);
 ```
 
 The topbar `*` selector sets all children to `color: #ffffff`. This cascades into the calendar picker dropdown — override explicitly with `!important` for any picker content that should be dark text.
+
+### Header Pulse Pattern
+
+Both `.topbar` and `.detail-topbar` display a subtle brand-compliant Pulse wave pattern via a `::before` pseudo-element. The pattern uses inline SVG data URIs with three layered sine-wave paths at low opacity (0.04–0.08 in dark mode, 0.06–0.15 white in light mode). This aligns with the C Spire Brand Guidelines (Burst Brand System) which state: "Subtle overlays mimicking wave-like movement work well when the Pulse pattern is on a flat background." Both topbar elements have `position:relative; overflow:hidden;` and all direct children are `z-index:1` to sit above the pattern. Only one pattern is used per piece (header bars), per brand rules.
 
 ### Light Mode — Text Colors
 
