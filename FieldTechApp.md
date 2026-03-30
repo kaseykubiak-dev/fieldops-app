@@ -7,17 +7,17 @@ Single-file web app (`fieldtech-app.html`) built for C Spire field technicians. 
 ## Repository Layout
 
 ```
-fieldtech-app.html       ← The entire app (HTML + CSS + JS, ~4900 lines)
-meraki-proxy.js          ← Node.js CORS proxy for Cisco Catalyst Center API
-package.json             ← { "start": "node meraki-proxy.js" }, Node ≥18
-internet-db.json         ← Simulated ISP circuit data (fiber, cable, DSL, wireless)
-firewall-db.json         ← Simulated firewall hardware data
-webex-phones-db.json     ← Simulated Webex/VoIP phone data (models + name lists)
-phones-db.json           ← Additional phone model reference
-cspire_burst_cyan.png    ← App icon (C Spire burst logo)
-seed_servicenow.py       ← Seeds 12 customer accounts, locations, and contacts
-seed_test_user.py        ← Creates test_fieldtech user and initial case set
-seed_next_week.py        ← Creates 10 cases for the following work week (March 31 – April 4)
+fieldtech-app.html       <- The entire app (HTML + CSS + JS, ~4950 lines)
+meraki-proxy.js          <- Node.js CORS proxy for Cisco Catalyst Center API
+package.json             <- { "start": "node meraki-proxy.js" }, Node >=18
+internet-db.json         <- Simulated ISP circuit data (fiber, cable, DSL, wireless)
+firewall-db.json         <- Simulated firewall hardware data
+webex-phones-db.json     <- Simulated Webex/VoIP phone data (models + name lists)
+phones-db.json           <- Additional phone model reference
+cspire_burst_cyan.png    <- App icon (C Spire burst logo)
+seed_servicenow.py       <- Seeds 12 customer accounts, locations, and contacts
+seed_test_user.py        <- Creates test_fieldtech user and initial case set
+seed_next_week.py        <- Creates 10 cases for the following work week (March 31 - April 4)
 ```
 
 `.gitignore` excludes `node_modules/`, `.env`, `App History/`, and seed scripts.
@@ -54,7 +54,7 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#screen-links` | Important Links | (static) |
 | `#login-screen` | Login | (shown by default) |
 
-Desktop uses a left sidebar nav (`.desktop-nav`). Mobile uses a bottom nav bar (`.bottom-nav` / `.bnav-btn`). The breakpoint is `800px` — see `isMobileView()`.
+Desktop uses a top nav bar (`#desktop-topbar` / `.desktop-nav`). Mobile uses a bottom nav bar (`.bottom-nav` / `.bnav-btn`). The primary breakpoint is `800px` — see `isMobileView()`. A tablet breakpoint at `1024px` narrows the list panel and tightens nav spacing.
 
 ---
 
@@ -71,8 +71,18 @@ const SN = {
 
 Auth is Basic (`authHeader()` builds `Authorization: Basic base64(user:pass)`). Credentials are stored in `sessionStorage` only — never localStorage. The table used is `sn_customerservice_case` (CSM Cases, not incidents).
 
-Session lifecycle:
-1. Login → `attemptLogin()` → stores creds + user info in sessionStorage → `startSession()`
+### snFetch — ServiceNow request wrapper
+
+All ServiceNow API calls go through `snFetch(url, opts, timeoutMs)`, which:
+- Attaches `Authorization` and `Accept: application/json` headers automatically
+- Wraps each call in an `AbortController` with a default 12-second timeout
+- Throws a descriptive error on timeout (`"Request timed out"`) or HTTP failure
+
+The only raw `fetch()` calls that intentionally bypass `snFetch` are: `attemptLogin` (uses temporary credentials before session starts), local JSON file loads (`internet-db.json`, etc.), geocoding/routing APIs, and `catalystGet` (has its own timeout logic).
+
+### Session lifecycle
+
+1. Login -> `attemptLogin()` -> stores creds + user info in sessionStorage -> `startSession()`
 2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`
 3. Force refresh: `forceAppRefresh()` clears `cachedAssignedTickets` and re-fetches, then navigates to the Tickets tab
 4. Logout: `logout()` clears sessionStorage and reloads the page
@@ -110,11 +120,13 @@ let _custLoaded    = false;
 let _networkCache = null;
 let _networkView  = 'list'; // 'list' | 'topology'
 
-// Notifications
-let _notifs         = [];        // array of notification objects
-let _notifSeen      = new Set(); // ticket numbers already shown
-let _notifLastCheck = null;      // ISO timestamp of last poll
-let _notifPollTimer = null;      // setInterval handle
+// Notifications (all declared together at top of script block)
+let _notifs             = [];        // array of notification objects
+let _notifSeen          = new Set(); // ticket numbers already shown
+let _notifLastCheck     = null;      // ISO timestamp of last poll
+let _notifPollTimer     = null;      // setInterval handle
+let _notifFailCount     = 0;         // consecutive polling failures
+const _NOTIF_MAX_FAILS  = 3;         // pause polling after this many failures
 
 // Tickets closed this browser session (shown as resolved without re-fetch)
 const _closedThisSession = new Set();
@@ -122,10 +134,26 @@ const _closedThisSession = new Set();
 
 ---
 
+## Ticket Detail — Extracted Sub-Fetches
+
+`fetchCaseDetail(number)` is the main loader (~90 lines). It fetches the case record, populates the topbar/pills/location/description synchronously, then fires 5 independent async helpers in parallel. Each helper manages its own DOM elements and error handling:
+
+| Helper | API table | DOM targets |
+|---|---|---|
+| `fetchDetailAssignee(sysId)` | `sys_user` | `#detail-assigned` |
+| `fetchDetailSLA(caseSysId)` | `task_sla` | `#detail-cust-sla` |
+| `fetchDetailAccount(sysId, fallback)` | `customer_account` | `#detail-cust-name`, `#detail-cust-id`, `#detail-cust-tier` |
+| `fetchDetailContact(sysId)` | `customer_contact` | `#detail-cust-contact`, `#detail-cust-phone` |
+| `fetchDetailDevice(sysId)` | `cmdb_ci_netgear` | `#affected-device-section` and children |
+
+After the sub-fetches, `fetchCaseDetail` also triggers mock-data renders (`renderInternetSection`, `renderFirewallSection`, `renderVoipSection`), `fetchTravelEstimate()`, `restoreDraft()`, and `fetchTimeline()`.
+
+---
+
 ## Calendar — Critical Details
 
 The calendar has two views:
-- **Desktop** (≥800px): `renderCalendarGrid()` — a classic month grid with ticket chips
+- **Desktop** (>=800px): `renderCalendarGrid()` — a classic month grid with ticket chips
 - **Mobile** (<800px): `renderCalendarAgenda()` — a scrollable list of every day in the month
 
 `renderCalendar()` checks `isMobileView()` and dispatches to the right renderer.
@@ -139,7 +167,7 @@ function pickerPickDay(year, month, day) {
   const d = new Date(year, month, day);
   const sameMonth = (d.getFullYear() === _cal.year && d.getMonth() === _cal.month);
 
-  closeCalDayPanel();        // ← nulls _cal.selectedDay — MUST be first
+  closeCalDayPanel();        // <- nulls _cal.selectedDay — MUST be first
   closeCalPicker();
 
   _cal.year        = d.getFullYear();
@@ -211,7 +239,16 @@ The `_hash(str)` function produces a stable integer from a ticket number, used t
 
 **Dark mode** (default): `:root { ... }` defines all CSS variables.
 
-**C Spire Light mode**: `html[data-theme="cspire"] { ... }` overrides variables, then a large block of `html[data-theme="cspire"] .selector { ... }` rules handle elements that hardcode rgba/hex values.
+**C Spire Light mode**: `html[data-theme="cspire"] { ... }` overrides variables. The light theme uses CSS custom properties for shared patterns:
+
+| Variable group | Purpose |
+|---|---|
+| `--card-bg`, `--card-border`, `--card-shadow` | Frosted glass card surface (ticket, device, customer cards) |
+| `--header-grad`, `--header-shadow`, `--header-text-shadow` | Consumer gradient for topbar/detail-topbar/section headers |
+| `--pill-*-text` (9 vars) | Dark text colors for each pill state/priority on light gradient backgrounds |
+| `--resize-bg`, `--resize-bar`, `--resize-hover`, `--resize-bar-hover` | Panel resize handle colors |
+
+When adding new light-theme overrides, prefer using or extending these variables rather than hardcoding rgba values. Any remaining `!important` flags in the light theme are structurally necessary to override the `topbar *` wildcard color rule.
 
 Toggle is stored in `localStorage` key `ft_theme`. Applied via `document.documentElement.setAttribute('data-theme', ...)`.
 
@@ -246,8 +283,21 @@ Key safe-area rules:
 - `.topbar` and `.detail-topbar`: `min-height` (not `height`), `padding-top: env(safe-area-inset-top)`
 - `.bottom-nav`: `min-height`, `padding-bottom: env(safe-area-inset-bottom)`, `position: relative`
 - `.bottom-nav::after`: fills the home indicator zone below the nav bar with the background color
+- **Landscape insets**: `@supports(padding-left: env(safe-area-inset-left))` block adds `padding-left`/`padding-right` using `max(Npx, env(safe-area-inset-left/right))` to topbar, detail-topbar, bottom-nav, desktop-topbar, and all `.screen` containers. On non-notched devices, `env()` evaluates to `0px` so the existing padding is preserved.
 
 Do not use `-webkit-fill-available` on `.app` height — it caused double-counting of the safe area inset in PWA mode.
+
+---
+
+## Responsive Breakpoints
+
+| Breakpoint | Layout | Key rules |
+|---|---|---|
+| < 800px (mobile) | Bottom nav, single-screen view, slide-in detail | `isMobileView()` returns true |
+| 800 - 1024px (tablet) | Desktop topbar, list panel narrowed to 300px, tighter nav spacing | `@media(min-width:800px) and (max-width:1024px)` |
+| > 1024px (desktop) | Desktop topbar, list panel 340px + detail pane side by side | `@media(min-width:800px)` base rules |
+
+The `data-mobile-preview` HTML attribute forces mobile layout at any width for dev/testing.
 
 ---
 
@@ -271,18 +321,10 @@ box-shadow:
   inset 0 1px 0 rgba(255,255,255,0.08),
   inset 0 -1px 0 rgba(0,0,0,0.18);
 
-/* Light mode pattern */
-background: rgba(255,255,255,0.78);
-backdrop-filter: blur(10px);
--webkit-backdrop-filter: blur(10px);
-border: 1px solid rgba(0,192,243,0.22);
-border-left: 3px solid var(--accent);
-box-shadow:
-  0 1px 3px rgba(0,0,0,0.08),
-  0 4px 16px rgba(0,192,243,0.1),
-  0 10px 28px rgba(122,85,152,0.07),
-  inset 0 1px 0 rgba(255,255,255,0.95),
-  inset 0 -1px 0 rgba(0,0,0,0.04);
+/* Light mode — uses CSS variables (see Themes section) */
+background: var(--card-bg);
+border: 1px solid var(--card-border);
+box-shadow: var(--card-shadow);
 ```
 
 Applies to: `.ticket-inner`, `.device-card`, `.cust-banner`, `.cust-card-inner`, `.cust-detail-banner`, `.net-summary`, `.stat-chip`.
@@ -291,37 +333,17 @@ All of these have `position: relative` and `overflow: hidden` set.
 
 ### Background Burst Orbs
 
-`.app` has layered radial gradients creating ambient energy — C Spire Blue at top-right, Magnetic Purple at bottom-left, with a soft center glow. Light mode version is slightly more saturated:
-
-```css
-/* Dark mode */
-.app { background:
-  radial-gradient(circle at 82% 7%, rgba(0,192,243,0.17) 0%, transparent 42%),
-  radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 40%),
-  radial-gradient(circle at 50% 50%, rgba(0,192,243,0.05) 0%, transparent 55%); }
-
-/* Light mode */
-html[data-theme="cspire"] .app { background:
-  radial-gradient(circle at 82% 7%, rgba(0,192,243,0.22) 0%, transparent 40%),
-  radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 37%),
-  radial-gradient(circle at 50% 50%, rgba(0,192,243,0.07) 0%, transparent 52%); }
-```
+`.app` has layered radial gradients creating ambient energy — C Spire Blue at top-right, Magnetic Purple at bottom-left, with a soft center glow. Light mode version is slightly more saturated.
 
 ### Pill / Badge styling
 
-**Dark mode pills** have a colored border + 3-layer inset shadow for dimension:
-```css
-border: 1.5px solid rgba(<color>, 0.42);
-box-shadow: 0 1px 4px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.14);
-```
-
-**Light mode pills** use per-type linear gradient fills + 1.5px solid border + dark text color.
+**Dark mode pills** have a colored border + 3-layer inset shadow for dimension. **Light mode pills** use per-type linear gradient fills + 1.5px solid border + dark text color via `var(--pill-*-text)` variables.
 
 Priority severity pills (`pill-critical`, `pill-high`, `pill-medium`, `pill-low`) are intentionally **not shown** in the Calendar and Notification panel — state and type badges are sufficient context for field techs who are already assigned to the ticket. Severity pills still exist as CSS classes and may appear in other contexts (e.g. network device status).
 
 ### Light Mode — Headers
 
-Topbar and detail-topbar use Consumer Hierarchy gradient (blue-dominant, soft purple tail):
+Topbar and detail-topbar use Consumer Hierarchy gradient via `var(--header-grad)`:
 ```css
 background: linear-gradient(90deg, #00c0f3 0%, #009dd6 55%, #7a5598 100%);
 ```
@@ -347,13 +369,13 @@ Priority:  pill-critical  pill-high  pill-medium  pill-low  (CSS exists; not sho
 Type:      type-badge repair | installation | service-call
 ```
 
-`PRIORITY_MAP` and `STATE_MAP` (both keyed by SN integer value AND display string) live around line 2272.
+`PRIORITY_MAP` and `STATE_MAP` (both keyed by SN integer value AND display string) live around line 2360.
 
 ---
 
 ## Network Screen
 
-Pulls live data from Cisco Catalyst Center via `catalystGet(path)` → the proxy at `CATALYST.base`. Two views:
+Pulls live data from Cisco Catalyst Center via `catalystGet(path)` -> the proxy at `CATALYST.base`. Two views:
 
 - **List view**: `renderNetworkList(data)` — device cards grouped by type
 - **Topology view**: Canvas-drawn network diagram, `drawTopology(data)`
@@ -368,17 +390,41 @@ Pulls live data from Cisco Catalyst Center via `catalystGet(path)` → the proxy
 
 Notification items show ticket number, time ago, company, and description. Priority pill is intentionally omitted.
 
+### Polling backoff
+
+`_notifFailCount` increments on each consecutive polling failure. After `_NOTIF_MAX_FAILS` (3) failures, polling pauses (`clearInterval` + nulls the timer) and logs a warning. Polling resumes automatically on the next manual `refreshCases()` call, which resets `_notifFailCount` to 0 and calls `startNotifPolling()`.
+
+---
+
+## Accessibility
+
+The app includes ARIA attributes and semantic HTML added in March 2026:
+- Login `<div>` converted to `<form>` with `<label>`/`for` associations and `onsubmit` handler
+- Disclaimer modal: `role="dialog"`, `aria-modal`, `aria-labelledby`
+- Notification panel: `role="region"`, `aria-hidden`, `aria-live="polite"`
+- All 4 accordion headers: `aria-expanded`, `aria-controls` (synced by `toggleAcc()`)
+- 11 static section-title `<div>`s converted to `<h2>`
+- Search inputs: `aria-label`
+- Form selects/textarea: `<label>` + `aria-label`
+- Back buttons: `aria-label`
+- Calendar grid: `role="grid"`, day-of-week cells `role="columnheader"`
+- Calendar picker button: `aria-expanded`, `aria-controls`
+- More screen interactive `<div>`s converted to `<button>`
+- `.sr-only` utility class for screen-reader-only text
+- `--text-muted` bumped to `#6889a5` for WCAG AA contrast compliance (4.5:1 ratio)
+
 ---
 
 ## Important Patterns
 
 - **No framework, no build**: pure DOM manipulation. `escHtml(str)` must be used on all user/API data inserted into innerHTML.
+- **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any new SN API call.
 - **`isMobileView()`**: `window.innerWidth < 800 || document.documentElement.hasAttribute('data-mobile-preview')`. The `data-mobile-preview` attribute enables mobile layout on desktop for dev/testing.
 - **ServiceNow dates**: always internal format `"YYYY-MM-DD HH:MM:SS"` UTC. Use `parseSNDate(str)` or `.replace(' ','T')+'Z'` before `new Date()`.
 - **Detail screen sections** (Internet, Firewall, Voice, Service Order) are conditionally shown/hidden based on ticket type (`getCaseType(inc)`).
 - **Draft notes**: `saveDraft()` / `restoreDraft(sysId)` persist the update textarea to `localStorage` keyed by ticket sys_id.
 - **`_closedThisSession`**: a Set of ticket numbers closed in this browser session. `renderTickets` and detail view check this to show closed state without waiting for a re-fetch.
-- **Seed scripts**: require `tzdata` pip package on Windows (`python -m pip install tzdata`). Use ASCII-only print statements — Windows terminal (cp1252) can't encode Unicode symbols like `✓` or `──`.
+- **Seed scripts**: require `tzdata` pip package on Windows (`python -m pip install tzdata`). Use ASCII-only print statements — Windows terminal (cp1252) can't encode Unicode symbols.
 
 ---
 
@@ -395,21 +441,21 @@ Notification items show ticket number, time ago, company, and description. Prior
 
 ## Change Protocol
 
-This section governs how edits are made to `fieldtech-app.html`. The file is ~4900 lines of inline HTML + CSS + JS with no build step, so discipline around changes is critical.
+This section governs how edits are made to `fieldtech-app.html`. The file is ~4950 lines of inline HTML + CSS + JS with no build step, so discipline around changes is critical.
 
 ### File structure boundaries
 
 | Section | Approximate lines | Contents |
 |---|---|---|
-| CSS | 1 – ~1200 | `<style>` block: dark theme variables, light theme overrides, all component styles |
-| HTML | ~1200 – ~2100 | All screen markup, modals, nav bars |
-| JS | ~2100 – ~4900 | `<script>` block: state, API calls, rendering, event handlers |
+| CSS | 1 - ~1340 | `<style>` block: dark theme variables, light theme overrides, all component styles |
+| HTML | ~1340 - ~2180 | All screen markup, modals, nav bars |
+| JS | ~2180 - ~4950 | `<script>` block: state, API calls, rendering, event handlers |
 
-When reading or editing, use these boundaries to target the right section. Always read the surrounding 20–30 lines of context before making an edit to avoid collisions.
+When reading or editing, use these boundaries to target the right section. Always read the surrounding 20-30 lines of context before making an edit to avoid collisions.
 
 ### Edit rules
 
-1. **Batch size**: No more than 5–10 related changes per editing pass. After each pass, verify nothing broke before continuing.
+1. **Batch size**: No more than 5-10 related changes per editing pass. After each pass, verify nothing broke before continuing.
 2. **One section at a time**: Complete all work in a logical section (e.g., "accessibility — forms/modals") before moving to the next. Do not interleave unrelated changes.
 3. **Theme parity**: Any CSS change must be checked against both dark and light themes. If a variable is added or renamed, update both `:root` and `html[data-theme="cspire"]` blocks.
 4. **No behavioral regressions**: Refactors (renaming functions, reorganizing globals, standardizing async patterns) must not change user-visible behavior. If the before/after behavior might differ, note it explicitly.
@@ -420,13 +466,15 @@ When reading or editing, use these boundaries to target the right section. Alway
    - `escHtml()` on all user/API data inserted via innerHTML
    - `calDateStr(d)` for local-time date strings
    - `parseSNDate()` / `.replace(' ','T')+'Z'` for ServiceNow dates
+   - `snFetch()` for all ServiceNow API calls (do not revert to raw `fetch`)
+   - Detail sub-fetch helpers (`fetchDetailAssignee`, etc.) — do not inline back into `fetchCaseDetail`
 6. **innerHTML safety**: Every new `innerHTML =` assignment that includes dynamic data must use `escHtml()`. If building onclick handlers in HTML strings, prefer `data-*` attributes + delegated event listeners instead.
 
 ### Verification checklist
 
 After each section of changes, confirm the following still work in both themes:
 
-- [ ] Login flow (enter credentials → disclaimer modal → ticket list)
+- [ ] Login flow (enter credentials -> disclaimer modal -> ticket list)
 - [ ] Ticket list loads, search/filter works
 - [ ] Ticket detail opens, accordion sections expand/collapse
 - [ ] Calendar month view renders, day selection works, agenda view scrolls correctly on mobile
@@ -442,13 +490,13 @@ After each section of changes, confirm the following still work in both themes:
 
 Commit after each verified section with a message like: `a11y: add ARIA attributes to accordion sections and modals`. This gives clean rollback points if a later section introduces a regression.
 
-### Known refactoring plan (March 2026)
+### Completed refactoring (March 2026)
 
-The following improvements are planned, in priority order. Security hardening is deferred until the app moves beyond demo/training use.
+All six planned improvements have been implemented:
 
-1. **Accessibility pass** — ARIA attributes, form labels, heading hierarchy, focus management, keyboard navigation
-2. **Color contrast fixes** — `--text-muted` WCAG AA compliance, pill background audit
-3. **Network resilience** — AbortController timeouts (10–15s) on all fetches, inline error UI, notification polling backoff
-4. **Light theme CSS refactor** — extract hardcoded `rgba()` values into CSS variables, eliminate `!important` flags
-5. **Code cleanup** — break up `fetchCaseDetail` (~170 lines), standardize on `async/await`, group globals into feature objects
-6. **Responsive polish** — tablet breakpoint (~1024px), landscape safe-area-inset-left/right
+1. **Accessibility pass** -- ARIA attributes, form labels, heading hierarchy, `.sr-only`, semantic HTML
+2. **Color contrast fixes** -- `--text-muted` bumped to `#6889a5` for WCAG AA (4.5:1)
+3. **Network resilience** -- `snFetch()` with AbortController timeouts on all SN calls, notification polling backoff after 3 failures
+4. **Light theme CSS refactor** -- 15+ CSS variables (`--card-*`, `--header-*`, `--pill-*-text`, `--resize-*`) replacing hardcoded rgba values
+5. **Code cleanup** -- `fetchCaseDetail` broken into 6 functions (main + 5 helpers), all `.then()` chains converted to async/await, notification globals consolidated
+6. **Responsive polish** -- Tablet breakpoint (800-1024px) narrows list panel, landscape `safe-area-inset-left/right` via `@supports`
