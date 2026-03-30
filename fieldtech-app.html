@@ -342,7 +342,7 @@
   .app { display:flex; flex-direction:column; height:100vh; height:100dvh; background:radial-gradient(circle at 82% 7%, rgba(0,192,243,0.17) 0%, transparent 42%), radial-gradient(circle at 14% 90%, rgba(136,77,157,0.15) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(0,192,243,0.05) 0%, transparent 55%); }
 
   /* TOP BAR */
-  .topbar { min-height:var(--top-bar); background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); border-bottom:2px solid rgba(0,192,243,0.32); display:flex; align-items:center; padding:env(safe-area-inset-top) 16px 0; gap:12px; flex-shrink:0; z-index:20; box-shadow:0 1px 3px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,192,243,0.15); position:relative; overflow:hidden; }
+  .topbar { min-height:var(--top-bar); background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); border-bottom:2px solid rgba(0,192,243,0.32); display:flex; align-items:center; padding:env(safe-area-inset-top) 16px 0; gap:12px; flex-shrink:0; z-index:20; box-shadow:0 1px 3px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,192,243,0.15); position:relative; }
 
   /* ── BRAND PULSE PATTERN — subtle wave overlay (C Spire brand-compliant) ── */
   .topbar::before, .detail-topbar::before {
@@ -680,7 +680,7 @@
   .date-divider-line { display:none; }
 
   /* ─── DETAIL SCREEN ─── */
-  .detail-topbar { min-height:var(--top-bar); background:var(--surface); border-bottom:2px solid rgba(0,192,243,0.22); display:flex; align-items:center; padding:env(safe-area-inset-top) 12px 0; gap:10px; flex-shrink:0; position:relative; overflow:hidden; }
+  .detail-topbar { min-height:var(--top-bar); background:var(--surface); border-bottom:2px solid rgba(0,192,243,0.22); display:flex; align-items:center; padding:env(safe-area-inset-top) 12px 0; gap:10px; flex-shrink:0; position:relative; }
   .back-btn { width:36px; height:36px; border:none; background:transparent; color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0; }
   .back-btn:active { background:var(--surface2); }
   .detail-tb-info { flex:1; min-width:0; }
