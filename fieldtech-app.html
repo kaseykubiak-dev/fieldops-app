@@ -2795,6 +2795,22 @@
               </div>
             </div>
 
+            <!-- Frequency setting row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:10px;background:rgba(0,192,243,0.03);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);">Reminder Frequency</div>
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label">End of month (default)</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <input id="safety-freq-input" type="number" min="1" max="31" inputmode="numeric" style="width:48px;padding:5px 6px;font-family:var(--mono);font-size:12px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency(this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
+                <span style="font-size:11px;color:var(--text-muted);">days</span>
+                <button onclick="setSafetyFrequency(0);document.getElementById('safety-freq-input').value='';" style="padding:4px 8px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -2928,6 +2944,7 @@
   let _safetyChecks = { vehicle: null, ladder: null };
   let _safetyBannerDismissed = false;
   let _safetyModalShown = false;
+  let _safetyFrequency = 0; // 0 = end of month (default), 1-31 = custom cycle in days
 
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
@@ -6037,27 +6054,100 @@
   }
   function _safetyLsKey(type) { return `ft_safety_${type}_${_safetyMonthKey()}`; }
   function _safetyDaysInMonth() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth() + 1, 0).getDate(); }
-  function _safetyDaysRemaining() { return _safetyDaysInMonth() - new Date().getDate(); }
   function _safetyMonthName() { return new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }); }
 
+  // Returns { deadline: Date, daysLeft: number, cycleDays: number } for the current cycle.
+  // If frequency is 0 (default), deadline = end of month.
+  // If frequency > 0, deadline = last completion + frequency days, capped at end of month.
+  // If no completion exists this month, cycle starts from the 1st.
+  function _safetyCycleInfo() {
+    const now = new Date();
+    const eom = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const daysInMonth = eom.getDate();
+    const freq = _safetyFrequency;
+
+    if (freq <= 0 || freq >= daysInMonth) {
+      // Default: end-of-month cycle
+      const daysLeft = daysInMonth - now.getDate();
+      return { deadline: eom, daysLeft: daysLeft, cycleDays: daysInMonth };
+    }
+
+    // Custom frequency: find the most recent completion across all types
+    let latestDone = null;
+    _SAFETY_TYPES.forEach(t => {
+      if (_safetyChecks[t.key]) {
+        const d = new Date(_safetyChecks[t.key]);
+        if (!latestDone || d > latestDone) latestDone = d;
+      }
+    });
+
+    let cycleStart;
+    if (latestDone && latestDone.getMonth() === now.getMonth() && latestDone.getFullYear() === now.getFullYear()) {
+      cycleStart = latestDone;
+    } else {
+      cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    const deadline = new Date(cycleStart.getTime() + freq * 86400000);
+    // Cap at end of month
+    const capped = deadline > eom ? eom : deadline;
+    const daysLeft = Math.max(0, Math.ceil((capped.getTime() - now.getTime()) / 86400000));
+    return { deadline: capped, daysLeft: daysLeft, cycleDays: freq };
+  }
+
+  // Check if a specific type needs to be done in the current cycle.
+  // With custom frequency, a check that was completed within the current cycle window is "done".
+  function _isSafetyDue(type) {
+    const ts = _safetyChecks[type];
+    if (!ts) return true; // never completed this month
+    if (_safetyFrequency <= 0 || _safetyFrequency >= _safetyDaysInMonth()) return false; // monthly mode, completed = done
+    // Custom frequency: check if completion is within the current cycle
+    const completedAt = new Date(ts);
+    const now = new Date();
+    const elapsed = (now.getTime() - completedAt.getTime()) / 86400000;
+    return elapsed >= _safetyFrequency;
+  }
+
   function getSafetyUrgency() {
-    const done = _SAFETY_TYPES.filter(t => _safetyChecks[t.key]).length;
-    if (done === _SAFETY_TYPES.length) return 'none';
-    const day = new Date().getDate();
-    if (day <= 7)  return 'low';
-    if (day <= 21) return 'medium';
+    const allDone = _SAFETY_TYPES.every(t => !_isSafetyDue(t.key));
+    if (allDone) return 'none';
+
+    const info = _safetyCycleInfo();
+    const elapsed = info.cycleDays - info.daysLeft;
+    const pct = info.cycleDays > 0 ? elapsed / info.cycleDays : 1;
+
+    if (pct <= 0.25)  return 'low';
+    if (pct <= 0.75)  return 'medium';
     return 'high';
   }
 
   function _safetyIncompleteCount() {
-    return _SAFETY_TYPES.filter(t => !_safetyChecks[t.key]).length;
+    return _SAFETY_TYPES.filter(t => _isSafetyDue(t.key)).length;
   }
 
   function initSafetyChecks() {
+    // Load frequency setting (0 = end of month default)
+    const storedFreq = localStorage.getItem('ft_safety_frequency');
+    _safetyFrequency = storedFreq ? parseInt(storedFreq, 10) || 0 : 0;
+
     _SAFETY_TYPES.forEach(t => {
       const stored = localStorage.getItem(_safetyLsKey(t.key));
       _safetyChecks[t.key] = stored || null;
     });
+    renderSafetySection();
+    updateSafetyBadge();
+    renderSafetyBanner();
+  }
+
+  function setSafetyFrequency(val) {
+    const days = parseInt(val, 10) || 0;
+    const maxDays = _safetyDaysInMonth();
+    _safetyFrequency = Math.max(0, Math.min(days, maxDays));
+    if (_safetyFrequency === 0) {
+      localStorage.removeItem('ft_safety_frequency');
+    } else {
+      localStorage.setItem('ft_safety_frequency', String(_safetyFrequency));
+    }
     renderSafetySection();
     updateSafetyBadge();
     renderSafetyBanner();
@@ -6086,7 +6176,9 @@
 
   function renderSafetySection() {
     const urgency = getSafetyUrgency();
-    const doneCount = _SAFETY_TYPES.length - _safetyIncompleteCount();
+    const incomplete = _safetyIncompleteCount();
+    const doneCount = _SAFETY_TYPES.length - incomplete;
+    const info = _safetyCycleInfo();
 
     const pill = document.getElementById('safety-urgency-pill');
     if (pill) {
@@ -6102,24 +6194,26 @@
       const actions = document.getElementById('safety-actions-' + t.key);
       if (!card) return;
 
-      const done = !!_safetyChecks[t.key];
+      const due = _isSafetyDue(t.key);
+      const hasTimestamp = !!_safetyChecks[t.key];
       if (dateEl) {
-        if (done) {
+        if (hasTimestamp) {
           const d = new Date(_safetyChecks[t.key]);
-          dateEl.textContent = 'Completed ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+          const prefix = due ? 'Last completed ' : 'Completed ';
+          dateEl.textContent = prefix + d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
           dateEl.style.display = '';
         } else { dateEl.style.display = 'none'; }
       }
       if (actions) {
-        if (done) {
+        if (!due) {
           actions.innerHTML =
-            '<span class="safety-card-status status-done" >Complete</span>' +
+            '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Undo</button>';
         } else {
           actions.innerHTML =
-            '<span class="safety-card-status status-pending" >Pending</span>' +
+            '<span class="safety-card-status status-pending">Pending</span>' +
             '<button class="safety-btn safety-btn-sospes" onclick="launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
             '<button class="safety-btn safety-btn-primary" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         }
@@ -6131,13 +6225,30 @@
     const bar = document.getElementById('safety-progress-bar');
     if (progressText) progressText.textContent = doneCount + ' of ' + _SAFETY_TYPES.length + ' complete';
     if (daysText) {
-      const remaining = _safetyDaysRemaining();
-      daysText.textContent = remaining + ' day' + (remaining !== 1 ? 's' : '') + ' left in ' + _safetyMonthName();
+      if (_safetyFrequency > 0 && _safetyFrequency < _safetyDaysInMonth()) {
+        daysText.textContent = info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + ' left in cycle';
+      } else {
+        const remaining = _safetyDaysInMonth() - new Date().getDate();
+        daysText.textContent = remaining + ' day' + (remaining !== 1 ? 's' : '') + ' left in ' + _safetyMonthName();
+      }
     }
     if (bar) {
       const pct = Math.round((doneCount / _SAFETY_TYPES.length) * 100);
       bar.style.width = pct + '%';
       bar.classList.toggle('bar-complete', pct === 100);
+    }
+
+    // Update frequency input if present
+    const freqInput = document.getElementById('safety-freq-input');
+    if (freqInput && document.activeElement !== freqInput) {
+      freqInput.value = _safetyFrequency > 0 ? _safetyFrequency : '';
+      freqInput.placeholder = _safetyDaysInMonth() + '';
+    }
+    const freqLabel = document.getElementById('safety-freq-label');
+    if (freqLabel) {
+      freqLabel.textContent = _safetyFrequency > 0
+        ? 'Every ' + _safetyFrequency + ' day' + (_safetyFrequency !== 1 ? 's' : '')
+        : 'End of month (default)';
     }
   }
 
@@ -6153,18 +6264,18 @@
     }
 
     const text = document.getElementById('safety-banner-text');
-    const remaining = _safetyDaysRemaining();
+    const info = _safetyCycleInfo();
     banner.classList.toggle('urgency-high', urgency === 'high');
 
     if (text) {
       if (urgency === 'high') {
         text.innerHTML = '<strong>Safety checks overdue</strong> — ' +
           incomplete + ' inspection' + (incomplete > 1 ? 's' : '') +
-          ' incomplete with only <strong>' + remaining + ' day' + (remaining !== 1 ? 's' : '') + '</strong> remaining.';
+          ' incomplete with only <strong>' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + '</strong> remaining.';
       } else {
         text.innerHTML = '<strong>Safety checks due</strong> — ' +
-          incomplete + ' monthly inspection' + (incomplete > 1 ? 's' : '') +
-          ' still pending. ' + remaining + ' days remaining.';
+          incomplete + ' inspection' + (incomplete > 1 ? 's' : '') +
+          ' still pending. ' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + ' remaining.';
       }
     }
     banner.style.display = 'flex';
@@ -6202,11 +6313,11 @@
     const el = document.getElementById('safety-modal-checklist');
     if (!el) return;
     el.innerHTML = _SAFETY_TYPES.map(t => {
-      const done = !!_safetyChecks[t.key];
-      return '<div class="safety-modal-item ' + (done ? 'item-done' : '') + '">' +
-        '<span class="safety-modal-item-icon">' + (done ? '&#9989;' : '&#9744;') + '</span>' +
+      const due = _isSafetyDue(t.key);
+      return '<div class="safety-modal-item ' + (!due ? 'item-done' : '') + '">' +
+        '<span class="safety-modal-item-icon">' + (!due ? '&#9989;' : '&#9744;') + '</span>' +
         '<span class="safety-modal-item-label">' + escHtml(t.label) + '</span>' +
-        (done ? '' : '<button class="safety-btn safety-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')">Done</button>') +
+        (due ? '<button class="safety-btn safety-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')">Done</button>' : '') +
       '</div>';
     }).join('');
   }
