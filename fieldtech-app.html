@@ -1020,6 +1020,10 @@
 
   /* Body */
   .accordion { transition:box-shadow .28s ease, background .28s ease; border-radius:8px; }
+  /* Nested accordions inside cards should not add extra rounding */
+  .card-body > .accordion { border-radius:0; }
+  .card-body > .accordion.acc-expanded { background:rgba(22,34,54,0.25); box-shadow:none; }
+  html[data-theme="cspire"] .card-body > .accordion.acc-expanded { background:rgba(0,80,160,0.04); box-shadow:none; }
   .accordion.acc-expanded { background:rgba(22,34,54,0.5); box-shadow:0 2px 6px rgba(0,0,0,0.35), 0 6px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05); }
   html[data-theme="cspire"] .accordion.acc-expanded { background:rgba(255,255,255,0.5); box-shadow:0 2px 8px rgba(0,80,160,0.1), 0 6px 20px rgba(0,80,160,0.08); }
   .acc-body {
@@ -2761,53 +2765,81 @@
               <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
             </div>
 
-            <!-- Vehicle Inspection row -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-vehicle">
-              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
-                <div style="min-width:0;">
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Vehicle Inspection</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Brakes, tires, lights, fluids, mirrors</div>
+            <!-- Vehicle Inspection accordion -->
+            <div class="accordion" id="safety-acc-vehicle" style="border-bottom:1px solid var(--border);">
+              <button class="acc-header" onclick="toggleAcc('safety-vehicle')" aria-expanded="false" style="padding:14px 16px;">
+                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+                </div>
+                <div class="acc-header-info" id="safety-card-vehicle">
+                  <span class="acc-title">Vehicle Inspection</span>
+                  <span class="acc-sub">Brakes, tires, lights, fluids, mirrors</span>
                   <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                 </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-vehicle">
-                <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-vehicle">
+                  <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
+                </div>
+                <svg class="acc-chevron" id="chev-safety-vehicle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="acc-body" id="body-safety-vehicle">
+                <div style="padding:10px 16px 6px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="safety-btns-vehicle">
+                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
+                </div>
+                <div class="acc-divider" style="margin:6px 16px;"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
+                  <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div style="min-width:0;">
+                      <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
+                      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label-vehicle">End of month (default)</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                    <input id="safety-freq-input-vehicle" type="number" min="1" max="31" inputmode="numeric" style="width:44px;padding:4px 5px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency('vehicle',this.value)" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){this.blur();}">
+                    <span style="font-size:10px;color:var(--text-muted);">days</span>
+                    <button onclick="event.stopPropagation();setSafetyFrequency('vehicle',0);document.getElementById('safety-freq-input-vehicle').value='';" style="padding:3px 7px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Ladder Inspection row -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-ladder">
-              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
-                <div style="min-width:0;">
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Ladder Inspection</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Rungs, locks, feet, hinges, weight rating</div>
+            <!-- Ladder Inspection accordion -->
+            <div class="accordion" id="safety-acc-ladder" style="border-bottom:none;">
+              <button class="acc-header" onclick="toggleAcc('safety-ladder')" aria-expanded="false" style="padding:14px 16px;">
+                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
+                </div>
+                <div class="acc-header-info" id="safety-card-ladder">
+                  <span class="acc-title">Ladder Inspection</span>
+                  <span class="acc-sub">Rungs, locks, feet, hinges, weight rating</span>
                   <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                 </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-ladder">
-                <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
-              </div>
-            </div>
-
-            <!-- Frequency setting row -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:10px;background:rgba(0,192,243,0.03);">
-              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <div style="min-width:0;">
-                  <div style="font-size:13px;font-weight:600;color:var(--text);">Reminder Frequency</div>
-                  <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label">End of month (default)</div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-ladder">
+                  <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
                 </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                <input id="safety-freq-input" type="number" min="1" max="31" inputmode="numeric" style="width:48px;padding:5px 6px;font-family:var(--mono);font-size:12px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency(this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
-                <span style="font-size:11px;color:var(--text-muted);">days</span>
-                <button onclick="setSafetyFrequency(0);document.getElementById('safety-freq-input').value='';" style="padding:4px 8px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+                <svg class="acc-chevron" id="chev-safety-ladder" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="acc-body" id="body-safety-ladder">
+                <div style="padding:10px 16px 6px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="safety-btns-ladder">
+                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
+                </div>
+                <div class="acc-divider" style="margin:6px 16px;"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
+                  <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div style="min-width:0;">
+                      <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
+                      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label-ladder">End of month (default)</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                    <input id="safety-freq-input-ladder" type="number" min="1" max="31" inputmode="numeric" style="width:44px;padding:4px 5px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency('ladder',this.value)" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){this.blur();}">
+                    <span style="font-size:10px;color:var(--text-muted);">days</span>
+                    <button onclick="event.stopPropagation();setSafetyFrequency('ladder',0);document.getElementById('safety-freq-input-ladder').value='';" style="padding:3px 7px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2944,7 +2976,7 @@
   let _safetyChecks = { vehicle: null, ladder: null };
   let _safetyBannerDismissed = false;
   let _safetyModalShown = false;
-  let _safetyFrequency = 0; // 0 = end of month (default), 1-31 = custom cycle in days
+  let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month (default), 1-31 = custom cycle in days
 
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
@@ -6057,68 +6089,73 @@
   function _safetyMonthName() { return new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }); }
 
   // Returns { deadline: Date, daysLeft: number, cycleDays: number } for the current cycle.
-  // If frequency is 0 (default), deadline = end of month.
+  // Per-type cycle info. If frequency is 0 (default), deadline = end of month.
   // If frequency > 0, deadline = last completion + frequency days, capped at end of month.
-  // If no completion exists this month, cycle starts from the 1st.
-  function _safetyCycleInfo() {
+  function _safetyCycleInfo(type) {
     const now = new Date();
     const eom = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const daysInMonth = eom.getDate();
-    const freq = _safetyFrequency;
+    const freq = type ? (_safetyFrequency[type] || 0) : 0;
 
     if (freq <= 0 || freq >= daysInMonth) {
-      // Default: end-of-month cycle
       const daysLeft = daysInMonth - now.getDate();
       return { deadline: eom, daysLeft: daysLeft, cycleDays: daysInMonth };
     }
 
-    // Custom frequency: find the most recent completion across all types
-    let latestDone = null;
-    _SAFETY_TYPES.forEach(t => {
-      if (_safetyChecks[t.key]) {
-        const d = new Date(_safetyChecks[t.key]);
-        if (!latestDone || d > latestDone) latestDone = d;
-      }
-    });
-
+    // Custom frequency: use this type's completion timestamp
+    const ts = _safetyChecks[type];
     let cycleStart;
-    if (latestDone && latestDone.getMonth() === now.getMonth() && latestDone.getFullYear() === now.getFullYear()) {
-      cycleStart = latestDone;
+    if (ts) {
+      const d = new Date(ts);
+      if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+        cycleStart = d;
+      } else {
+        cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
     } else {
       cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
     }
 
     const deadline = new Date(cycleStart.getTime() + freq * 86400000);
-    // Cap at end of month
     const capped = deadline > eom ? eom : deadline;
     const daysLeft = Math.max(0, Math.ceil((capped.getTime() - now.getTime()) / 86400000));
     return { deadline: capped, daysLeft: daysLeft, cycleDays: freq };
   }
 
   // Check if a specific type needs to be done in the current cycle.
-  // With custom frequency, a check that was completed within the current cycle window is "done".
   function _isSafetyDue(type) {
     const ts = _safetyChecks[type];
     if (!ts) return true; // never completed this month
-    if (_safetyFrequency <= 0 || _safetyFrequency >= _safetyDaysInMonth()) return false; // monthly mode, completed = done
-    // Custom frequency: check if completion is within the current cycle
+    const freq = _safetyFrequency[type] || 0;
+    if (freq <= 0 || freq >= _safetyDaysInMonth()) return false; // monthly mode, completed = done
     const completedAt = new Date(ts);
     const now = new Date();
     const elapsed = (now.getTime() - completedAt.getTime()) / 86400000;
-    return elapsed >= _safetyFrequency;
+    return elapsed >= freq;
   }
 
+  // Per-type urgency
+  function _getSafetyUrgencyForType(type) {
+    if (!_isSafetyDue(type)) return 'none';
+    const info = _safetyCycleInfo(type);
+    const elapsed = info.cycleDays - info.daysLeft;
+    const pct = info.cycleDays > 0 ? elapsed / info.cycleDays : 1;
+    if (pct <= 0.25) return 'low';
+    if (pct <= 0.75) return 'medium';
+    return 'high';
+  }
+
+  // Overall urgency (worst across all types)
   function getSafetyUrgency() {
     const allDone = _SAFETY_TYPES.every(t => !_isSafetyDue(t.key));
     if (allDone) return 'none';
-
-    const info = _safetyCycleInfo();
-    const elapsed = info.cycleDays - info.daysLeft;
-    const pct = info.cycleDays > 0 ? elapsed / info.cycleDays : 1;
-
-    if (pct <= 0.25)  return 'low';
-    if (pct <= 0.75)  return 'medium';
-    return 'high';
+    const levels = { none: 0, low: 1, medium: 2, high: 3 };
+    let worst = 'none';
+    _SAFETY_TYPES.forEach(t => {
+      const u = _getSafetyUrgencyForType(t.key);
+      if (levels[u] > levels[worst]) worst = u;
+    });
+    return worst;
   }
 
   function _safetyIncompleteCount() {
@@ -6126,27 +6163,38 @@
   }
 
   function initSafetyChecks() {
-    // Load frequency setting (0 = end of month default)
-    const storedFreq = localStorage.getItem('ft_safety_frequency');
-    _safetyFrequency = storedFreq ? parseInt(storedFreq, 10) || 0 : 0;
-
+    // Load per-type frequency settings (0 = end of month default)
     _SAFETY_TYPES.forEach(t => {
+      const storedFreq = localStorage.getItem('ft_safety_freq_' + t.key);
+      _safetyFrequency[t.key] = storedFreq ? parseInt(storedFreq, 10) || 0 : 0;
       const stored = localStorage.getItem(_safetyLsKey(t.key));
       _safetyChecks[t.key] = stored || null;
     });
+    // Migrate legacy shared frequency key if present
+    const legacyFreq = localStorage.getItem('ft_safety_frequency');
+    if (legacyFreq) {
+      const val = parseInt(legacyFreq, 10) || 0;
+      _SAFETY_TYPES.forEach(t => {
+        if (_safetyFrequency[t.key] === 0 && val > 0) {
+          _safetyFrequency[t.key] = val;
+          localStorage.setItem('ft_safety_freq_' + t.key, String(val));
+        }
+      });
+      localStorage.removeItem('ft_safety_frequency');
+    }
     renderSafetySection();
     updateSafetyBadge();
     renderSafetyBanner();
   }
 
-  function setSafetyFrequency(val) {
+  function setSafetyFrequency(type, val) {
     const days = parseInt(val, 10) || 0;
     const maxDays = _safetyDaysInMonth();
-    _safetyFrequency = Math.max(0, Math.min(days, maxDays));
-    if (_safetyFrequency === 0) {
-      localStorage.removeItem('ft_safety_frequency');
+    _safetyFrequency[type] = Math.max(0, Math.min(days, maxDays));
+    if (_safetyFrequency[type] === 0) {
+      localStorage.removeItem('ft_safety_freq_' + type);
     } else {
-      localStorage.setItem('ft_safety_frequency', String(_safetyFrequency));
+      localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
     }
     renderSafetySection();
     updateSafetyBadge();
@@ -6178,7 +6226,6 @@
     const urgency = getSafetyUrgency();
     const incomplete = _safetyIncompleteCount();
     const doneCount = _SAFETY_TYPES.length - incomplete;
-    const info = _safetyCycleInfo();
 
     const pill = document.getElementById('safety-urgency-pill');
     if (pill) {
@@ -6189,13 +6236,14 @@
 
     _SAFETY_TYPES.forEach(t => {
       const card   = document.getElementById('safety-card-' + t.key);
-      const status = document.getElementById('safety-status-' + t.key);
       const dateEl = document.getElementById('safety-date-' + t.key);
       const actions = document.getElementById('safety-actions-' + t.key);
+      const btns   = document.getElementById('safety-btns-' + t.key);
       if (!card) return;
 
       const due = _isSafetyDue(t.key);
       const hasTimestamp = !!_safetyChecks[t.key];
+
       if (dateEl) {
         if (hasTimestamp) {
           const d = new Date(_safetyChecks[t.key]);
@@ -6204,19 +6252,42 @@
           dateEl.style.display = '';
         } else { dateEl.style.display = 'none'; }
       }
+
+      // Update status badge in accordion header
       if (actions) {
         if (!due) {
-          actions.innerHTML =
-            '<span class="safety-card-status status-done">Complete</span>' +
-            '<button class="safety-btn safety-btn-undo" onclick="undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
+          actions.innerHTML = '<span class="safety-card-status status-done">Complete</span>';
+        } else {
+          actions.innerHTML = '<span class="safety-card-status status-pending">Pending</span>';
+        }
+      }
+
+      // Update action buttons inside accordion body
+      if (btns) {
+        if (!due) {
+          btns.innerHTML =
+            '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Undo</button>';
         } else {
-          actions.innerHTML =
-            '<span class="safety-card-status status-pending">Pending</span>' +
-            '<button class="safety-btn safety-btn-sospes" onclick="launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
-            '<button class="safety-btn safety-btn-primary" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
+          btns.innerHTML =
+            '<button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
+            '<button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         }
+      }
+
+      // Update per-type frequency input
+      const freq = _safetyFrequency[t.key] || 0;
+      const freqInput = document.getElementById('safety-freq-input-' + t.key);
+      if (freqInput && document.activeElement !== freqInput) {
+        freqInput.value = freq > 0 ? freq : '';
+        freqInput.placeholder = _safetyDaysInMonth() + '';
+      }
+      const freqLabel = document.getElementById('safety-freq-label-' + t.key);
+      if (freqLabel) {
+        freqLabel.textContent = freq > 0
+          ? 'Every ' + freq + ' day' + (freq !== 1 ? 's' : '')
+          : 'End of month (default)';
       }
     });
 
@@ -6225,8 +6296,16 @@
     const bar = document.getElementById('safety-progress-bar');
     if (progressText) progressText.textContent = doneCount + ' of ' + _SAFETY_TYPES.length + ' complete';
     if (daysText) {
-      if (_safetyFrequency > 0 && _safetyFrequency < _safetyDaysInMonth()) {
-        daysText.textContent = info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + ' left in cycle';
+      // Show the nearest deadline across all due types
+      let nearestDays = null;
+      _SAFETY_TYPES.forEach(t => {
+        if (_isSafetyDue(t.key)) {
+          const info = _safetyCycleInfo(t.key);
+          if (nearestDays === null || info.daysLeft < nearestDays) nearestDays = info.daysLeft;
+        }
+      });
+      if (nearestDays !== null) {
+        daysText.textContent = nearestDays + ' day' + (nearestDays !== 1 ? 's' : '') + ' until next deadline';
       } else {
         const remaining = _safetyDaysInMonth() - new Date().getDate();
         daysText.textContent = remaining + ' day' + (remaining !== 1 ? 's' : '') + ' left in ' + _safetyMonthName();
@@ -6237,26 +6316,12 @@
       bar.style.width = pct + '%';
       bar.classList.toggle('bar-complete', pct === 100);
     }
-
-    // Update frequency input if present
-    const freqInput = document.getElementById('safety-freq-input');
-    if (freqInput && document.activeElement !== freqInput) {
-      freqInput.value = _safetyFrequency > 0 ? _safetyFrequency : '';
-      freqInput.placeholder = _safetyDaysInMonth() + '';
-    }
-    const freqLabel = document.getElementById('safety-freq-label');
-    if (freqLabel) {
-      freqLabel.textContent = _safetyFrequency > 0
-        ? 'Every ' + _safetyFrequency + ' day' + (_safetyFrequency !== 1 ? 's' : '')
-        : 'End of month (default)';
-    }
   }
 
   function renderSafetyBanner() {
     const banner = document.getElementById('safety-banner');
     if (!banner) return;
     const urgency = getSafetyUrgency();
-    const incomplete = _safetyIncompleteCount();
 
     if (urgency === 'none' || urgency === 'low' || _safetyBannerDismissed) {
       banner.style.display = 'none';
@@ -6264,19 +6329,22 @@
     }
 
     const text = document.getElementById('safety-banner-text');
-    const info = _safetyCycleInfo();
     banner.classList.toggle('urgency-high', urgency === 'high');
 
     if (text) {
-      if (urgency === 'high') {
-        text.innerHTML = '<strong>Safety checks overdue</strong> — ' +
-          incomplete + ' inspection' + (incomplete > 1 ? 's' : '') +
-          ' incomplete with only <strong>' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + '</strong> remaining.';
-      } else {
-        text.innerHTML = '<strong>Safety checks due</strong> — ' +
-          incomplete + ' inspection' + (incomplete > 1 ? 's' : '') +
-          ' still pending. ' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : '') + ' remaining.';
-      }
+      // Build per-inspection lines
+      const lines = [];
+      _SAFETY_TYPES.forEach(t => {
+        if (!_isSafetyDue(t.key)) return;
+        const info = _safetyCycleInfo(t.key);
+        const typeUrgency = _getSafetyUrgencyForType(t.key);
+        if (typeUrgency === 'high') {
+          lines.push('<strong>' + escHtml(t.label) + ' Overdue</strong> — Please Complete ASAP');
+        } else {
+          lines.push('<strong>' + escHtml(t.label) + ' Due</strong> in ' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : ''));
+        }
+      });
+      text.innerHTML = lines.join('<br>');
     }
     banner.style.display = 'flex';
   }

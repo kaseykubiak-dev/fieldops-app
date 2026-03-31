@@ -59,11 +59,14 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#screen-customer-detail` | Customer Detail | `fetchCustomerDetail(sysId)` |
 | `#screen-network` | Network Equipment | `loadNetworkScreen()` |
 | `#screen-cx360` | CX 360 | `cx360Send()` (mock AI chat) |
-| `#screen-more` | More / Settings | `initSafetyChecks()` + static settings |
+| `#screen-techtools` | Tech Tools | `initSafetyChecks()` + static tools |
+| `#screen-more` | Settings | (static — Appearance, App, Account) |
 | `#screen-links` | Important Links | (static) |
 | `#login-screen` | Login | (shown by default) |
 
-Desktop uses a top nav bar (`#desktop-topbar` / `.desktop-nav`). Mobile uses a bottom nav bar (`.bottom-nav` / `.bnav-btn`) with 5 tabs: Tickets, Customers, Calendar, CX 360, More. The primary breakpoint is `800px` — see `isMobileView()`. A tablet breakpoint at `1024px` narrows the list panel and tightens nav spacing.
+Desktop uses a top nav bar (`#desktop-topbar` / `.desktop-nav`). Mobile uses a bottom nav bar (`.bottom-nav` / `.bnav-btn`) with 5 tabs: Tickets, Calendar, CX 360, Tech Tools. The primary breakpoint is `800px` — see `isMobileView()`. A tablet breakpoint at `1024px` narrows the list panel and tightens nav spacing.
+
+Settings (`#screen-more` in code) is accessed via the user avatar dropdown menu, not via a nav tab. When Settings is active, no nav tab is highlighted. The screen ID remains `screen-more` in code to avoid breaking existing references.
 
 ---
 
@@ -528,40 +531,47 @@ Monthly vehicle and ladder inspection tracking with escalating urgency reminders
 ### State
 
 ```js
-let _safetyChecks = { vehicle: null, ladder: null };  // null = pending, ISO string = completed timestamp
-let _safetyBannerDismissed = false;  // per-session dismiss (resets on logout)
-let _safetyModalShown = false;       // only show once per session
-
+// Declared in the App state section at the top of the script block
+// (before login/session flow) to avoid Temporal Dead Zone errors —
+// showScreen() → updateSafetyBadge() → getSafetyUrgency() references
+// these during dismissDisclaimer(), which runs before the safety
+// section code at the bottom of the script.
 const _SAFETY_TYPES = [
   { key: 'vehicle', label: 'Vehicle Inspection' },
   { key: 'ladder',  label: 'Ladder Inspection'  }
 ];
+let _safetyChecks = { vehicle: null, ladder: null };  // null = pending, ISO string = completed timestamp
+let _safetyBannerDismissed = false;  // per-session dismiss (resets on logout)
+let _safetyModalShown = false;       // only show once per session
+let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month, 1-31 = custom days
 ```
 
-Completion state is stored in `localStorage` keyed as `ft_safety_{type}_{YYYY-MM}` (e.g., `ft_safety_vehicle_2026-03`). Checks reset automatically each calendar month — `_safetyMonthKey()` returns `"YYYY-MM"` based on the current date.
+Completion state is stored in `localStorage` keyed as `ft_safety_{type}_{YYYY-MM}` (e.g., `ft_safety_vehicle_2026-03`). Checks reset automatically each calendar month — `_safetyMonthKey()` returns `"YYYY-MM"` based on the current date. Per-type reminder frequency stored as `ft_safety_freq_{type}` (e.g., `ft_safety_freq_vehicle`). Legacy shared key `ft_safety_frequency` is auto-migrated to per-type keys on init.
 
 ### Urgency levels
 
-`getSafetyUrgency()` returns one of four levels based on the current day of the month and whether all checks are complete:
+Urgency is now computed **per inspection type** via `_getSafetyUrgencyForType(type)`, which uses that type's own frequency and cycle info. `getSafetyUrgency()` returns the **worst** urgency across all types (used for the overall pill and badge).
 
 | Level | Condition | Behavior |
 |---|---|---|
 | `none` | All checks complete | Green "All Clear" pill, no banner/badge/modal |
-| `low` | Day 1-7, incomplete | Blue "Due This Month" pill, no banner |
-| `medium` | Day 8-21, incomplete | Yellow "Due Soon" pill, banner on Tickets screen |
-| `high` | Day 22+, incomplete | Red "Overdue" pill (pulses), banner, badge dot on More nav, login modal |
+| `low` | ≤25% of cycle elapsed, incomplete | Blue "Due This Month" pill, no banner |
+| `medium` | 25-75% of cycle elapsed, incomplete | Yellow "Due Soon" pill, banner on Tickets screen |
+| `high` | >75% of cycle elapsed, incomplete | Red "Overdue" pill (pulses), banner, badge dot on Tech Tools nav, login modal |
+
+With per-type frequency, each inspection can be at a different urgency level independently. The cycle length is either the full month (default, freq=0) or the custom day count.
 
 ### UI components
 
-**Section header** (More screen): Uses `.section-title` bar with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container matching the Appearance/App/Tools/Account sections.
+**Section header** (Tech Tools screen): Uses `.section-title` bar with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container.
 
-**Inspection rows** (More screen): Each inspection (Vehicle, Ladder) is a row inside the safety card with icon, label, description, status pill, and action buttons (Sospes + Done when pending; Undo when complete). Completed date shown below label.
+**Inspection accordions** (Tech Tools screen): Each inspection (Vehicle, Ladder) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding the accordion reveals action buttons (Sospes + Done when pending; Undo when complete) and a per-type **Reminder Frequency** control (number input + Reset button). The frequency setting is nested inside each accordion body, allowing independent frequency per inspection. Uses the existing `toggleAcc()` function with IDs `safety-vehicle` and `safety-ladder`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds via CSS overrides.
 
-**Progress bar**: Below the inspection rows, shows "N of 2 complete" with days remaining and a fill bar (`#safety-progress-bar`). Bar turns green (`.bar-complete`) when all checks are done.
+**Progress bar**: Above the inspection accordions (top of the safety card), shows "N of 2 complete" with nearest deadline info and a fill bar (`#safety-progress-bar`). Bar turns green (`.bar-complete`) when all checks are done.
 
-**Safety banner** (`#safety-banner`): Displayed on the Tickets screen (`#screen-list`) for `medium` and `high` urgency. Has a "Review" button (navigates to More) and a dismiss button (per-session). Red variant for `high` urgency.
+**Safety banner** (`#safety-banner`): Displayed on the Tickets screen (`#screen-list`) for `medium` and `high` urgency. Now shows **per-inspection messages**: "Vehicle Inspection Due in X days" / "Vehicle Inspection Overdue — Please Complete ASAP" (and same for Ladder). Each due inspection gets its own line. Has a "Review" button (navigates to Tech Tools) and a dismiss button (per-session). Red variant when any type is `high` urgency.
 
-**Badge dots**: Orange dot on mobile More button (`#safety-badge-mobile`, `.safety-badge-dot`) and desktop More nav (`#safety-badge-desktop`, `.dnav-safety-badge`). Pulses red at `high` urgency. Updated on every `showScreen()` call via `updateSafetyBadge()`.
+**Badge dots**: Orange dot on mobile Tech Tools button (`#safety-badge-mobile`, `.safety-badge-dot`) and desktop Tech Tools nav (`#safety-badge-desktop`, `.dnav-safety-badge`). Pulses red at `high` urgency. Updated on every `showScreen()` call via `updateSafetyBadge()`.
 
 **Safety modal** (`#safety-modal`): Full-screen overlay shown once per session on login when urgency is `high`. Displays checklist of incomplete inspections with inline "Done" buttons. Options to open Sospes or acknowledge ("I'll complete later today").
 
@@ -569,14 +579,19 @@ Completion state is stored in `localStorage` keyed as `ft_safety_{type}_{YYYY-MM
 
 | Function | Purpose |
 |---|---|
-| `initSafetyChecks()` | Loads state from localStorage, renders all components |
+| `initSafetyChecks()` | Loads state + per-type frequencies from localStorage (with legacy migration), renders all components |
 | `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
 | `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all |
-| `renderSafetySection()` | Updates cards, pills, progress bar in More screen |
-| `renderSafetyBanner()` | Shows/hides banner on Tickets screen |
+| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage |
+| `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency |
+| `_isSafetyDue(type)` | Checks if inspection is due using that type's frequency |
+| `_getSafetyUrgencyForType(type)` | Returns urgency level (none/low/medium/high) for a specific inspection |
+| `getSafetyUrgency()` | Returns worst urgency across all types |
+| `renderSafetySection()` | Updates accordions, pills, progress bar, per-type frequency inputs in Tech Tools screen |
+| `renderSafetyBanner()` | Shows/hides banner with per-inspection messages on Tickets screen |
 | `updateSafetyBadge()` | Updates badge dots on mobile + desktop nav |
 | `checkSafetyModal()` | Shows modal on login if urgency = high |
-| `launchSospes(type)` | Deep-links to Sospes app with fallback to app store |
+| `launchSospes(type)` | Opens Sospes app store page (App Store on iOS, Play Store on Android) |
 
 ### Integration hooks
 
@@ -585,15 +600,48 @@ Three existing functions have safety check hooks:
 - `showScreen()`: calls `updateSafetyBadge()` on every screen switch (guarded by `typeof` check)
 - `logout()`: resets `_safetyBannerDismissed` and `_safetyModalShown`
 
-`showScreen()` also calls `setDesktopNav()` internally with a mapping table (`network` and `links` map to `more`) to keep the desktop nav active state in sync — this replaced the separate `setDesktopNav()` calls in each desktop nav button's onclick handler.
+`showScreen()` also calls `setDesktopNav()` internally with a mapping table (`network` and `links` map to `techtools`, `more` maps to empty string for no highlight) to keep the desktop nav active state in sync.
 
-### Sospes deep-linking
+### Sospes integration
 
-`launchSospes()` attempts `window.location.href = 'sospes://'` to open the native Sospes app. After 1.5 seconds, if the page hasn't navigated away, it falls back to the App Store (iOS) or Play Store (Android) based on user agent detection. The deep-link URL scheme and store IDs are placeholders — replace with actual Sospes values when available.
+`launchSospes()` opens the Sospes app store page directly based on user agent detection: App Store (`id1485744669`) on iOS, Play Store (`com.sospesinc.safety`) on Android. Custom URL scheme deep-linking (`sospes://`) was removed because Delta is a web app — Safari and mobile browsers show "address is invalid" errors when attempting custom URL schemes from a non-native context.
 
 ### Pill styling
 
 Safety pills (urgency pill and status pills) use the same visual pattern as ticket pills: `border-radius:4px`, gradient backgrounds, `1.5px` colored borders, multi-layer box-shadow with glow, and `text-shadow`. Classes: `.safety-urgency-pill.urgency-{none|low|medium|high}` and `.safety-card-status.status-{pending|done}`.
+
+---
+
+## User Menu
+
+The user avatar button (`.avatar-sm`, `#user-avatar`) in the topbar opens a dropdown panel (`.user-menu-panel`) instead of directly triggering logout. The panel follows the same pattern as the notification panel: fixed positioning anchored below the avatar via `getBoundingClientRect()`, backdrop overlay for click-to-close, `.show` class toggle, `aria-expanded`/`aria-hidden` sync.
+
+### Menu contents
+
+The header shows a larger avatar circle with user initials and full name (from `sessionStorage`), plus a "Field Technician" role label. Two menu items: "Settings" (gear icon, navigates to `#screen-more`) and "Sign Out" (red, calls `confirmLogout()`).
+
+### Mutual exclusion
+
+`toggleUserMenu()` closes the notification panel first; `toggleNotifPanel()` closes the user menu first. Both panels share `z-index:1999` and use separate backdrop elements at `z-index:1998`.
+
+### Key functions
+
+| Function | Purpose |
+|---|---|
+| `toggleUserMenu(avatarBtn)` | Opens/closes user menu, populates name/initials, positions panel |
+| `closeUserMenu()` | Hides panel, resets aria attributes |
+
+---
+
+## Tech Tools vs Settings
+
+The original "More" screen was split into two screens:
+
+**Tech Tools** (`#screen-techtools`) — visible as a nav tab (wrench icon) in both mobile bottom nav and desktop top nav. Contains Monthly Safety Checks and Tools sections (Network Equipment, Important Links). Safety badge dots appear on this tab.
+
+**Settings** (`#screen-more` in code) — accessible only via the user avatar dropdown menu "Settings" option. Contains Appearance (theme toggle, mobile preview), App (force refresh), and Account (sign out) sections. No nav tab highlights when Settings is active. The screen ID remains `screen-more` in code to avoid breaking existing references.
+
+The desktop nav mapping in `showScreen()` routes `network` and `links` to highlight `techtools`, and `more` to empty string (no tab highlighted).
 
 ---
 
@@ -746,4 +794,7 @@ All six planned improvements have been implemented:
 5. **Code cleanup** -- `fetchCaseDetail` broken into 6 functions (main + 5 helpers), all `.then()` chains converted to async/await, notification globals consolidated
 6. **Responsive polish** -- Tablet breakpoint (800-1024px) narrows list panel, landscape `safe-area-inset-left/right` via `@supports`
 7. **Visual polish** -- Skeleton loading screens, enhanced empty states, button loading states, modal animations, SLA urgency pulse, mobile press feedback, accordion depth, card hover consistency, prefers-reduced-motion, data viz stat bars
-8. **Safety Check Tracker** -- Monthly vehicle + ladder inspection tracking with escalating urgency (none/low/medium/high), Sospes deep-link integration, login gate modal, banner on Tickets screen, badge dots on nav, progress bar. Pills styled to match ticket pill design system. More screen uses standard `.section-title` + `.card` layout pattern with scroll support.
+8. **Safety Check Tracker** -- Monthly vehicle + ladder inspection tracking with escalating urgency (none/low/medium/high), Sospes app store integration (App Store `id1485744669`, Play Store `com.sospesinc.safety`), login gate modal, banner on Tickets screen, badge dots on nav, progress bar. Pills styled to match ticket pill design system.
+9. **User menu dropdown** -- Avatar button opens a dropdown panel (matching notification panel pattern) with user profile header, Settings navigation, and Sign Out. Replaces direct `confirmLogout()` on avatar click.
+10. **Tech Tools / Settings split** -- "More" screen split into Tech Tools (nav tab with safety checks + tools) and Settings (user menu only, Appearance/App/Account). Screen ID `screen-more` retained for Settings to avoid breaking references.
+11. **Per-inspection accordion + frequency** -- Each inspection (Vehicle, Ladder) wrapped in an accordion with nested per-type reminder frequency control. Frequency stored independently per type (`ft_safety_freq_{type}`). Banner messages now show per-inspection: "Vehicle Inspection Due in X days" / "Vehicle Inspection Overdue — Please Complete ASAP". Urgency computed per type, overall urgency = worst across all types. Legacy shared `ft_safety_frequency` key auto-migrated on init.
