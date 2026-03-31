@@ -2778,16 +2778,13 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-vehicle">
                   <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
+                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
                 </div>
                 <svg class="acc-chevron" id="chev-safety-vehicle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="acc-body" id="body-safety-vehicle">
-                <div style="padding:10px 16px 6px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="safety-btns-vehicle">
-                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
-                </div>
-                <div class="acc-divider" style="margin:6px 16px;"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
                   <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <div style="min-width:0;">
@@ -2817,16 +2814,13 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-ladder">
                   <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
+                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
                 </div>
                 <svg class="acc-chevron" id="chev-safety-ladder" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="acc-body" id="body-safety-ladder">
-                <div style="padding:10px 16px 6px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="safety-btns-ladder">
-                  <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
-                </div>
-                <div class="acc-divider" style="margin:6px 16px;"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
                   <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <div style="min-width:0;">
@@ -6238,7 +6232,6 @@
       const card   = document.getElementById('safety-card-' + t.key);
       const dateEl = document.getElementById('safety-date-' + t.key);
       const actions = document.getElementById('safety-actions-' + t.key);
-      const btns   = document.getElementById('safety-btns-' + t.key);
       if (!card) return;
 
       const due = _isSafetyDue(t.key);
@@ -6253,24 +6246,17 @@
         } else { dateEl.style.display = 'none'; }
       }
 
-      // Update status badge in accordion header
+      // Update status + action buttons in accordion header
       if (actions) {
         if (!due) {
-          actions.innerHTML = '<span class="safety-card-status status-done">Complete</span>';
-        } else {
-          actions.innerHTML = '<span class="safety-card-status status-pending">Pending</span>';
-        }
-      }
-
-      // Update action buttons inside accordion body
-      if (btns) {
-        if (!due) {
-          btns.innerHTML =
+          actions.innerHTML =
+            '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Undo</button>';
         } else {
-          btns.innerHTML =
+          actions.innerHTML =
+            '<span class="safety-card-status status-pending">Pending</span>' +
             '<button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
             '<button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         }
