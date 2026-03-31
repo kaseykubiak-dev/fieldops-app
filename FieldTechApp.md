@@ -773,7 +773,7 @@ After each section of changes, confirm the following still work in both themes:
 - [ ] Delta logo swaps correctly between dark and light variants on theme toggle
 - [ ] Bottom nav (mobile) and sidebar nav (desktop) both highlight the active screen (5 tabs on mobile)
 - [ ] Network Equipment link in ticket detail accordion navigates to Network tab
-- [ ] Safety check section in More screen renders correctly, Done/Undo buttons work, progress bar updates
+- [ ] Safety check section in Tech Tools screen renders correctly, Done/Undo buttons work, accordions expand/collapse
 - [ ] Safety banner appears on Tickets screen when urgency is medium or high, dismiss works
 - [ ] Safety modal appears on login when urgency is high, checklist items are interactive
 - [ ] Safety badge dots appear on More nav button when checks are incomplete
@@ -783,6 +783,16 @@ After each section of changes, confirm the following still work in both themes:
 ### Git checkpoint strategy
 
 Commit after each verified section with a message like: `a11y: add ARIA attributes to accordion sections and modals`. This gives clean rollback points if a later section introduces a regression.
+
+### Git commit reminder
+
+After any change to files in the `fieldops-app-main` directory, always offer to commit the changes to Git, or provide the terminal commands to do it manually:
+
+```bash
+cd /path/to/fieldops-app-main
+git add fieldtech-app.html        # or whichever files changed
+git commit -m "short description of change"
+```
 
 ### Completed refactoring (March 2026)
 
@@ -800,3 +810,4 @@ All six planned improvements have been implemented:
 10. **Tech Tools / Settings split** -- "More" screen split into Tech Tools (nav tab with safety checks + tools) and Settings (user menu only, Appearance/App/Account). Screen ID `screen-more` retained for Settings to avoid breaking references.
 11. **Per-inspection accordion + frequency** -- Each inspection (Vehicle, Ladder) wrapped in an accordion with nested per-type reminder frequency control. Frequency stored independently per type (`ft_safety_freq_{type}`). Banner messages now show per-inspection: "Vehicle Inspection Due in X days" / "Vehicle Inspection Overdue — Please Complete ASAP". Urgency computed per type, overall urgency = worst across all types. Legacy shared `ft_safety_frequency` key auto-migrated on init.
 12. **Inspection next-due date fix + frequency toast** -- "Next Inspection Due" now projects correctly beyond the current month: monthly mode shows end of *next* month; 7/14-day modes show `completionDate + N days` with no end-of-month cap. `setSafetyFrequency()` now calls `_showFreqToast()` after saving, displaying a bottom toast (e.g. "Vehicle inspection set to remind every 7 days") that auto-dismisses after ~3 s. The "Next Inspection Due" field refreshes immediately on frequency change.
+13. **Safety progress bar removed** (2026-03-31) -- Removed the "N of 2 complete" progress bar row from the Monthly Safety Checks card. Cleaned from CSS (dark + light theme rules), HTML, and `renderSafetySection()` JS. Reminder frequency settings confirmed to already persist across sessions via `localStorage` (`ft_safety_freq_{type}` keys) — no code change needed.

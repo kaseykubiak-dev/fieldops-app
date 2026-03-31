@@ -1861,12 +1861,6 @@
   .dnav-safety-badge.urgency-high { background:var(--danger); box-shadow:0 0 5px rgba(255,82,82,0.4); }
   .dnav-safety-badge.visible { display:inline-block; }
 
-  /* Progress bar */
-  .safety-progress { margin-top:10px; padding:0 2px; }
-  .safety-progress-label { display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-bottom:5px; }
-  .safety-progress-bar-bg { height:3px; border-radius:2px; background:rgba(255,255,255,0.08); overflow:hidden; }
-  .safety-progress-bar-fill { height:100%; border-radius:2px; background:var(--accent); transition:width 0.4s ease-out; }
-  .safety-progress-bar-fill.bar-complete { background:var(--success); }
 
   @media(max-width:799px)  { .safety-card:active { transform:scale(0.98); transition:transform 0.12s; } }
   @media(min-width:800px)  { .safety-card:hover { transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,0.5),0 8px 24px rgba(0,0,0,0.4),0 14px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.18); transition:transform 0.2s,box-shadow 0.2s; } }
@@ -1891,7 +1885,6 @@
   html[data-theme="cspire"] .safety-banner.urgency-high { background:rgba(255,82,82,0.06); border-color:rgba(200,60,60,0.2); }
   html[data-theme="cspire"] .safety-modal-card { background:var(--surface); border-color:var(--border); box-shadow:0 8px 40px rgba(0,0,0,0.15); }
   html[data-theme="cspire"] .safety-modal-item { background:rgba(0,0,0,0.03); border-color:var(--border); }
-  html[data-theme="cspire"] .safety-progress-bar-bg { background:rgba(0,0,0,0.08); }
   html[data-theme="cspire"] .safety-card-icon { background:rgba(0,192,243,0.1); }
   html[data-theme="cspire"] .safety-card.safety-complete .safety-card-icon { background:rgba(0,192,106,0.1); }
 </style>
@@ -2768,14 +2761,6 @@
         <div class="card" id="safety-section">
           <div class="card-body" style="padding:0;">
 
-            <!-- Progress bar row -->
-            <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
-              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
-                <span id="safety-progress-text">0 of 2 complete</span>
-                <span id="safety-days-remaining"></span>
-              </div>
-              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
-            </div>
 
             <!-- Vehicle Inspection accordion -->
             <div class="accordion" id="safety-acc-vehicle" style="border-bottom:1px solid var(--border);">
@@ -6322,31 +6307,6 @@
       }
     });
 
-    const progressText = document.getElementById('safety-progress-text');
-    const daysText = document.getElementById('safety-days-remaining');
-    const bar = document.getElementById('safety-progress-bar');
-    if (progressText) progressText.textContent = doneCount + ' of ' + _SAFETY_TYPES.length + ' complete';
-    if (daysText) {
-      // Show the nearest deadline across all due types
-      let nearestDays = null;
-      _SAFETY_TYPES.forEach(t => {
-        if (_isSafetyDue(t.key)) {
-          const info = _safetyCycleInfo(t.key);
-          if (nearestDays === null || info.daysLeft < nearestDays) nearestDays = info.daysLeft;
-        }
-      });
-      if (nearestDays !== null) {
-        daysText.textContent = nearestDays + ' day' + (nearestDays !== 1 ? 's' : '') + ' until next deadline';
-      } else {
-        const remaining = _safetyDaysInMonth() - new Date().getDate();
-        daysText.textContent = remaining + ' day' + (remaining !== 1 ? 's' : '') + ' left in ' + _safetyMonthName();
-      }
-    }
-    if (bar) {
-      const pct = Math.round((doneCount / _SAFETY_TYPES.length) * 100);
-      bar.style.width = pct + '%';
-      bar.classList.toggle('bar-complete', pct === 100);
-    }
   }
 
   function renderSafetyBanner() {
