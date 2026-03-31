@@ -2589,6 +2589,15 @@
         <div class="card" id="safety-section">
           <div class="card-body" style="padding:0;">
 
+            <!-- Progress bar row -->
+            <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
+                <span id="safety-progress-text">0 of 2 complete</span>
+                <span id="safety-days-remaining"></span>
+              </div>
+              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
+            </div>
+
             <!-- Vehicle Inspection row -->
             <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-vehicle">
               <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
@@ -2621,15 +2630,6 @@
                 <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
                 <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
               </div>
-            </div>
-
-            <!-- Progress bar row -->
-            <div style="padding:10px 16px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
-                <span id="safety-progress-text">0 of 2 complete</span>
-                <span id="safety-days-remaining"></span>
-              </div>
-              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
             </div>
 
           </div>
@@ -6093,9 +6093,9 @@
       if (Date.now() - start < 2000) {
         const ua = navigator.userAgent.toLowerCase();
         if (/iphone|ipad|ipod/.test(ua)) {
-          window.open('https://apps.apple.com/app/sospes/id1234567890', '_blank'); // Replace with actual App Store ID
+          window.open('https://apps.apple.com/us/app/sospes-safety/id1485744669', '_blank');
         } else {
-          window.open('https://play.google.com/store/apps/details?id=com.sospes.app', '_blank'); // Replace with actual package name
+          window.open('https://play.google.com/store/apps/details?id=com.sospesinc.safety', '_blank');
         }
       }
     }, 1500);
