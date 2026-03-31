@@ -473,6 +473,64 @@
   html[data-theme="cspire"] .icon-btn .badge { border-color:var(--surface); }
   .avatar-sm { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#1c3450,#0f2038); border:2px solid var(--border); color:var(--accent); font-family:var(--mono); font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
+  /* USER MENU PANEL */
+  .user-menu-backdrop { position:fixed; inset:0; z-index:1998; display:none; }
+  .user-menu-backdrop.show { display:block; }
+  .user-menu-panel {
+    position:fixed; top:64px; right:12px;
+    width:240px;
+    background:linear-gradient(155deg, #162236 0%, #0f1a2e 100%);
+    border:1px solid rgba(0,192,243,0.2);
+    border-radius:13px; overflow:hidden;
+    flex-direction:column;
+    box-shadow:0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,192,243,0.06);
+    display:none; z-index:1999;
+  }
+  .user-menu-panel.show { display:flex; animation:notifSlideIn .15s ease both; }
+  .user-menu-header {
+    display:flex; align-items:center; gap:10px;
+    padding:14px 14px 12px;
+    background:linear-gradient(135deg, #1e3050 0%, #162440 100%);
+    border-bottom:1px solid rgba(0,192,243,0.18);
+  }
+  .user-menu-avatar {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#1c3450,#0f2038);
+    border:2px solid var(--accent);
+    color:var(--accent); font-family:var(--mono); font-size:13px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .user-menu-name { font-family:var(--sans); font-size:13px; font-weight:700; color:var(--text); line-height:1.3; }
+  .user-menu-role { font-family:var(--mono); font-size:10px; color:var(--text-muted); }
+  .user-menu-items { padding:6px 0; }
+  .user-menu-item {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px; border:none; background:none; width:100%;
+    font-family:var(--sans); font-size:13px; font-weight:500; color:var(--text);
+    cursor:pointer; transition:background .12s; text-align:left;
+  }
+  .user-menu-item:active { background:var(--surface2); }
+  .user-menu-item svg { color:var(--text-muted); flex-shrink:0; }
+  .user-menu-item.danger { color:var(--danger); }
+  .user-menu-item.danger svg { color:var(--danger); }
+  .user-menu-sep { height:1px; background:var(--border); margin:2px 12px; }
+
+  /* User menu — C Spire light theme */
+  html[data-theme="cspire"] .user-menu-panel {
+    background:linear-gradient(155deg, #d4eaf8 0%, #c4dcf0 100%);
+    border-color:rgba(0,80,160,0.28);
+    box-shadow:0 12px 40px rgba(0,60,140,0.18), 0 0 0 1px rgba(255,255,255,0.5);
+  }
+  html[data-theme="cspire"] .user-menu-header {
+    background:linear-gradient(135deg, #c4dff5 0%, #b8d6ee 100%);
+    border-bottom-color:rgba(0,80,160,0.28);
+  }
+  html[data-theme="cspire"] .user-menu-avatar {
+    background:linear-gradient(135deg, #00c0f3, #7a5598);
+    color:#fff; border-color:rgba(255,255,255,0.3);
+  }
+  html[data-theme="cspire"] .user-menu-item:active { background:rgba(0,80,160,0.06); }
+
   /* SCREEN WRAP */
   .screen-wrap { flex:1; overflow:hidden; position:relative; }
   .screen { position:absolute; inset:0; display:none; flex-direction:column; overflow:hidden; background:linear-gradient(165deg, #0f1c2e 0%, #0b1420 100%); }
@@ -1877,6 +1935,29 @@
   </div>
 </div>
 
+<!-- USER MENU OVERLAY -->
+<div class="user-menu-backdrop" id="user-menu-backdrop" onclick="closeUserMenu()" aria-hidden="true"></div>
+<div class="user-menu-panel" id="user-menu-panel" role="region" aria-label="User menu" aria-hidden="true">
+  <div class="user-menu-header">
+    <div class="user-menu-avatar" id="user-menu-avatar">??</div>
+    <div>
+      <div class="user-menu-name" id="user-menu-name">—</div>
+      <div class="user-menu-role">Field Technician</div>
+    </div>
+  </div>
+  <div class="user-menu-items">
+    <button class="user-menu-item" onclick="closeUserMenu();showScreen('more',null);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+    <div class="user-menu-sep"></div>
+    <button class="user-menu-item danger" onclick="closeUserMenu();confirmLogout();">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+  </div>
+</div>
+
 <div class="app">
 
   <!-- DESKTOP TOPBAR -->
@@ -1909,7 +1990,7 @@
     </nav>
     <div class="topbar-right">
       <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
-      <button class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out" aria-label="Sign out">??</button>
+      <button class="avatar-sm" id="user-avatar" onclick="toggleUserMenu(this)" title="User menu" aria-label="User menu" aria-expanded="false" aria-controls="user-menu-panel">??</button>
     </div>
   </header>
 
@@ -1937,7 +2018,7 @@
             filter:drop-shadow(0 1px 6px rgba(0,192,243,0.45));
           ">We Are Customer Inspired</span>
           <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
-          <button class="avatar-sm" id="user-avatar" onclick="confirmLogout()" title="Sign out" aria-label="Sign out">??</button>
+          <button class="avatar-sm" id="user-avatar" onclick="toggleUserMenu(this)" title="User menu" aria-label="User menu" aria-expanded="false" aria-controls="user-menu-panel">??</button>
         </div>
       </div>
 
@@ -5796,6 +5877,9 @@
       return;
     }
 
+    // Close user menu if open
+    closeUserMenu();
+
     // Position the panel anchored below the bell button
     const rect = bellBtn.getBoundingClientRect();
     panel.style.top  = (rect.bottom + 6) + 'px';
@@ -5824,6 +5908,42 @@
     panel.setAttribute('aria-hidden', 'true');
     document.getElementById('notif-backdrop').classList.remove('show');
     document.querySelectorAll('.notif-bell').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  }
+
+  // ── User Menu ──────────────────────────────────────────────────────────────
+  function toggleUserMenu(avatarBtn) {
+    const panel = document.getElementById('user-menu-panel');
+    if (panel.classList.contains('show')) { closeUserMenu(); return; }
+
+    // Close notif panel if open
+    closeNotifPanel();
+
+    // Populate user info
+    const initials = sessionStorage.getItem('sn_user_initials') || '??';
+    const name = sessionStorage.getItem('sn_user_name') || SN.username || '—';
+    document.getElementById('user-menu-avatar').textContent = initials;
+    document.getElementById('user-menu-name').textContent = name;
+
+    // Position anchored below the avatar button
+    const rect = avatarBtn.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 6) + 'px';
+    const panelW = 240;
+    const rightEdge = window.innerWidth - rect.right;
+    panel.style.right = Math.max(8, rightEdge) + 'px';
+    panel.style.left = 'auto';
+
+    panel.classList.add('show');
+    panel.setAttribute('aria-hidden', 'false');
+    document.getElementById('user-menu-backdrop').classList.add('show');
+    document.querySelectorAll('#user-avatar').forEach(b => b.setAttribute('aria-expanded', 'true'));
+  }
+
+  function closeUserMenu() {
+    const panel = document.getElementById('user-menu-panel');
+    panel.classList.remove('show');
+    panel.setAttribute('aria-hidden', 'true');
+    document.getElementById('user-menu-backdrop').classList.remove('show');
+    document.querySelectorAll('#user-avatar').forEach(b => b.setAttribute('aria-expanded', 'false'));
   }
 
   function renderNotifList() {
