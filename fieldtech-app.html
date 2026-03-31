@@ -787,7 +787,8 @@
 
   .detail-pills { display:flex; gap:6px; padding:10px 14px; flex-shrink:0; align-items:center; flex-wrap:wrap; }
 
-  .detail-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:20px; }
+  .detail-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:20px; min-height:0; }
+  #screen-more .detail-scroll > * { flex-shrink:0; }
 
   /* CUSTOMER BANNER */
   .cust-banner { position:relative; margin:12px 14px; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.18); border-left:3px solid var(--accent); border-radius:13px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
@@ -2556,58 +2557,56 @@
     <!-- ══ MORE ══ -->
     <div class="screen" id="screen-more">
       <div class="topbar"><span class="topbar-title" style="margin-left:4px;">More</span></div>
-      <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;">
+      <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
         <!-- ── Monthly Safety Checks ── -->
-        <div class="safety-section" id="safety-section">
-          <div class="safety-section-hd">
-            <h2 style="font-family:var(--sans);font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.01em;margin:0;">Monthly Safety Checks</h2>
-            <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill">All Clear</span>
-          </div>
-          <div class="safety-cards" id="safety-cards">
-            <!-- Vehicle Inspection Card -->
-            <div class="safety-card" id="safety-card-vehicle">
-              <div class="safety-card-top">
-                <div class="safety-card-title">
-                  <div class="safety-card-icon" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
-                  </div>
-                  <span class="safety-card-name">Vehicle Inspection</span>
+        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;">All Clear</span></h2>
+        <div class="card" id="safety-section">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Vehicle Inspection row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-vehicle">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+                <div style="min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Vehicle Inspection</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Brakes, tires, lights, fluids, mirrors</div>
+                  <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                 </div>
-                <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
               </div>
-              <div class="safety-card-info">Monthly vehicle safety check — brakes, tires, lights, fluid levels, mirrors, and general condition.</div>
-              <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;"></div>
-              <div class="safety-card-actions" id="safety-actions-vehicle">
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open in Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')">Mark Complete</button>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-vehicle">
+                <span class="safety-card-status status-pending" id="safety-status-vehicle" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>
+                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
               </div>
             </div>
-            <!-- Ladder Inspection Card -->
-            <div class="safety-card" id="safety-card-ladder">
-              <div class="safety-card-top">
-                <div class="safety-card-title">
-                  <div class="safety-card-icon" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
-                  </div>
-                  <span class="safety-card-name">Ladder Inspection</span>
+
+            <!-- Ladder Inspection row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-ladder">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
+                <div style="min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Ladder Inspection</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Rungs, locks, feet, hinges, weight rating</div>
+                  <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                 </div>
-                <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
               </div>
-              <div class="safety-card-info">Monthly ladder safety check — rungs, locks, feet, hinges, weight rating label, and structural integrity.</div>
-              <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;"></div>
-              <div class="safety-card-actions" id="safety-actions-ladder">
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open in Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')">Mark Complete</button>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-ladder">
+                <span class="safety-card-status status-pending" id="safety-status-ladder" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>
+                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
               </div>
             </div>
-          </div>
-          <div class="safety-progress">
-            <div class="safety-progress-label">
-              <span id="safety-progress-text">0 of 2 complete</span>
-              <span id="safety-days-remaining"></span>
+
+            <!-- Progress bar row -->
+            <div style="padding:10px 16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
+                <span id="safety-progress-text">0 of 2 complete</span>
+                <span id="safety-days-remaining"></span>
+              </div>
+              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
             </div>
-            <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
+
           </div>
         </div>
 
@@ -4348,6 +4347,9 @@
     if (name === 'calendar')  loadCalendarScreen();
     if (name === 'customers') loadCustomersScreen();
     localStorage.setItem('ft_tab', name);
+    // Sync desktop nav active state (network/links live under More)
+    const _dnavKey = {list:'list',customers:'customers',calendar:'calendar',cx360:'cx360',more:'more',network:'more',links:'more'};
+    setDesktopNav(_dnavKey[name] || name);
     if (typeof updateSafetyBadge === 'function') updateSafetyBadge();
   }
 
@@ -5942,12 +5944,6 @@
       if (!card) return;
 
       const done = !!_safetyChecks[t.key];
-      card.classList.toggle('safety-complete', done);
-
-      if (status) {
-        status.className = 'safety-card-status ' + (done ? 'status-done' : 'status-pending');
-        status.textContent = done ? 'Complete' : 'Pending';
-      }
       if (dateEl) {
         if (done) {
           const d = new Date(_safetyChecks[t.key]);
@@ -5958,15 +5954,15 @@
       if (actions) {
         if (done) {
           actions.innerHTML =
-            '<button class="safety-btn safety-btn-undo" onclick="undoSafetyCheck(\'' + escHtml(t.key) + '\')">' +
+            '<span class="safety-card-status status-done" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Complete</span>' +
+            '<button class="safety-btn safety-btn-undo" onclick="undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Undo</button>';
         } else {
           actions.innerHTML =
-            '<button class="safety-btn safety-btn-sospes" onclick="launchSospes(\'' + escHtml(t.key) + '\')">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
-              ' Open in Sospes</button>' +
-            '<button class="safety-btn safety-btn-primary" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')">Mark Complete</button>';
+            '<span class="safety-card-status status-pending" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>' +
+            '<button class="safety-btn safety-btn-sospes" onclick="launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
+            '<button class="safety-btn safety-btn-primary" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         }
       }
     });
