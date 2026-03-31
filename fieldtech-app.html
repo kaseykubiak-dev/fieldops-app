@@ -2767,7 +2767,7 @@
 
             <!-- Vehicle Inspection accordion -->
             <div class="accordion" id="safety-acc-vehicle" style="border-bottom:1px solid var(--border);">
-              <button class="acc-header" onclick="toggleAcc('safety-vehicle')" aria-expanded="false" style="padding:14px 16px;">
+              <div class="acc-header" onclick="toggleAcc('safety-vehicle')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
                 </div>
@@ -2775,6 +2775,7 @@
                   <span class="acc-title">Vehicle Inspection</span>
                   <span class="acc-sub">Brakes, tires, lights, fluids, mirrors</span>
                   <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                  <div id="safety-next-due-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-vehicle">
                   <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
@@ -2782,20 +2783,20 @@
                   <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
                 </div>
                 <svg class="acc-chevron" id="chev-safety-vehicle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
+              </div>
               <div class="acc-body" id="body-safety-vehicle">
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
                   <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <div style="min-width:0;">
-                      <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
-                      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label-vehicle">End of month (default)</div>
-                    </div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
                   </div>
                   <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                    <input id="safety-freq-input-vehicle" type="number" min="1" max="31" inputmode="numeric" style="width:44px;padding:4px 5px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency('vehicle',this.value)" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){this.blur();}">
-                    <span style="font-size:10px;color:var(--text-muted);">days</span>
-                    <button onclick="event.stopPropagation();setSafetyFrequency('vehicle',0);document.getElementById('safety-freq-input-vehicle').value='';" style="padding:3px 7px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+                    <select id="safety-freq-input-vehicle" onclick="event.stopPropagation()" style="padding:5px 8px;font-family:var(--mono);font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
+                      <option value="0">Remind me monthly</option>
+                      <option value="7">Remind me every 7 days</option>
+                      <option value="14">Remind me every 14 days</option>
+                    </select>
+                    <button onclick="event.stopPropagation();setSafetyFrequency('vehicle',document.getElementById('safety-freq-input-vehicle').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Confirm</button>
                   </div>
                 </div>
               </div>
@@ -2803,7 +2804,7 @@
 
             <!-- Ladder Inspection accordion -->
             <div class="accordion" id="safety-acc-ladder" style="border-bottom:none;">
-              <button class="acc-header" onclick="toggleAcc('safety-ladder')" aria-expanded="false" style="padding:14px 16px;">
+              <div class="acc-header" onclick="toggleAcc('safety-ladder')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
                 </div>
@@ -2811,6 +2812,7 @@
                   <span class="acc-title">Ladder Inspection</span>
                   <span class="acc-sub">Rungs, locks, feet, hinges, weight rating</span>
                   <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                  <div id="safety-next-due-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-ladder">
                   <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
@@ -2818,20 +2820,20 @@
                   <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
                 </div>
                 <svg class="acc-chevron" id="chev-safety-ladder" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
+              </div>
               <div class="acc-body" id="body-safety-ladder">
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,192,243,0.03);border-radius:0 0 12px 12px;">
                   <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <div style="min-width:0;">
-                      <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
-                      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" id="safety-freq-label-ladder">End of month (default)</div>
-                    </div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
                   </div>
                   <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                    <input id="safety-freq-input-ladder" type="number" min="1" max="31" inputmode="numeric" style="width:44px;padding:4px 5px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;" placeholder="31" onchange="setSafetyFrequency('ladder',this.value)" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){this.blur();}">
-                    <span style="font-size:10px;color:var(--text-muted);">days</span>
-                    <button onclick="event.stopPropagation();setSafetyFrequency('ladder',0);document.getElementById('safety-freq-input-ladder').value='';" style="padding:3px 7px;font-size:10px;font-weight:600;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;" title="Reset to end of month">Reset</button>
+                    <select id="safety-freq-input-ladder" onclick="event.stopPropagation()" style="padding:5px 8px;font-family:var(--mono);font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
+                      <option value="0">Remind me monthly</option>
+                      <option value="7">Remind me every 7 days</option>
+                      <option value="14">Remind me every 14 days</option>
+                    </select>
+                    <button onclick="event.stopPropagation();setSafetyFrequency('ladder',document.getElementById('safety-freq-input-ladder').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Confirm</button>
                   </div>
                 </div>
               </div>
@@ -6262,18 +6264,25 @@
         }
       }
 
-      // Update per-type frequency input
+      // Update per-type frequency dropdown
       const freq = _safetyFrequency[t.key] || 0;
-      const freqInput = document.getElementById('safety-freq-input-' + t.key);
-      if (freqInput && document.activeElement !== freqInput) {
-        freqInput.value = freq > 0 ? freq : '';
-        freqInput.placeholder = _safetyDaysInMonth() + '';
+      const freqSelect = document.getElementById('safety-freq-input-' + t.key);
+      if (freqSelect && document.activeElement !== freqSelect) {
+        freqSelect.value = String(freq);
       }
-      const freqLabel = document.getElementById('safety-freq-label-' + t.key);
-      if (freqLabel) {
-        freqLabel.textContent = freq > 0
-          ? 'Every ' + freq + ' day' + (freq !== 1 ? 's' : '')
-          : 'End of month (default)';
+
+      // Update "Next Inspection Due" line
+      const nextDueEl = document.getElementById('safety-next-due-' + t.key);
+      if (nextDueEl) {
+        if (!due) {
+          // Completed — show when next inspection is due
+          const info = _safetyCycleInfo(t.key);
+          const deadlineDate = info.deadline;
+          nextDueEl.textContent = 'Next Inspection Due: ' + deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.display = '';
+        } else {
+          nextDueEl.style.display = 'none';
+        }
       }
     });
 
