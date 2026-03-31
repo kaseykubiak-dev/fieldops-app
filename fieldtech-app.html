@@ -2827,6 +2827,15 @@
   let _notifFailCount     = 0;
   const _NOTIF_MAX_FAILS  = 3;
 
+  // Safety Check Tracker state (must be declared before showScreen references them)
+  const _SAFETY_TYPES = [
+    { key: 'vehicle', label: 'Vehicle Inspection' },
+    { key: 'ladder',  label: 'Ladder Inspection'  }
+  ];
+  let _safetyChecks = { vehicle: null, ladder: null };
+  let _safetyBannerDismissed = false;
+  let _safetyModalShown = false;
+
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
     const username = document.getElementById('login-username').value.trim();
@@ -5887,15 +5896,8 @@
   }
 
   // ── SAFETY CHECK TRACKER ──────────────────────────────────────────────────
-
-  let _safetyChecks = { vehicle: null, ladder: null };
-  let _safetyBannerDismissed = false;
-  let _safetyModalShown = false;
-
-  const _SAFETY_TYPES = [
-    { key: 'vehicle', label: 'Vehicle Inspection' },
-    { key: 'ladder',  label: 'Ladder Inspection'  }
-  ];
+  // State variables (_safetyChecks, _safetyBannerDismissed, _safetyModalShown, _SAFETY_TYPES)
+  // are declared in the App state section at the top of the script to avoid TDZ issues.
 
   function _safetyMonthKey() {
     const now = new Date();
