@@ -847,6 +847,7 @@
 
   .detail-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:20px; min-height:0; }
   #screen-more .detail-scroll > * { flex-shrink:0; }
+  #screen-techtools .detail-scroll > * { flex-shrink:0; }
 
   /* CUSTOMER BANNER */
   .cust-banner { position:relative; margin:12px 14px; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(0,192,243,0.18); border-left:3px solid var(--accent); border-radius:13px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
@@ -1129,10 +1130,12 @@
   html[data-mobile-preview] #screen-network,
   html[data-mobile-preview] #screen-calendar,
   html[data-mobile-preview] #screen-more { display:none !important; }
+  html[data-mobile-preview] #screen-techtools { display:none !important; }
   html[data-mobile-preview] #screen-customers.active,
   html[data-mobile-preview] #screen-network.active,
   html[data-mobile-preview] #screen-calendar.active,
   html[data-mobile-preview] #screen-more.active { display:flex !important; }
+  html[data-mobile-preview] #screen-techtools.active { display:flex !important; }
   html[data-mobile-preview] #screen-detail { display:none !important; }
   html[data-mobile-preview] #screen-detail.active { display:flex !important; }
   html[data-mobile-preview] .detail-topbar .back-btn { display:flex !important; }
@@ -1983,9 +1986,9 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         CX 360
       </button>
-      <button class="desktop-nav-btn" id="dnav-more" onclick="showScreen('more',null);setDesktopNav('more')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-        More<span class="dnav-safety-badge" id="safety-badge-desktop"></span>
+      <button class="desktop-nav-btn" id="dnav-techtools" onclick="showScreen('techtools',null);setDesktopNav('techtools')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Tools<span class="dnav-safety-badge" id="safety-badge-desktop"></span>
       </button>
     </nav>
     <div class="topbar-right">
@@ -2049,7 +2052,7 @@
         <div class="safety-banner-text" id="safety-banner-text">
           <strong>Safety checks due</strong> — You have incomplete monthly inspections.
         </div>
-        <button class="safety-banner-action" onclick="showScreen('more',document.getElementById('bnav-more'));setDesktopNav('more');">Review</button>
+        <button class="safety-banner-action" onclick="showScreen('techtools',document.getElementById('bnav-techtools'));">Review</button>
         <button class="safety-banner-dismiss" onclick="dismissSafetyBanner()" aria-label="Dismiss safety reminder">&times;</button>
       </div>
 
@@ -2555,7 +2558,7 @@
     <!-- ══ NETWORK / MERAKI ══ -->
     <div class="screen" id="screen-network">
       <div class="topbar">
-        <button class="icon-btn" onclick="showScreen('more',document.getElementById('bnav-more'));setDesktopNav('more');" style="margin-right:4px;" title="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="icon-btn" onclick="showScreen('techtools',document.getElementById('bnav-techtools'));" style="margin-right:4px;" title="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
         <span class="topbar-title">Network Equipment</span>
         <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:20px;background:rgba(84,49,97,0.25);color:#884d9d;border:1px solid rgba(136,77,157,0.4);margin-left:8px;">BETA</span>
         <div class="net-view-toggle">
@@ -2649,7 +2652,7 @@
     <!-- ══ IMPORTANT LINKS ══ -->
     <div class="screen" id="screen-links">
       <div class="topbar">
-        <button class="icon-btn" onclick="showScreen('more',document.getElementById('bnav-more'));setDesktopNav('more');" style="margin-right:4px;" title="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="icon-btn" onclick="showScreen('techtools',document.getElementById('bnav-techtools'));" style="margin-right:4px;" title="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
         <span class="topbar-title">Important Links</span>
       </div>
       <div class="detail-scroll" style="padding:12px 14px;min-height:0;">
@@ -2661,60 +2664,10 @@
     </div>
 
     <!-- ══ MORE ══ -->
+    <!-- SETTINGS SCREEN (formerly More — accessed via user menu) -->
     <div class="screen" id="screen-more">
-      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">More</span></div>
+      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Settings</span></div>
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
-
-        <!-- ── Monthly Safety Checks ── -->
-        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;">All Clear</span></h2>
-        <div class="card" id="safety-section">
-          <div class="card-body" style="padding:0;">
-
-            <!-- Progress bar row -->
-            <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
-              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
-                <span id="safety-progress-text">0 of 2 complete</span>
-                <span id="safety-days-remaining"></span>
-              </div>
-              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
-            </div>
-
-            <!-- Vehicle Inspection row -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-vehicle">
-              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
-                <div style="min-width:0;">
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Vehicle Inspection</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Brakes, tires, lights, fluids, mirrors</div>
-                  <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-vehicle">
-                <span class="safety-card-status status-pending" id="safety-status-vehicle" >Pending</span>
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
-              </div>
-            </div>
-
-            <!-- Ladder Inspection row -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-ladder">
-              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
-                <div style="min-width:0;">
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Ladder Inspection</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Rungs, locks, feet, hinges, weight rating</div>
-                  <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-ladder">
-                <span class="safety-card-status status-pending" id="safety-status-ladder" >Pending</span>
-                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
-                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
 
         <h2 class="section-title">Appearance</h2>
         <div class="card">
@@ -2770,35 +2723,6 @@
           </div>
         </div>
 
-        <h2 class="section-title" style="margin-top:4px;">Tools</h2>
-        <div class="card">
-          <div class="card-body" style="padding:0;">
-            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);width:100%;background:none;border-top:none;border-left:none;border-right:none;text-align:left;" onclick="showScreen('network',document.getElementById('bnav-more'));setDesktopNav('more');">
-              <div style="display:flex;align-items:center;gap:10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/><line x1="10" y1="6" x2="18" y2="6"/><line x1="10" y1="18" x2="18" y2="18"/></svg>
-                <div>
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:14px;font-weight:600;color:var(--text);">Network Equipment</span>
-                    <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:20px;background:rgba(84,49,97,0.25);color:#884d9d;border:1px solid rgba(136,77,157,0.4);">BETA</span>
-                  </div>
-                  <div style="font-size:11px;color:var(--text-muted);">View firewall, internet, and infrastructure details</div>
-                </div>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;width:100%;background:none;border:none;text-align:left;" onclick="showScreen('links',document.getElementById('bnav-more'));setDesktopNav('more');">
-              <div style="display:flex;align-items:center;gap:10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                <div>
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Important Links</div>
-                  <div style="font-size:11px;color:var(--text-muted);">Portals, order systems, and internal tools</div>
-                </div>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-        </div>
-
         <h2 class="section-title" style="margin-top:4px;">Account</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
@@ -2812,6 +2736,94 @@
               </div>
               <button onclick="confirmLogout()" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid rgba(255,82,82,0.4);background:rgba(255,82,82,0.1);color:var(--danger);cursor:pointer;">Sign Out</button>
             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TECH TOOLS SCREEN -->
+    <div class="screen" id="screen-techtools">
+      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Tech Tools</span></div>
+      <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
+
+        <!-- ── Monthly Safety Checks ── -->
+        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;">All Clear</span></h2>
+        <div class="card" id="safety-section">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Progress bar row -->
+            <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:5px;">
+                <span id="safety-progress-text">0 of 2 complete</span>
+                <span id="safety-days-remaining"></span>
+              </div>
+              <div class="safety-progress-bar-bg"><div class="safety-progress-bar-fill" id="safety-progress-bar" style="width:0%;"></div></div>
+            </div>
+
+            <!-- Vehicle Inspection row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-vehicle">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+                <div style="min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Vehicle Inspection</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Brakes, tires, lights, fluids, mirrors</div>
+                  <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-vehicle">
+                <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
+                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
+              </div>
+            </div>
+
+            <!-- Ladder Inspection row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px;" id="safety-card-ladder">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
+                <div style="min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Ladder Inspection</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Rungs, locks, feet, hinges, weight rating</div>
+                  <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-ladder">
+                <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
+                <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
+                <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h2 class="section-title" style="margin-top:4px;">Tools</h2>
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);width:100%;background:none;border-top:none;border-left:none;border-right:none;text-align:left;" onclick="showScreen('network',document.getElementById('bnav-techtools'));">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)" aria-hidden="true"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/><line x1="10" y1="6" x2="18" y2="6"/><line x1="10" y1="18" x2="18" y2="18"/></svg>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:14px;font-weight:600;color:var(--text);">Network Equipment</span>
+                    <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;padding:2px 7px;border-radius:20px;background:rgba(84,49,97,0.25);color:#884d9d;border:1px solid rgba(136,77,157,0.4);">BETA</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted);">View firewall, internet, and infrastructure details</div>
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;width:100%;background:none;border:none;text-align:left;" onclick="showScreen('links',document.getElementById('bnav-techtools'));">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Important Links</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Portals, order systems, and internal tools</div>
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
         </div>
 
@@ -2877,9 +2889,9 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       <span class="bnav-label">CX 360</span>
     </button>
-    <button class="bnav-btn" id="bnav-more" onclick="showScreen('more',this)" style="position:relative;">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-      <span class="bnav-label">More</span>
+    <button class="bnav-btn" id="bnav-techtools" onclick="showScreen('techtools',this)" style="position:relative;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="bnav-label">Tools</span>
       <span class="safety-badge-dot" id="safety-badge-mobile"></span>
     </button>
   </nav>
@@ -3000,9 +3012,9 @@
 
     // Restore last active tab, fallback to tickets
     const savedTab = localStorage.getItem('ft_tab') || 'list';
-    const bnavId   = { list:'bnav-tickets', customers:'bnav-customers', calendar:'bnav-calendar', cx360:'bnav-cx360', more:'bnav-more', network:'bnav-more' };
+    const bnavId   = { list:'bnav-tickets', customers:'bnav-customers', calendar:'bnav-calendar', cx360:'bnav-cx360', techtools:'bnav-techtools', more:'bnav-techtools', network:'bnav-techtools', links:'bnav-techtools' };
     showScreen(savedTab, document.getElementById(bnavId[savedTab] || 'bnav-tickets'));
-    setDesktopNav(savedTab === 'network' ? 'more' : savedTab);
+    setDesktopNav(savedTab === 'network' || savedTab === 'links' ? 'techtools' : savedTab);
 
     // Load tickets
     fetchTickets('today');
@@ -4447,7 +4459,7 @@
     renderTickets(filtered);
   }
 
-  const screenMap = { list:'screen-list', customers:'screen-customers', network:'screen-network', links:'screen-links', calendar:'screen-calendar', cx360:'screen-cx360', more:'screen-more' };
+  const screenMap = { list:'screen-list', customers:'screen-customers', network:'screen-network', links:'screen-links', calendar:'screen-calendar', cx360:'screen-cx360', more:'screen-more', techtools:'screen-techtools' };
 
   function showScreen(name, btn) {
     document.getElementById('screen-detail').classList.remove('active');
@@ -4462,8 +4474,8 @@
     if (name === 'calendar')  loadCalendarScreen();
     if (name === 'customers') loadCustomersScreen();
     localStorage.setItem('ft_tab', name);
-    // Sync desktop nav active state (network/links live under More)
-    const _dnavKey = {list:'list',customers:'customers',calendar:'calendar',cx360:'cx360',more:'more',network:'more',links:'more'};
+    // Sync desktop nav active state (network/links live under Tech Tools; more/settings has no nav tab)
+    const _dnavKey = {list:'list',customers:'customers',calendar:'calendar',cx360:'cx360',techtools:'techtools',network:'techtools',links:'techtools',more:''};
     setDesktopNav(_dnavKey[name] || name);
     if (typeof updateSafetyBadge === 'function') updateSafetyBadge();
   }
