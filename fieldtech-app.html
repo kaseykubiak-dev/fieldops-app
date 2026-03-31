@@ -1872,6 +1872,18 @@
   @media(min-width:800px)  { .safety-card:hover { transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,0.5),0 8px 24px rgba(0,0,0,0.4),0 14px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.18); transition:transform 0.2s,box-shadow 0.2s; } }
   @media(prefers-reduced-motion:reduce) { .safety-banner,.safety-modal-overlay,.safety-modal-card,.safety-badge-dot { animation:none !important; } }
 
+  /* Frequency-saved toast */
+  #safety-freq-toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--surface2,#1e2a38); color:var(--success,#22c55e);
+    border:1px solid var(--success,#22c55e); border-radius:8px;
+    padding:9px 18px; font-family:var(--mono,'Courier New',monospace); font-size:12px; font-weight:700;
+    white-space:nowrap; pointer-events:none; z-index:10001;
+    opacity:0; transition:opacity 0.2s ease, transform 0.2s ease;
+    display:flex; align-items:center; gap:7px; box-shadow:0 4px 16px rgba(0,0,0,0.35);
+  }
+  #safety-freq-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
   /* Light theme overrides */
   html[data-theme="cspire"] .safety-card { background:var(--card-bg); border:1px solid var(--card-border); box-shadow:var(--card-shadow); border-left:3px solid var(--accent); }
   html[data-theme="cspire"] .safety-card.safety-complete { border-left-color:var(--success); }
@@ -6183,6 +6195,16 @@
     renderSafetyBanner();
   }
 
+  function _showFreqToast(msg) {
+    const toast = document.getElementById('safety-freq-toast');
+    const msgEl = document.getElementById('safety-freq-toast-msg');
+    if (!toast) return;
+    if (msgEl) msgEl.textContent = msg || 'Reminder frequency updated';
+    if (toast._hideTimer) clearTimeout(toast._hideTimer);
+    toast.classList.add('show');
+    toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
   function setSafetyFrequency(type, val) {
     const days = parseInt(val, 10) || 0;
     const maxDays = _safetyDaysInMonth();
@@ -6192,6 +6214,10 @@
     } else {
       localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
     }
+    // Build a human-readable confirmation label
+    const typeLabel = type === 'vehicle' ? 'Vehicle' : type === 'ladder' ? 'Ladder' : type.charAt(0).toUpperCase() + type.slice(1);
+    const freqLabel = _safetyFrequency[type] === 0 ? 'monthly' : 'every ' + _safetyFrequency[type] + ' days';
+    _showFreqToast(typeLabel + ' inspection set to remind ' + freqLabel);
     renderSafetySection();
     updateSafetyBadge();
     renderSafetyBanner();
@@ -6275,10 +6301,20 @@
       const nextDueEl = document.getElementById('safety-next-due-' + t.key);
       if (nextDueEl) {
         if (!due) {
-          // Completed — show when next inspection is due
-          const info = _safetyCycleInfo(t.key);
-          const deadlineDate = info.deadline;
-          nextDueEl.textContent = 'Next Inspection Due: ' + deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          // Completed — calculate the NEXT due date (not capped to current month)
+          const freq = _safetyFrequency[t.key] || 0;
+          const now = new Date();
+          let nextDate;
+          if (freq <= 0) {
+            // Monthly: next inspection is due at end of next month
+            nextDate = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+          } else {
+            // 7 or 14 days: next inspection = completion date + freq days
+            const ts = _safetyChecks[t.key];
+            const completedAt = ts ? new Date(ts) : now;
+            nextDate = new Date(completedAt.getTime() + freq * 86400000);
+          }
+          nextDueEl.textContent = 'Next Inspection Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
           nextDueEl.style.display = '';
         } else {
           nextDueEl.style.display = 'none';
@@ -6419,6 +6455,12 @@
       <button class="safety-modal-btn safety-modal-btn-acknowledge" onclick="acknowledgeSafetyModal()">I'll complete later today</button>
     </div>
   </div>
+</div>
+
+<!-- Frequency-saved toast -->
+<div id="safety-freq-toast" role="status" aria-live="polite">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="safety-freq-toast-msg">Reminder frequency updated</span>
 </div>
 
 </body>
