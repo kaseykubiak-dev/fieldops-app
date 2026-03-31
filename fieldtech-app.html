@@ -1813,6 +1813,8 @@
   .safety-btn-primary:active { transform:scale(0.97); }
   .safety-btn-sospes { background:rgba(255,103,32,0.15); color:var(--accent2); border:1px solid rgba(255,103,32,0.3); }
   .safety-btn-sospes:hover { background:rgba(255,103,32,0.25); }
+  .safety-btn-truckstock { background:rgba(0,201,106,0.15); color:var(--success); border:1px solid rgba(0,201,106,0.3); }
+  .safety-btn-truckstock:hover { background:rgba(0,201,106,0.25); }
   .safety-btn-undo { background:rgba(255,255,255,0.06); color:var(--text-muted); border:1px solid var(--border); }
   .safety-btn-undo:hover { background:rgba(255,255,255,0.1); }
 
@@ -2854,6 +2856,50 @@
           </div>
         </div>
 
+        <!-- ── Inventory Management ── -->
+        <h2 class="section-title" style="margin-top:4px;">Inventory Management</h2>
+        <div class="card" id="inventory-section">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Inventory Report accordion -->
+            <div class="accordion" id="inventory-acc-inventory" style="border-bottom:none;">
+              <div class="acc-header" onclick="toggleAcc('inventory-inventory')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
+                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,201,106,0.15),rgba(0,201,106,0.05));box-shadow:0 1px 4px rgba(0,201,106,0.12);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <div class="acc-header-info" id="inventory-card-inventory">
+                  <span class="acc-title">Inventory Report</span>
+                  <span class="acc-sub">Truck stock, tools, and supplies</span>
+                  <div class="safety-card-completed-date" id="inventory-date-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                  <div id="inventory-next-due-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="inventory-actions-inventory">
+                  <span class="safety-card-status status-pending" id="inventory-status-inventory">Pending</span>
+                  <button class="safety-btn safety-btn-truckstock" onclick="event.stopPropagation();launchTruckStock()" style="padding:6px 12px;font-size:11px;">Truck Stock</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markInventoryComplete('inventory')" style="padding:6px 12px;font-size:11px;">Done</button>
+                </div>
+                <svg class="acc-chevron" id="chev-inventory-inventory" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="acc-body" id="body-inventory-inventory">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,201,106,0.03);border-radius:0 0 12px 12px;">
+                  <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                    <select id="inventory-freq-input-inventory" onclick="event.stopPropagation()" style="padding:5px 8px;font-family:var(--mono);font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
+                      <option value="7">Remind me every 7 days</option>
+                      <option value="14">Remind me every 14 days</option>
+                    </select>
+                    <button onclick="event.stopPropagation();setInventoryFrequency('inventory',document.getElementById('inventory-freq-input-inventory').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(0,201,106,0.35);background:rgba(0,201,106,0.1);color:var(--success);cursor:pointer;">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <h2 class="section-title" style="margin-top:4px;">Tools</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
@@ -2986,6 +3032,13 @@
   let _safetyModalShown = false;
   let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month (default), 1-31 = custom cycle in days
 
+  // Inventory Tracker state
+  const _INVENTORY_TYPES = [
+    { key: 'inventory', label: 'Inventory Report' }
+  ];
+  let _inventoryChecks    = { inventory: null };
+  let _inventoryFrequency = { inventory: 7 }; // 7 or 14 days only (no monthly option)
+
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
     const username = document.getElementById('login-username').value.trim();
@@ -3082,6 +3135,9 @@
     // Safety check tracker — init + show modal if overdue
     initSafetyChecks();
     checkSafetyModal();
+
+    // Inventory tracker — init
+    initInventoryChecks();
   }
 
   async function forceAppRefresh() {
@@ -4719,7 +4775,7 @@
   //   - Due / overdue        → current cycle deadline from _safetyCycleInfo
   function getInspectionDueDates() {
     const today = new Date();
-    return ['vehicle', 'ladder'].map(type => {
+    const safetyItems = ['vehicle', 'ladder'].map(type => {
       const freq = (_safetyFrequency && _safetyFrequency[type]) || 0;
       const isDue = (typeof _isSafetyDue === 'function') ? _isSafetyDue(type) : true;
       let dueDate;
@@ -4751,6 +4807,25 @@
         dueStr:     calDateStr(dueDate)
       };
     });
+
+    // Append inventory due dates — always cyclic (7 or 14 days), no monthly option.
+    // _inventoryCycleInfo returns the correct deadline in all states (due or not due).
+    const inventoryItems = (_INVENTORY_TYPES || []).map(t => {
+      let dueDate;
+      if (typeof _inventoryCycleInfo === 'function') {
+        dueDate = _inventoryCycleInfo(t.key).deadline;
+      } else {
+        dueDate = new Date(today.getTime() + 7 * 86400000); // fallback
+      }
+      return {
+        type:       t.key,
+        label:      'Inventory Report Due',
+        shortLabel: 'Inventory Rpt.',
+        dueStr:     calDateStr(dueDate)
+      };
+    });
+
+    return [...safetyItems, ...inventoryItems];
   }
 
   function initCalState() {
@@ -6467,6 +6542,131 @@
     } else {
       window.open('https://play.google.com/store/apps/details?id=com.sospesinc.safety', '_blank');
     }
+  }
+
+  // ── INVENTORY TRACKER ────────────────────────────────────────────────────
+  // Parallel to the safety check system but cyclic-only (7 or 14 days; no monthly).
+  // State: _INVENTORY_TYPES, _inventoryChecks, _inventoryFrequency (declared in app state).
+
+  function _inventoryLsKey(type) { return 'ft_inventory_' + type; }
+
+  // Returns { deadline: Date, daysLeft: number, cycleDays: number } for the current cycle.
+  // Always cyclic — deadline = last completion + freq days (or today if never completed).
+  function _inventoryCycleInfo(type) {
+    const now  = new Date();
+    const freq = _inventoryFrequency[type] || 7;
+    const ts   = _inventoryChecks[type];
+    if (!ts) {
+      // Never completed — deadline is today (overdue from the start)
+      const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { deadline, daysLeft: 0, cycleDays: freq };
+    }
+    const lastDone = new Date(ts);
+    const deadline = new Date(lastDone.getTime() + freq * 86400000);
+    const daysLeft = Math.max(0, Math.ceil((deadline.getTime() - now.getTime()) / 86400000));
+    return { deadline, daysLeft, cycleDays: freq };
+  }
+
+  // Returns true if the inventory report is due or overdue.
+  function _isInventoryDue(type) {
+    const ts = _inventoryChecks[type];
+    if (!ts) return true; // never completed
+    const freq      = _inventoryFrequency[type] || 7;
+    const completed = new Date(ts);
+    const elapsed   = (Date.now() - completed.getTime()) / 86400000;
+    return elapsed >= freq;
+  }
+
+  function initInventoryChecks() {
+    _INVENTORY_TYPES.forEach(t => {
+      const storedFreq = localStorage.getItem('ft_inventory_freq_' + t.key);
+      const parsed     = storedFreq ? parseInt(storedFreq, 10) : NaN;
+      _inventoryFrequency[t.key] = (parsed === 7 || parsed === 14) ? parsed : 7;
+      const stored = localStorage.getItem(_inventoryLsKey(t.key));
+      _inventoryChecks[t.key] = stored || null;
+    });
+    renderInventorySection();
+  }
+
+  function setInventoryFrequency(type, val) {
+    const days = parseInt(val, 10) || 7;
+    _inventoryFrequency[type] = (days === 14) ? 14 : 7; // clamp to 7 or 14
+    localStorage.setItem('ft_inventory_freq_' + type, String(_inventoryFrequency[type]));
+    _showFreqToast('Inventory report set to remind every ' + _inventoryFrequency[type] + ' days');
+    renderInventorySection();
+  }
+
+  function markInventoryComplete(type) {
+    const ts = new Date().toISOString();
+    _inventoryChecks[type] = ts;
+    localStorage.setItem(_inventoryLsKey(type), ts);
+    renderInventorySection();
+  }
+
+  function undoInventoryCheck(type) {
+    _inventoryChecks[type] = null;
+    localStorage.removeItem(_inventoryLsKey(type));
+    renderInventorySection();
+  }
+
+  function renderInventorySection() {
+    _INVENTORY_TYPES.forEach(t => {
+      const dateEl  = document.getElementById('inventory-date-' + t.key);
+      const actions = document.getElementById('inventory-actions-' + t.key);
+      const due     = _isInventoryDue(t.key);
+      const hasTs   = !!_inventoryChecks[t.key];
+
+      // Completed-date line
+      if (dateEl) {
+        if (hasTs) {
+          const d      = new Date(_inventoryChecks[t.key]);
+          const prefix = due ? 'Last completed ' : 'Completed ';
+          dateEl.textContent = prefix + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+          dateEl.style.display = '';
+        } else {
+          dateEl.style.display = 'none';
+        }
+      }
+
+      // Action buttons
+      if (actions) {
+        if (!due) {
+          actions.innerHTML =
+            '<span class="safety-card-status status-done">Complete</span>' +
+            '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoInventoryCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
+              ' Undo</button>';
+        } else {
+          actions.innerHTML =
+            '<span class="safety-card-status status-pending">Pending</span>' +
+            '<button class="safety-btn safety-btn-truckstock" onclick="event.stopPropagation();launchTruckStock()" style="padding:6px 12px;font-size:11px;">Truck Stock</button>' +
+            '<button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markInventoryComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
+        }
+      }
+
+      // Frequency dropdown sync
+      const freqSelect = document.getElementById('inventory-freq-input-' + t.key);
+      if (freqSelect && document.activeElement !== freqSelect) {
+        freqSelect.value = String(_inventoryFrequency[t.key] || 7);
+      }
+
+      // "Next Report Due" line
+      const nextDueEl = document.getElementById('inventory-next-due-' + t.key);
+      if (nextDueEl) {
+        if (!due) {
+          const info = _inventoryCycleInfo(t.key);
+          nextDueEl.textContent = 'Next Report Due: ' + info.deadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.display = '';
+        } else {
+          nextDueEl.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  function launchTruckStock() {
+    // URL to be provided — placeholder opens a blank tab
+    window.open('about:blank', '_blank');
   }
 </script>
 
