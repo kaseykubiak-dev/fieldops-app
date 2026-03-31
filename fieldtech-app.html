@@ -1887,6 +1887,21 @@
   html[data-theme="cspire"] .safety-modal-item { background:rgba(0,0,0,0.03); border-color:var(--border); }
   html[data-theme="cspire"] .safety-card-icon { background:rgba(0,192,243,0.1); }
   html[data-theme="cspire"] .safety-card.safety-complete .safety-card-icon { background:rgba(0,192,106,0.1); }
+
+  /* ── Calendar inspection due banners ─────────────────────────────────────── */
+  /* Month grid chip — follows .cal-chip pattern, red accent */
+  .cal-chip.chip-inspection { border-left-color:var(--danger); color:#ff6b6b; background:rgba(255,59,48,0.11); font-weight:700; position:relative; overflow:hidden; }
+  .cal-chip.chip-inspection::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(255,255,255,0.05) 0%,transparent 60%); pointer-events:none; }
+  /* Week view inspection banner */
+  .cal-week-inspection { position:relative; background:rgba(255,59,48,0.10); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border:1px solid rgba(255,59,48,0.28); border-left:3px solid var(--danger); border-radius:7px; padding:5px 8px; margin-bottom:5px; display:flex; align-items:center; gap:5px; font-family:var(--sans); font-size:11px; font-weight:700; color:#ff6b6b; letter-spacing:0.01em; box-shadow:0 1px 4px rgba(255,59,48,0.12),inset 0 1px 0 rgba(255,255,255,0.06); overflow:hidden; }
+  .cal-week-inspection::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(255,255,255,0.04) 0%,transparent 50%); pointer-events:none; }
+  /* Agenda inspection banner — full-width, matches .cal-mini-card depth */
+  .cal-agenda-inspection { position:relative; background:rgba(255,59,48,0.10); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,59,48,0.28); border-left:3px solid var(--danger); border-radius:9px; padding:8px 11px; margin-bottom:6px; display:flex; align-items:center; gap:8px; font-family:var(--sans); font-size:12px; font-weight:700; color:#ff6b6b; letter-spacing:0.01em; box-shadow:0 1px 3px rgba(255,59,48,0.12),0 3px 10px rgba(255,59,48,0.08),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.12); overflow:hidden; }
+  .cal-agenda-inspection::after { content:''; position:absolute; inset:0; background:linear-gradient(105deg,rgba(255,255,255,0.05) 0%,transparent 40%,rgba(255,255,255,0.02) 80%,transparent 100%); pointer-events:none; }
+  /* Light theme overrides */
+  html[data-theme="cspire"] .cal-chip.chip-inspection { background:rgba(220,38,38,0.09); color:#dc2626; border-left-color:#dc2626; }
+  html[data-theme="cspire"] .cal-week-inspection { background:rgba(220,38,38,0.07); border-color:rgba(220,38,38,0.22); border-left-color:#dc2626; color:#dc2626; box-shadow:0 1px 4px rgba(220,38,38,0.10),inset 0 1px 0 rgba(255,255,255,0.6); }
+  html[data-theme="cspire"] .cal-agenda-inspection { background:rgba(220,38,38,0.07); border-color:rgba(220,38,38,0.22); border-left-color:#dc2626; color:#dc2626; box-shadow:0 1px 3px rgba(220,38,38,0.10),0 3px 10px rgba(220,38,38,0.06),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); }
 </style>
 </head>
 <body>
@@ -4697,6 +4712,33 @@
   let _cal = { year: null, month: null, tickets: null, selectedDay: null };
   let _calView = 'month'; // 'month' | 'week'
 
+  // Returns [{type, label, shortLabel, dueStr}] for both inspection types.
+  // Reads _safetyChecks and _safetyFrequency to compute each next due date.
+  // freq 0 = monthly (last day of current month); 7/14 = completion + N days.
+  function getInspectionDueDates() {
+    const today = new Date();
+    return ['vehicle', 'ladder'].map(type => {
+      const freq = (_safetyFrequency && _safetyFrequency[type]) || 0;
+      let dueDate;
+      if (freq === 0) {
+        dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // last day of month
+      } else {
+        const lastDone = _safetyChecks && _safetyChecks[type];
+        if (lastDone) {
+          dueDate = new Date(new Date(lastDone).getTime() + freq * 86400000);
+        } else {
+          dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        }
+      }
+      return {
+        type,
+        label:      type === 'vehicle' ? 'Vehicle Inspection Due' : 'Ladder Inspection Due',
+        shortLabel: type === 'vehicle' ? 'Vehicle Insp.'          : 'Ladder Insp.',
+        dueStr:     calDateStr(dueDate)
+      };
+    });
+  }
+
   function initCalState() {
     const now = new Date();
     _cal.year  = now.getFullYear();
@@ -4917,6 +4959,7 @@
 
     const todayStr = calDateStr(new Date());
     const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const inspectionDueDates = getInspectionDueDates();
 
     let html = '<div class="cal-week-view">';
     days.forEach((d, i) => {
@@ -4934,8 +4977,12 @@
       html += '</div>';
       html += '<div class="cal-week-col-body">';
 
+      const dayDueBanners = inspectionDueDates.filter(b => b.dueStr === dStr);
+      dayDueBanners.forEach(b => {
+        html += `<div class="cal-week-inspection"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(b.label)}</div>`;
+      });
       if (dayTix.length === 0) {
-        html += '<div class="cal-week-empty">No tickets</div>';
+        if (dayDueBanners.length === 0) html += '<div class="cal-week-empty">No tickets</div>';
       } else {
         dayTix.forEach(inc => {
           const company = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || inc.number || '';
@@ -4999,6 +5046,7 @@
     const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
     const totalDays = new Date(year, month+1, 0).getDate();
     const PRI_CLS = { '1':'critical','2':'high','3':'medium','4':'low','5':'low' };
+    const inspectionDueDates = getInspectionDueDates();
 
     let html = '';
     let dayNum = 1 - firstDow;
@@ -5023,8 +5071,12 @@
         html += `<div class="${cls}" onclick="selectCalDay('${dStr}')">`;
         html += `<span class="cal-day-num">${d.getDate()}</span>`;
 
-        if (dayTix.length > 0) {
+        const dueBanners = inMonth ? inspectionDueDates.filter(b => b.dueStr === dStr) : [];
+        if (dayTix.length > 0 || dueBanners.length > 0) {
           html += '<div class="cal-chips">';
+          dueBanners.forEach(b => {
+            html += `<div class="cal-chip chip-inspection">${escHtml(b.shortLabel)}</div>`;
+          });
           dayTix.slice(0, 2).forEach(inc => {
             const typeCls = getCaseType(inc).cls === 'installation' ? 'chip-install' : 'chip-repair';
             const company = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || inc.number || '';
@@ -5074,6 +5126,7 @@
 
     const todayStr  = calDateStr(new Date());
     const totalDays = new Date(year, month + 1, 0).getDate();
+    const inspectionDueDates = getInspectionDueDates();
 
     let html = '<div class="cal-agenda">';
 
@@ -5091,8 +5144,12 @@
       </div>`;
       html += '<div class="cal-agenda-cards">';
 
+      const dayDueBanners = inspectionDueDates.filter(b => b.dueStr === dStr);
+      dayDueBanners.forEach(b => {
+        html += `<div class="cal-agenda-inspection"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(b.label)}</div>`;
+      });
       if (dayTix.length === 0) {
-        html += `<div class="cal-agenda-empty">No tickets assigned</div>`;
+        if (dayDueBanners.length === 0) html += `<div class="cal-agenda-empty">No tickets assigned</div>`;
       } else {
         dayTix.forEach(inc => {
           const pri      = PRIORITY_MAP[inc.priority] || { label:'Low',  cls:'pill-low'  };
@@ -5416,1012 +5473,4 @@
 
       devices.forEach(d => {
         const id      = d.id;
-        const stCls   = d.reachabilityStatus === 'Reachable'      ? 'online'
-                      : d.reachabilityStatus === 'Ping Reachable' ? 'alerting' : 'offline';
-        const typeLabel = getCatalystDeviceType(d.family);
-        const health  = healthMap[d.hostname] || {};
-        const ifaces  = (ifaceMap[id] || []).sort((a,b) => (a.portName||'').localeCompare(b.portName||''));
-        const upIfaces = ifaces.filter(i => i.status === 'up').length;
-
-        // ── Health score colour ──
-        const hs      = health.overallHealth ?? null;
-        const hsCls   = hs === null ? '' : hs >= 8 ? 'good' : hs >= 4 ? 'warn' : 'bad';
-
-        // ── CPU / memory bar colour ──
-        const barCls  = v => v >= 80 ? 'bad' : v >= 60 ? 'warn' : 'good';
-        const cpu     = health.cpuUtilization  != null ? Math.round(health.cpuUtilization)  : null;
-        const mem     = health.memoryUtilization != null ? Math.round(health.memoryUtilization) : null;
-
-        html += `
-        <div class="device-card" id="dev-card-${escHtml(id)}">
-          <div class="device-card-header" onclick="toggleDeviceCard('${escHtml(id)}')">
-            <span class="device-status-dot ${stCls}"></span>
-            <div class="device-header-main">
-              <div class="device-header-name">${escHtml(d.hostname || d.serialNumber || '—')}</div>
-              <div class="device-header-sub">
-                <span class="device-role-badge">${escHtml(typeLabel)}</span>
-                <span class="device-header-ip">${escHtml(d.managementIpAddress || '—')}</span>
-                ${d.reachabilityFailureReason && d.reachabilityFailureReason !== 'NA'
-                  ? `<span style="font-size:11px;color:var(--danger)">${escHtml(d.reachabilityFailureReason)}</span>` : ''}
-              </div>
-            </div>
-            <span class="device-header-model">${escHtml(d.platformId || '')}</span>
-            <svg class="device-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-
-          <div class="device-card-body">
-
-            <!-- Section: Device Details -->
-            <div class="dev-section open">
-              <div class="dev-section-hd" onclick="toggleDevSection(this)">
-                <span class="dev-section-title">Device Details</span>
-                <svg class="dev-section-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-              <div class="dev-section-body">
-                <div class="kv-grid">
-                  <div class="kv-item"><span class="kv-key">Type</span><span class="kv-val">${escHtml(d.type || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Platform</span><span class="kv-val">${escHtml(d.platformId || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">IOS Version</span><span class="kv-val">${escHtml(d.softwareVersion || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Role</span><span class="kv-val">${escHtml(d.role || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Uptime</span><span class="kv-val">${escHtml(d.upTime || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Status</span><span class="kv-val">${escHtml(d.reachabilityStatus || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Serial</span><span class="kv-val">${escHtml(d.serialNumber || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">MAC</span><span class="kv-val">${escHtml(d.macAddress || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Mgmt IP</span><span class="kv-val">${escHtml(d.managementIpAddress || '—')}</span></div>
-                  <div class="kv-item"><span class="kv-key">Collection</span><span class="kv-val">${escHtml(d.collectionStatus || '—')}</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Section: Performance -->
-            <div class="dev-section">
-              <div class="dev-section-hd" onclick="toggleDevSection(this)">
-                <span class="dev-section-title">Performance</span>
-                <svg class="dev-section-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-              <div class="dev-section-body">
-                ${hs !== null ? `
-                <div class="health-score-row">
-                  <span class="health-score-num ${hsCls}">${hs}</span>
-                  <div>
-                    <div style="font-size:13px;font-weight:600;color:var(--text)">Health Score</div>
-                    <div class="health-score-meta">out of 10 · ${hs >= 8 ? 'Good' : hs >= 4 ? 'Fair' : 'Poor'}</div>
-                  </div>
-                </div>` : ''}
-                <div class="perf-rows">
-                  ${cpu !== null ? `
-                  <div class="perf-row">
-                    <span class="perf-label">CPU</span>
-                    <div class="perf-track"><div class="perf-fill ${barCls(cpu)}" style="width:${cpu}%"></div></div>
-                    <span class="perf-val">${cpu}%</span>
-                  </div>` : ''}
-                  ${mem !== null ? `
-                  <div class="perf-row">
-                    <span class="perf-label">Memory</span>
-                    <div class="perf-track"><div class="perf-fill ${barCls(mem)}" style="width:${mem}%"></div></div>
-                    <span class="perf-val">${mem}%</span>
-                  </div>` : ''}
-                  ${hs === null && cpu === null ? '<span style="font-size:12px;color:var(--text-muted)">No performance data available.</span>' : ''}
-                </div>
-              </div>
-            </div>
-
-            <!-- Section: Interfaces -->
-            <div class="dev-section">
-              <div class="dev-section-hd" onclick="toggleDevSection(this)">
-                <span class="dev-section-title">Interfaces (${ifaces.length}) · ${upIfaces} up</span>
-                <svg class="dev-section-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-              <div class="dev-section-body">
-                ${ifaces.length ? `
-                <div class="iface-list">
-                  ${ifaces.map(i => `
-                  <div class="iface-row">
-                    <span class="iface-dot ${i.status === 'up' ? 'up' : 'down'}"></span>
-                    <span class="iface-name">${escHtml(i.portName || '—')}</span>
-                    <span class="iface-speed">${formatIfaceSpeed(i.speed)}</span>
-                    <span class="iface-vlan">${i.vlanId && i.vlanId !== '0' ? 'VLAN ' + escHtml(i.vlanId) : ''}</span>
-                    <span class="iface-ip">${escHtml(i.ipv4Address || '')}</span>
-                  </div>`).join('')}
-                </div>` : '<span style="font-size:12px;color:var(--text-muted)">No interface data available.</span>'}
-              </div>
-            </div>
-
-          </div>
-        </div>`;
-      });
-
-      container.innerHTML = html;
-  }
-
-  function toggleDeviceCard(id) {
-    document.getElementById(`dev-card-${id}`).classList.toggle('open');
-  }
-
-  function toggleDevSection(headerEl) {
-    headerEl.closest('.dev-section').classList.toggle('open');
-  }
-
-  // ── Topology view ────────────────────────────────────────────────────────────
-  function runForceLayout(nodes, links, W, H) {
-    const N = nodes.length;
-    if (!N) return;
-    const ideal = Math.min(W, H) * 0.32;
-    nodes.forEach((n, i) => {
-      n.x  = W/2 + Math.cos(2*Math.PI*i/N) * ideal;
-      n.y  = H/2 + Math.sin(2*Math.PI*i/N) * ideal;
-      n.vx = 0; n.vy = 0;
-    });
-    for (let iter = 0; iter < 400; iter++) {
-      const cool = Math.max(0.02, 1 - iter/360);
-      nodes.forEach(n => { n.fx = 0; n.fy = 0; });
-      // Repulsion
-      for (let i = 0; i < N; i++) {
-        for (let j = i+1; j < N; j++) {
-          const a = nodes[i], b = nodes[j];
-          const dx = b.x - a.x || 0.01, dy = b.y - a.y || 0.01;
-          const d2 = dx*dx + dy*dy, d = Math.sqrt(d2);
-          const f = (ideal*ideal*1.1) / d2;
-          a.fx -= f*(dx/d); a.fy -= f*(dy/d);
-          b.fx += f*(dx/d); b.fy += f*(dy/d);
-        }
-      }
-      // Attraction along links
-      links.forEach(l => {
-        const s = nodes.find(n => n.id === l.source);
-        const t = nodes.find(n => n.id === l.target);
-        if (!s || !t) return;
-        const dx = t.x - s.x, dy = t.y - s.y;
-        const d = Math.sqrt(dx*dx + dy*dy) || 0.01;
-        const f = (d - ideal) * 0.25;
-        s.fx += f*(dx/d); s.fy += f*(dy/d);
-        t.fx -= f*(dx/d); t.fy -= f*(dy/d);
-      });
-      // Weak center gravity
-      nodes.forEach(n => {
-        n.fx += (W/2 - n.x) * 0.015;
-        n.fy += (H/2 - n.y) * 0.015;
-      });
-      // Integrate
-      const maxSpd = ideal * cool;
-      nodes.forEach(n => {
-        n.vx = (n.vx + n.fx) * 0.65;
-        n.vy = (n.vy + n.fy) * 0.65;
-        const spd = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
-        if (spd > maxSpd) { n.vx *= maxSpd/spd; n.vy *= maxSpd/spd; }
-        n.x += n.vx; n.y += n.vy;
-        const pad = 64;
-        n.x = Math.max(pad, Math.min(W - pad, n.x));
-        n.y = Math.max(pad, Math.min(H - pad, n.y));
-      });
-    }
-  }
-
-  function renderTopologyView() {
-    const { devices, healthMap, topoNodes, topoLinks } = _networkCache;
-    const wrap = document.getElementById('topo-svg-wrap');
-    const W = wrap.clientWidth  || 600;
-    const H = wrap.clientHeight || 400;
-
-    // Use topology nodes from API; fall back to device list if empty
-    let nodes;
-    if (topoNodes.length) {
-      nodes = topoNodes.map(n => ({ ...n }));
-    } else {
-      nodes = devices.map(d => ({
-        id: d.id, label: d.hostname, ip: d.managementIpAddress,
-        role: d.role, reachabilityStatus: d.reachabilityStatus,
-        family: d.family, nodeType: 'device'
-      }));
-    }
-
-    // Enrich nodes with health + device info from cache
-    const devById = {};
-    devices.forEach(d => { devById[d.id] = d; });
-
-    runForceLayout(nodes, topoLinks, W, H);
-
-    const nodeById = {};
-    nodes.forEach(n => { nodeById[n.id] = n; });
-
-    const statusColor = n => {
-      const dev = devById[n.id];
-      const st  = dev ? dev.reachabilityStatus : (n.reachabilityStatus || '');
-      if (st === 'Reachable')      return '#00c96a';
-      if (st === 'Ping Reachable') return '#f59e0b';
-      if (st === 'Unreachable')    return '#ff5252';
-      return '#6889a5';
-    };
-
-    const typeAbbr = n => {
-      const f = (devById[n.id]?.family || n.family || '').toLowerCase();
-      if (f.includes('router'))  return 'RTR';
-      if (f.includes('switch'))  return 'SW';
-      if (f.includes('wireless'))return 'AP';
-      if (f.includes('firewall'))return 'FW';
-      return 'DEV';
-    };
-
-    // SVG
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="display:block">
-  <defs>
-    <pattern id="topo-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-      <circle cx="16" cy="16" r="1" fill="#252a3a" opacity="0.6"/>
-    </pattern>
-  </defs>
-  <rect width="${W}" height="${H}" fill="url(#topo-grid)"/>`;
-
-    // Links
-    topoLinks.forEach(l => {
-      const s = nodeById[l.source], t = nodeById[l.target];
-      if (!s || !t) return;
-      const color = l.linkStatus === 'UP' ? '#00c96a' : l.linkStatus === 'DOWN' ? '#ff5252' : '#6889a5';
-      const mx = (s.x + t.x) / 2, my = (s.y + t.y) / 2;
-      svg += `<line x1="${s.x.toFixed(1)}" y1="${s.y.toFixed(1)}" x2="${t.x.toFixed(1)}" y2="${t.y.toFixed(1)}"
-        stroke="${color}" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="${l.linkStatus === 'DOWN' ? '6,4' : 'none'}"/>`;
-      if (l.startPortName) {
-        svg += `<text x="${mx.toFixed(1)}" y="${(my - 5).toFixed(1)}" text-anchor="middle"
-          font-size="8" fill="#6889a5" font-family="IBM Plex Mono, monospace"
-          style="pointer-events:none">${escHtml(l.startPortName)}</text>`;
-      }
-    });
-
-    // Nodes
-    nodes.forEach(n => {
-      const col  = statusColor(n);
-      const abbr = typeAbbr(n);
-      const lbl  = escHtml((n.label || n.ip || '').length > 14 ? (n.label||n.ip).slice(0,13)+'…' : (n.label||n.ip||''));
-      const ip   = escHtml(devById[n.id]?.managementIpAddress || n.ip || '');
-      const x = n.x.toFixed(1), y = n.y.toFixed(1);
-      svg += `
-  <g style="cursor:pointer" onclick="topoNodeClick('${n.id.replace(/'/g,"\\'")}')">
-    <circle cx="${x}" cy="${y}" r="26" fill="${col}" fill-opacity="0.08"/>
-    <circle cx="${x}" cy="${y}" r="20" fill="#131e2a" stroke="${col}" stroke-width="2"/>
-    <text x="${x}" y="${(+y + 4).toFixed(1)}" text-anchor="middle"
-      font-size="9" font-weight="700" fill="${col}"
-      font-family="IBM Plex Mono, monospace" style="pointer-events:none">${abbr}</text>
-    <text x="${x}" y="${(+y + 36).toFixed(1)}" text-anchor="middle"
-      font-size="11" font-weight="600" fill="#EDF1F7"
-      font-family="Nunito, sans-serif" style="pointer-events:none">${lbl}</text>
-    <text x="${x}" y="${(+y + 49).toFixed(1)}" text-anchor="middle"
-      font-size="9" fill="#6889a5"
-      font-family="IBM Plex Mono, monospace" style="pointer-events:none">${ip}</text>
-  </g>`;
-    });
-
-    svg += `</svg>`;
-    wrap.innerHTML = svg;
-  }
-
-  function topoNodeClick(nodeId) {
-    const { devices, healthMap, topoLinks } = _networkCache;
-    const dev   = devices.find(d => d.id === nodeId);
-    const h     = dev ? (healthMap[dev.hostname] || {}) : {};
-    const panel = document.getElementById('topo-info');
-    if (!dev) { panel.classList.remove('show'); return; }
-
-    const stCol = dev.reachabilityStatus === 'Reachable' ? 'var(--success)'
-                : dev.reachabilityStatus === 'Ping Reachable' ? '#f59e0b' : 'var(--danger)';
-    const connectedLinks = topoLinks.filter(l => l.source === nodeId || l.target === nodeId);
-    const upLinks = connectedLinks.filter(l => l.linkStatus === 'UP').length;
-    const cpu = h.cpuUtilization    != null ? Math.round(h.cpuUtilization)    + '%' : '—';
-    const mem = h.memoryUtilization != null ? Math.round(h.memoryUtilization) + '%' : '—';
-    const hs  = h.overallHealth     != null ? h.overallHealth + '/10'                : '—';
-
-    panel.innerHTML = `
-      <div class="topo-info-row">
-        <span style="width:9px;height:9px;border-radius:50%;background:${stCol};flex-shrink:0;display:inline-block"></span>
-        <span class="topo-info-name">${escHtml(dev.hostname || dev.serialNumber || '—')}</span>
-        <span class="topo-info-ip">${escHtml(dev.managementIpAddress || '')}</span>
-        <span class="topo-info-role">${escHtml(dev.role || dev.family || '')}</span>
-        <button class="topo-info-close" onclick="document.getElementById('topo-info').classList.remove('show')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="topo-info-stats">
-        <div class="topo-info-stat"><span class="topo-info-stat-lbl">Health</span><span class="topo-info-stat-val">${hs}</span></div>
-        <div class="topo-info-stat"><span class="topo-info-stat-lbl">CPU</span><span class="topo-info-stat-val">${cpu}</span></div>
-        <div class="topo-info-stat"><span class="topo-info-stat-lbl">Memory</span><span class="topo-info-stat-val">${mem}</span></div>
-        <div class="topo-info-stat"><span class="topo-info-stat-lbl">Links</span><span class="topo-info-stat-val">${upLinks}/${connectedLinks.length} up</span></div>
-        <div class="topo-info-stat"><span class="topo-info-stat-lbl">Model</span><span class="topo-info-stat-val">${escHtml(dev.platformId || '—')}</span></div>
-      </div>`;
-    panel.classList.add('show');
-  }
-
-  function getCatalystDeviceType(family) {
-    if (!family) return 'Device';
-    const f = family.toLowerCase();
-    if (f.includes('switch'))    return 'Switch';
-    if (f.includes('router'))    return 'Router';
-    if (f.includes('wireless controller') || f.includes('wlc')) return 'WLC';
-    if (f.includes('unified ap') || f.includes('access point'))  return 'Access Point';
-    if (f.includes('firewall'))  return 'Firewall';
-    if (f.includes('voice'))     return 'Voice';
-    return 'Device';
-  }
-
-  function formatIfaceSpeed(kbps) {
-    if (!kbps || kbps === '0') return '';
-    const n = parseInt(kbps);
-    if (n >= 1000000) return (n / 1000000) + ' Gbps';
-    if (n >= 1000)    return (n / 1000)    + ' Mbps';
-    return n + ' Kbps';
-  }
-
-  function toggleMobilePreview() {
-    const html = document.documentElement;
-    const btn  = document.getElementById('dev-mobile-toggle-more');
-    const isOn = html.hasAttribute('data-mobile-preview');
-    if (isOn) {
-      html.removeAttribute('data-mobile-preview');
-      localStorage.setItem('ft_mobile', '0');
-      if (btn) btn.textContent = '📱 Toggle';
-      document.getElementById('screen-list').classList.add('active');
-    } else {
-      html.setAttribute('data-mobile-preview', '');
-      localStorage.setItem('ft_mobile', '1');
-      if (btn) btn.textContent = '🖥 Desktop';
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-list').classList.add('active');
-    }
-  }
-
-  function isMobileView() {
-    return window.innerWidth < 800 || document.documentElement.hasAttribute('data-mobile-preview');
-  }
-
-  // ── Panel resize: ticket list ↔ detail (desktop only) ─────────────────────
-  (function () {
-    const handle   = document.getElementById('panel-resize-handle');
-    const listPane = document.getElementById('screen-list');
-    let _active = false, _startX = 0, _startW = 0;
-
-    handle.addEventListener('mousedown', e => {
-      if (isMobileView()) return;
-      _active  = true;
-      _startX  = e.clientX;
-      _startW  = listPane.offsetWidth;
-      handle.classList.add('dragging');
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', e => {
-      if (!_active) return;
-      const w = Math.max(220, Math.min(640, _startW + (e.clientX - _startX)));
-      listPane.style.width = w + 'px';
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (!_active) return;
-      _active = false;
-      handle.classList.remove('dragging');
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      localStorage.setItem('ft_list_w', listPane.style.width);
-    });
-
-    // Restore saved width
-    const saved = localStorage.getItem('ft_list_w');
-    if (saved) listPane.style.width = saved;
-  })();
-
-  // ── Cal day panel resize (drag from top handle) ────────────────────────────
-  (function () {
-    const dragHandle = document.getElementById('cal-panel-resize-handle');
-    const panel      = document.getElementById('cal-day-panel');
-    let _active = false, _startY = 0, _startH = 0;
-
-    dragHandle.addEventListener('mousedown', e => {
-      _active  = true;
-      _startY  = e.clientY;
-      _startH  = panel.offsetHeight;
-      panel.classList.add('resized');
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
-      e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', e => {
-      if (!_active) return;
-      const calBody = document.getElementById('cal-grid')?.closest('.cal-body-wrap');
-      const maxH = calBody ? calBody.offsetHeight - 40 : 500;
-      const h = Math.max(80, Math.min(maxH, _startH + (_startY - e.clientY)));
-      panel.style.height = h + 'px';
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (!_active) return;
-      _active = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    });
-  })();
-
-  function applyLogoForTheme(theme) {
-    const src = theme === 'cspire' ? 'delta-logo-light-transparent.png' : 'delta-logo-dark-transparent.png';
-    document.querySelectorAll('.delta-logo').forEach(img => img.src = src);
-    // C Spire Business logo on detail topbar: cyan for dark, white for light
-    const csbSrc = theme === 'cspire' ? 'CSB_Logo_white.png' : 'CSB_Logo_cyan.png';
-    document.querySelectorAll('.csb-logo').forEach(img => img.src = csbSrc);
-  }
-
-  function toggleTheme() {
-    const html = document.documentElement;
-    const isCspire = html.getAttribute('data-theme') === 'cspire';
-    const newTheme = isCspire ? 'dark' : 'cspire';
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('ft_theme', newTheme);
-    const activeLabel = isCspire ? 'DARK' : 'LIGHT';
-    const inactiveLabel = isCspire ? 'Light' : 'Dark';
-    document.querySelectorAll('.tt-active').forEach(el => el.textContent = activeLabel);
-    document.querySelectorAll('.tt-inactive').forEach(el => el.textContent = inactiveLabel);
-    applyLogoForTheme(newTheme);
-  }
-
-  // ── Notifications ──────────────────────────────────────────────────────────
-  // All _notif* globals declared at top of script alongside other state
-
-  function startNotifPolling() {
-    // First check: look back 24 hours to catch anything already assigned
-    checkNewNotifs();
-    // Then poll every 60 seconds
-    _notifPollTimer = setInterval(checkNewNotifs, 60000);
-  }
-
-  async function checkNewNotifs() {
-    if (!SN.technicianId) return;
-
-    // Back off after consecutive failures to avoid hammering a dead endpoint
-    if (_notifFailCount >= _NOTIF_MAX_FAILS) {
-      clearInterval(_notifPollTimer);
-      _notifPollTimer = null;
-      console.warn(`Notification polling paused after ${_NOTIF_MAX_FAILS} consecutive failures. Will resume on next manual refresh.`);
-      return;
-    }
-
-    // Build cutoff: last check time, or 24 h ago on first run
-    const now = new Date();
-    const cutoff = _notifLastCheck
-      || new Date(now.getTime() - 24 * 60 * 60 * 1000)
-           .toISOString().slice(0,19).replace('T',' ');
-    // Store UTC timestamp for next poll
-    _notifLastCheck = now.toISOString().slice(0,19).replace('T',' ');
-
-    const query  = `assigned_to=${SN.technicianId}^sys_created_on>${cutoff}^state!=4^state!=5`;
-    const fields = 'number,short_description,priority,account,sys_created_on';
-    const url    = `${SN.instance}/api/now/table/sn_customerservice_case`
-                 + `?sysparm_query=${encodeURIComponent(query)}`
-                 + `&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
-
-    try {
-      const res = await snFetch(url, {}, 8000);
-      const data = await res.json();
-      _notifFailCount = 0; // reset on success
-      const fresh = (data.result || []).filter(t => !_notifSeen.has(t.number));
-      fresh.forEach(t => {
-        _notifSeen.add(t.number);
-        _notifs.unshift({
-          number:  t.number,
-          company: t.account?.display_value || t.account || '',
-          desc:    t.short_description || '',
-          priority: t.priority,
-          time:    parseSNDate(t.sys_created_on),
-          read:    false
-        });
-      });
-      if (fresh.length > 0) updateNotifBadge();
-    } catch (_) {
-      _notifFailCount++;
-    }
-  }
-
-  function updateNotifBadge() {
-    const hasUnread = _notifs.some(n => !n.read);
-    document.querySelectorAll('.notif-bell .badge').forEach(el => {
-      el.classList.toggle('has-unread', hasUnread);
-    });
-  }
-
-  function toggleNotifPanel(bellBtn) {
-    const panel = document.getElementById('notif-panel');
-    if (panel.classList.contains('show')) {
-      closeNotifPanel();
-      return;
-    }
-
-    // Close user menu if open
-    closeUserMenu();
-
-    // Position the panel anchored below the bell button
-    const rect = bellBtn.getBoundingClientRect();
-    panel.style.top  = (rect.bottom + 6) + 'px';
-    // Align right edge of panel to right edge of bell, clamped to viewport
-    const panelW = 320;
-    const rightEdge = window.innerWidth - rect.right;
-    panel.style.right = Math.max(8, rightEdge) + 'px';
-    panel.style.left  = 'auto';
-
-    renderNotifList();
-    panel.classList.add('show');
-    panel.setAttribute('aria-hidden', 'false');
-    document.getElementById('notif-backdrop').classList.add('show');
-
-    // Sync aria-expanded on all bell buttons
-    document.querySelectorAll('.notif-bell').forEach(b => b.setAttribute('aria-expanded', 'true'));
-
-    // Mark all as read on open
-    _notifs.forEach(n => n.read = true);
-    updateNotifBadge();
-  }
-
-  function closeNotifPanel() {
-    const panel = document.getElementById('notif-panel');
-    panel.classList.remove('show');
-    panel.setAttribute('aria-hidden', 'true');
-    document.getElementById('notif-backdrop').classList.remove('show');
-    document.querySelectorAll('.notif-bell').forEach(b => b.setAttribute('aria-expanded', 'false'));
-  }
-
-  // ── User Menu ──────────────────────────────────────────────────────────────
-  function toggleUserMenu(avatarBtn) {
-    const panel = document.getElementById('user-menu-panel');
-    if (panel.classList.contains('show')) { closeUserMenu(); return; }
-
-    // Close notif panel if open
-    closeNotifPanel();
-
-    // Populate user info
-    const initials = sessionStorage.getItem('sn_user_initials') || '??';
-    const name = sessionStorage.getItem('sn_user_name') || SN.username || '—';
-    document.getElementById('user-menu-avatar').textContent = initials;
-    document.getElementById('user-menu-name').textContent = name;
-
-    // Position anchored below the avatar button
-    const rect = avatarBtn.getBoundingClientRect();
-    panel.style.top = (rect.bottom + 6) + 'px';
-    const panelW = 240;
-    const rightEdge = window.innerWidth - rect.right;
-    panel.style.right = Math.max(8, rightEdge) + 'px';
-    panel.style.left = 'auto';
-
-    panel.classList.add('show');
-    panel.setAttribute('aria-hidden', 'false');
-    document.getElementById('user-menu-backdrop').classList.add('show');
-    document.querySelectorAll('#user-avatar').forEach(b => b.setAttribute('aria-expanded', 'true'));
-  }
-
-  function closeUserMenu() {
-    const panel = document.getElementById('user-menu-panel');
-    panel.classList.remove('show');
-    panel.setAttribute('aria-hidden', 'true');
-    document.getElementById('user-menu-backdrop').classList.remove('show');
-    document.querySelectorAll('#user-avatar').forEach(b => b.setAttribute('aria-expanded', 'false'));
-  }
-
-  function renderNotifList() {
-    const list = document.getElementById('notif-list');
-    if (_notifs.length === 0) {
-      list.innerHTML = `<div class="notif-empty">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        No New Notifications</div>`;
-      return;
-    }
-    let html = '';
-    _notifs.forEach(n => {
-      const pri = PRIORITY_MAP[n.priority] || { label:'Low', cls:'pill-low' };
-      html += `
-      <div class="notif-item ${n.read ? 'read' : 'unread'}" onclick="notifClick('${escHtml(n.number)}')">
-        <div class="notif-item-top">
-          <span class="notif-num">${escHtml(n.number)}</span>
-          <span class="notif-time">${timeAgo(n.time)}</span>
-        </div>
-        <div class="notif-company">${escHtml(n.company)}</div>
-        <div class="notif-desc">${escHtml(n.desc)}</div>
-      </div>`;
-    });
-    list.innerHTML = html;
-  }
-
-  function markAllNotifsRead() {
-    _notifs.forEach(n => n.read = true);
-    updateNotifBadge();
-    renderNotifList();
-  }
-
-  function notifClick(number) {
-    closeNotifPanel();
-    // Switch to tickets tab and open the detail
-    showScreen('list', document.getElementById('bnav-tickets'));
-    openDetail(number);
-  }
-
-  // ── Populate shared links containers ─────────────────────────────────────
-  initLinksContainers();
-
-  // ── Restore persisted settings on load ───────────────────────────────────
-  (function restoreSettings() {
-    const theme  = localStorage.getItem('ft_theme');
-    const mobile = localStorage.getItem('ft_mobile');
-
-    if (theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      const isLight = theme === 'cspire';
-      document.querySelectorAll('.tt-active').forEach(el => el.textContent = isLight ? 'LIGHT' : 'DARK');
-      document.querySelectorAll('.tt-inactive').forEach(el => el.textContent = isLight ? 'Dark' : 'Light');
-      applyLogoForTheme(theme);
-    }
-
-    if (mobile === '1') {
-      document.documentElement.setAttribute('data-mobile-preview', '');
-      const btn = document.getElementById('dev-mobile-toggle-more');
-      if (btn) btn.textContent = '🖥 Desktop';
-    }
-  })();
-
-  function timeAgo(date) {
-    const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-    if (mins <  1)  return 'just now';
-    if (mins < 60)  return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs  < 24)  return `${hrs}h ago`;
-    return `${Math.floor(hrs / 24)}d ago`;
-  }
-
-  // ── SAFETY CHECK TRACKER ──────────────────────────────────────────────────
-  // State variables (_safetyChecks, _safetyBannerDismissed, _safetyModalShown, _SAFETY_TYPES)
-  // are declared in the App state section at the top of the script to avoid TDZ issues.
-
-  function _safetyMonthKey() {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  }
-  function _safetyLsKey(type) { return `ft_safety_${type}_${_safetyMonthKey()}`; }
-  function _safetyDaysInMonth() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth() + 1, 0).getDate(); }
-  function _safetyMonthName() { return new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }); }
-
-  // Returns { deadline: Date, daysLeft: number, cycleDays: number } for the current cycle.
-  // Per-type cycle info. If frequency is 0 (default), deadline = end of month.
-  // If frequency > 0, deadline = last completion + frequency days, capped at end of month.
-  function _safetyCycleInfo(type) {
-    const now = new Date();
-    const eom = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-    const daysInMonth = eom.getDate();
-    const freq = type ? (_safetyFrequency[type] || 0) : 0;
-
-    if (freq <= 0 || freq >= daysInMonth) {
-      const daysLeft = daysInMonth - now.getDate();
-      return { deadline: eom, daysLeft: daysLeft, cycleDays: daysInMonth };
-    }
-
-    // Custom frequency: use this type's completion timestamp
-    const ts = _safetyChecks[type];
-    let cycleStart;
-    if (ts) {
-      const d = new Date(ts);
-      if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-        cycleStart = d;
-      } else {
-        cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      }
-    } else {
-      cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    }
-
-    const deadline = new Date(cycleStart.getTime() + freq * 86400000);
-    const capped = deadline > eom ? eom : deadline;
-    const daysLeft = Math.max(0, Math.ceil((capped.getTime() - now.getTime()) / 86400000));
-    return { deadline: capped, daysLeft: daysLeft, cycleDays: freq };
-  }
-
-  // Check if a specific type needs to be done in the current cycle.
-  function _isSafetyDue(type) {
-    const ts = _safetyChecks[type];
-    if (!ts) return true; // never completed this month
-    const freq = _safetyFrequency[type] || 0;
-    if (freq <= 0 || freq >= _safetyDaysInMonth()) return false; // monthly mode, completed = done
-    const completedAt = new Date(ts);
-    const now = new Date();
-    const elapsed = (now.getTime() - completedAt.getTime()) / 86400000;
-    return elapsed >= freq;
-  }
-
-  // Per-type urgency
-  function _getSafetyUrgencyForType(type) {
-    if (!_isSafetyDue(type)) return 'none';
-    const info = _safetyCycleInfo(type);
-    const elapsed = info.cycleDays - info.daysLeft;
-    const pct = info.cycleDays > 0 ? elapsed / info.cycleDays : 1;
-    if (pct <= 0.25) return 'low';
-    if (pct <= 0.75) return 'medium';
-    return 'high';
-  }
-
-  // Overall urgency (worst across all types)
-  function getSafetyUrgency() {
-    const allDone = _SAFETY_TYPES.every(t => !_isSafetyDue(t.key));
-    if (allDone) return 'none';
-    const levels = { none: 0, low: 1, medium: 2, high: 3 };
-    let worst = 'none';
-    _SAFETY_TYPES.forEach(t => {
-      const u = _getSafetyUrgencyForType(t.key);
-      if (levels[u] > levels[worst]) worst = u;
-    });
-    return worst;
-  }
-
-  function _safetyIncompleteCount() {
-    return _SAFETY_TYPES.filter(t => _isSafetyDue(t.key)).length;
-  }
-
-  function initSafetyChecks() {
-    // Load per-type frequency settings (0 = end of month default)
-    _SAFETY_TYPES.forEach(t => {
-      const storedFreq = localStorage.getItem('ft_safety_freq_' + t.key);
-      _safetyFrequency[t.key] = storedFreq ? parseInt(storedFreq, 10) || 0 : 0;
-      const stored = localStorage.getItem(_safetyLsKey(t.key));
-      _safetyChecks[t.key] = stored || null;
-    });
-    // Migrate legacy shared frequency key if present
-    const legacyFreq = localStorage.getItem('ft_safety_frequency');
-    if (legacyFreq) {
-      const val = parseInt(legacyFreq, 10) || 0;
-      _SAFETY_TYPES.forEach(t => {
-        if (_safetyFrequency[t.key] === 0 && val > 0) {
-          _safetyFrequency[t.key] = val;
-          localStorage.setItem('ft_safety_freq_' + t.key, String(val));
-        }
-      });
-      localStorage.removeItem('ft_safety_frequency');
-    }
-    renderSafetySection();
-    updateSafetyBadge();
-    renderSafetyBanner();
-  }
-
-  function _showFreqToast(msg) {
-    const toast = document.getElementById('safety-freq-toast');
-    const msgEl = document.getElementById('safety-freq-toast-msg');
-    if (!toast) return;
-    if (msgEl) msgEl.textContent = msg || 'Reminder frequency updated';
-    if (toast._hideTimer) clearTimeout(toast._hideTimer);
-    toast.classList.add('show');
-    toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2800);
-  }
-
-  function setSafetyFrequency(type, val) {
-    const days = parseInt(val, 10) || 0;
-    const maxDays = _safetyDaysInMonth();
-    _safetyFrequency[type] = Math.max(0, Math.min(days, maxDays));
-    if (_safetyFrequency[type] === 0) {
-      localStorage.removeItem('ft_safety_freq_' + type);
-    } else {
-      localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
-    }
-    // Build a human-readable confirmation label
-    const typeLabel = type === 'vehicle' ? 'Vehicle' : type === 'ladder' ? 'Ladder' : type.charAt(0).toUpperCase() + type.slice(1);
-    const freqLabel = _safetyFrequency[type] === 0 ? 'monthly' : 'every ' + _safetyFrequency[type] + ' days';
-    _showFreqToast(typeLabel + ' inspection set to remind ' + freqLabel);
-    renderSafetySection();
-    updateSafetyBadge();
-    renderSafetyBanner();
-  }
-
-  function markSafetyComplete(type) {
-    const ts = new Date().toISOString();
-    _safetyChecks[type] = ts;
-    localStorage.setItem(_safetyLsKey(type), ts);
-    renderSafetySection();
-    updateSafetyBadge();
-    renderSafetyBanner();
-    if (document.getElementById('safety-modal').classList.contains('active')) {
-      _renderSafetyModalChecklist();
-      if (_safetyIncompleteCount() === 0) setTimeout(() => acknowledgeSafetyModal(), 600);
-    }
-  }
-
-  function undoSafetyCheck(type) {
-    _safetyChecks[type] = null;
-    localStorage.removeItem(_safetyLsKey(type));
-    renderSafetySection();
-    updateSafetyBadge();
-    renderSafetyBanner();
-  }
-
-  function renderSafetySection() {
-    const urgency = getSafetyUrgency();
-    const incomplete = _safetyIncompleteCount();
-    const doneCount = _SAFETY_TYPES.length - incomplete;
-
-    const pill = document.getElementById('safety-urgency-pill');
-    if (pill) {
-      pill.className = 'safety-urgency-pill urgency-' + urgency;
-      const labels = { none: 'All Clear', low: 'Due This Month', medium: 'Due Soon', high: 'Overdue' };
-      pill.textContent = labels[urgency];
-    }
-
-    _SAFETY_TYPES.forEach(t => {
-      const card   = document.getElementById('safety-card-' + t.key);
-      const dateEl = document.getElementById('safety-date-' + t.key);
-      const actions = document.getElementById('safety-actions-' + t.key);
-      if (!card) return;
-
-      const due = _isSafetyDue(t.key);
-      const hasTimestamp = !!_safetyChecks[t.key];
-
-      if (dateEl) {
-        if (hasTimestamp) {
-          const d = new Date(_safetyChecks[t.key]);
-          const prefix = due ? 'Last completed ' : 'Completed ';
-          dateEl.textContent = prefix + d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
-          dateEl.style.display = '';
-        } else { dateEl.style.display = 'none'; }
-      }
-
-      // Update status + action buttons in accordion header
-      if (actions) {
-        if (!due) {
-          actions.innerHTML =
-            '<span class="safety-card-status status-done">Complete</span>' +
-            '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
-              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
-              ' Undo</button>';
-        } else {
-          actions.innerHTML =
-            '<span class="safety-card-status status-pending">Pending</span>' +
-            '<button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
-            '<button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
-        }
-      }
-
-      // Update per-type frequency dropdown
-      const freq = _safetyFrequency[t.key] || 0;
-      const freqSelect = document.getElementById('safety-freq-input-' + t.key);
-      if (freqSelect && document.activeElement !== freqSelect) {
-        freqSelect.value = String(freq);
-      }
-
-      // Update "Next Inspection Due" line
-      const nextDueEl = document.getElementById('safety-next-due-' + t.key);
-      if (nextDueEl) {
-        if (!due) {
-          // Completed — calculate the NEXT due date (not capped to current month)
-          const freq = _safetyFrequency[t.key] || 0;
-          const now = new Date();
-          let nextDate;
-          if (freq <= 0) {
-            // Monthly: next inspection is due at end of next month
-            nextDate = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
-          } else {
-            // 7 or 14 days: next inspection = completion date + freq days
-            const ts = _safetyChecks[t.key];
-            const completedAt = ts ? new Date(ts) : now;
-            nextDate = new Date(completedAt.getTime() + freq * 86400000);
-          }
-          nextDueEl.textContent = 'Next Inspection Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-          nextDueEl.style.display = '';
-        } else {
-          nextDueEl.style.display = 'none';
-        }
-      }
-    });
-
-  }
-
-  function renderSafetyBanner() {
-    const banner = document.getElementById('safety-banner');
-    if (!banner) return;
-    const urgency = getSafetyUrgency();
-
-    if (urgency === 'none' || urgency === 'low' || _safetyBannerDismissed) {
-      banner.style.display = 'none';
-      return;
-    }
-
-    const text = document.getElementById('safety-banner-text');
-    banner.classList.toggle('urgency-high', urgency === 'high');
-
-    if (text) {
-      // Build per-inspection lines
-      const lines = [];
-      _SAFETY_TYPES.forEach(t => {
-        if (!_isSafetyDue(t.key)) return;
-        const info = _safetyCycleInfo(t.key);
-        const typeUrgency = _getSafetyUrgencyForType(t.key);
-        if (typeUrgency === 'high') {
-          lines.push('<strong>' + escHtml(t.label) + ' Overdue</strong> — Please Complete ASAP');
-        } else {
-          lines.push('<strong>' + escHtml(t.label) + ' Due</strong> in ' + info.daysLeft + ' day' + (info.daysLeft !== 1 ? 's' : ''));
-        }
-      });
-      text.innerHTML = lines.join('<br>');
-    }
-    banner.style.display = 'flex';
-  }
-
-  function dismissSafetyBanner() {
-    _safetyBannerDismissed = true;
-    const b = document.getElementById('safety-banner');
-    if (b) b.style.display = 'none';
-  }
-
-  function updateSafetyBadge() {
-    const urgency = getSafetyUrgency();
-    const show = urgency !== 'none';
-    const mobileBadge = document.getElementById('safety-badge-mobile');
-    if (mobileBadge) { mobileBadge.classList.toggle('visible', show); mobileBadge.classList.toggle('urgency-high', urgency === 'high'); }
-    const desktopBadge = document.getElementById('safety-badge-desktop');
-    if (desktopBadge) { desktopBadge.classList.toggle('visible', show); desktopBadge.classList.toggle('urgency-high', urgency === 'high'); }
-  }
-
-  function checkSafetyModal() {
-    if (_safetyModalShown) return;
-    if (getSafetyUrgency() !== 'high') return;
-    _safetyModalShown = true;
-    _renderSafetyModalChecklist();
-    const countEl = document.getElementById('safety-modal-count');
-    const monthEl = document.getElementById('safety-modal-month');
-    if (countEl) countEl.textContent = _safetyIncompleteCount();
-    if (monthEl) monthEl.textContent = _safetyMonthName();
-    const modal = document.getElementById('safety-modal');
-    if (modal) modal.classList.add('active');
-  }
-
-  function _renderSafetyModalChecklist() {
-    const el = document.getElementById('safety-modal-checklist');
-    if (!el) return;
-    el.innerHTML = _SAFETY_TYPES.map(t => {
-      const due = _isSafetyDue(t.key);
-      return '<div class="safety-modal-item ' + (!due ? 'item-done' : '') + '">' +
-        '<span class="safety-modal-item-icon">' + (!due ? '&#9989;' : '&#9744;') + '</span>' +
-        '<span class="safety-modal-item-label">' + escHtml(t.label) + '</span>' +
-        (due ? '<button class="safety-btn safety-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')">Done</button>' : '') +
-      '</div>';
-    }).join('');
-  }
-
-  function acknowledgeSafetyModal() {
-    const modal = document.getElementById('safety-modal');
-    if (modal) modal.classList.remove('active');
-  }
-
-  function launchSospes(type) {
-    // Open Sospes app store page — direct link since this is a web app,
-    // not a native app (custom URL schemes like sospes:// cause Safari
-    // "address is invalid" errors in PWA / mobile browser context)
-    const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) {
-      window.open('https://apps.apple.com/us/app/sospes-safety/id1485744669', '_blank');
-    } else {
-      window.open('https://play.google.com/store/apps/details?id=com.sospesinc.safety', '_blank');
-    }
-  }
-</script>
-
-<!-- Safety Check Modal (high urgency login gate) -->
-<div class="safety-modal-overlay" id="safety-modal" role="dialog" aria-modal="true" aria-labelledby="safety-modal-title">
-  <div class="safety-modal-card">
-    <div class="safety-modal-icon" aria-hidden="true">&#9888;&#65039;</div>
-    <div class="safety-modal-title" id="safety-modal-title">Safety Checks Overdue</div>
-    <div class="safety-modal-body">
-      You have <strong id="safety-modal-count">2</strong> incomplete safety
-      inspection(s) for <strong id="safety-modal-month"></strong>.
-      Monthly checks must be completed before the end of the month.
-    </div>
-    <div class="safety-modal-checklist" id="safety-modal-checklist"></div>
-    <div class="safety-modal-actions">
-      <button class="safety-modal-btn safety-modal-btn-sospes" onclick="launchSospes('all')">Open Sospes to Complete</button>
-      <button class="safety-modal-btn safety-modal-btn-acknowledge" onclick="acknowledgeSafetyModal()">I'll complete later today</button>
-    </div>
-  </div>
-</div>
-
-<!-- Frequency-saved toast -->
-<div id="safety-freq-toast" role="status" aria-live="polite">
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-  <span id="safety-freq-toast-msg">Reminder frequency updated</span>
-</div>
-
-</body>
-</html>
+        const stCls   = d.reachabilityStatus === 'Reachable'      ? 'onli
