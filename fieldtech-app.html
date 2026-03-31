@@ -1687,11 +1687,28 @@
   .safety-section-hd { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding:0 2px; }
   .safety-section-hd h2 { font-family:var(--sans); font-size:15px; font-weight:700; color:var(--text); letter-spacing:0.01em; margin:0; }
 
-  .safety-urgency-pill { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:2px 8px; border-radius:20px; line-height:1.4; }
-  .safety-urgency-pill.urgency-none   { background:rgba(0,192,106,0.18); color:var(--success); border:1px solid rgba(0,192,106,0.3); }
-  .safety-urgency-pill.urgency-low    { background:rgba(0,192,243,0.15); color:var(--accent);  border:1px solid rgba(0,192,243,0.25); }
-  .safety-urgency-pill.urgency-medium { background:rgba(255,215,64,0.18); color:var(--warning); border:1px solid rgba(255,215,64,0.3); }
-  .safety-urgency-pill.urgency-high   { background:rgba(255,82,82,0.18);  color:var(--danger);  border:1px solid rgba(255,82,82,0.3); animation:slaPulse 2s ease-in-out infinite; }
+  .safety-urgency-pill { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; padding:2px 8px; border-radius:4px; line-height:1.4; text-shadow:0 1px 2px rgba(0,0,0,0.3); }
+  .safety-urgency-pill.urgency-none {
+    background:linear-gradient(135deg, rgba(0,230,118,0.2) 0%, rgba(0,230,118,0.06) 100%);
+    color:var(--success); border:1.5px solid rgba(0,230,118,0.42);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,230,118,0.12), inset 0 1px 0 rgba(0,230,118,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
+  .safety-urgency-pill.urgency-low {
+    background:linear-gradient(135deg, rgba(0,192,243,0.2) 0%, rgba(0,192,243,0.06) 100%);
+    color:var(--accent); border:1.5px solid rgba(0,192,243,0.44);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
+  .safety-urgency-pill.urgency-medium {
+    background:linear-gradient(135deg, rgba(255,215,64,0.24) 0%, rgba(255,215,64,0.08) 100%);
+    color:var(--warning); border:1.5px solid rgba(255,215,64,0.42);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,215,64,0.12), inset 0 1px 0 rgba(255,215,64,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
+  .safety-urgency-pill.urgency-high {
+    background:linear-gradient(135deg, rgba(255,82,82,0.24) 0%, rgba(255,82,82,0.08) 100%);
+    color:var(--danger); border:1.5px solid rgba(255,82,82,0.42);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,82,82,0.12), inset 0 1px 0 rgba(255,82,82,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+    animation:slaPulse 2s ease-in-out infinite;
+  }
 
   .safety-cards { display:flex; flex-direction:column; gap:10px; }
   .safety-card {
@@ -1709,9 +1726,17 @@
   .safety-card.safety-complete .safety-card-icon { background:rgba(0,192,106,0.12); color:var(--success); }
   .safety-card-name { font-family:var(--sans); font-size:14px; font-weight:700; color:var(--text); letter-spacing:0.01em; }
 
-  .safety-card-status { font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:0.04em; padding:3px 10px; border-radius:20px; }
-  .safety-card-status.status-pending { background:rgba(255,215,64,0.15); color:var(--warning); border:1px solid rgba(255,215,64,0.25); }
-  .safety-card-status.status-done    { background:rgba(0,192,106,0.15); color:var(--success); border:1px solid rgba(0,192,106,0.25); }
+  .safety-card-status { font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 8px; border-radius:4px; text-shadow:0 1px 2px rgba(0,0,0,0.3); }
+  .safety-card-status.status-pending {
+    background:linear-gradient(135deg, rgba(255,215,64,0.2) 0%, rgba(255,215,64,0.06) 100%);
+    color:var(--warning); border:1.5px solid rgba(255,215,64,0.42);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,215,64,0.12), inset 0 1px 0 rgba(255,215,64,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
+  .safety-card-status.status-done {
+    background:linear-gradient(135deg, rgba(0,230,118,0.18) 0%, rgba(0,230,118,0.05) 100%);
+    color:var(--success); border:1.5px solid rgba(0,230,118,0.4);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,230,118,0.12), inset 0 1px 0 rgba(0,230,118,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
 
   .safety-card-info { font-family:var(--body); font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.5; }
   .safety-card-completed-date { font-family:var(--mono); font-size:11px; color:var(--success); margin-bottom:10px; }
@@ -2575,7 +2600,7 @@
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-vehicle">
-                <span class="safety-card-status status-pending" id="safety-status-vehicle" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>
+                <span class="safety-card-status status-pending" id="safety-status-vehicle" >Pending</span>
                 <button class="safety-btn safety-btn-sospes" onclick="launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
                 <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
               </div>
@@ -2592,7 +2617,7 @@
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;" id="safety-actions-ladder">
-                <span class="safety-card-status status-pending" id="safety-status-ladder" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>
+                <span class="safety-card-status status-pending" id="safety-status-ladder" >Pending</span>
                 <button class="safety-btn safety-btn-sospes" onclick="launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
                 <button class="safety-btn safety-btn-primary" onclick="markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
               </div>
@@ -5954,13 +5979,13 @@
       if (actions) {
         if (done) {
           actions.innerHTML =
-            '<span class="safety-card-status status-done" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Complete</span>' +
+            '<span class="safety-card-status status-done" >Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Undo</button>';
         } else {
           actions.innerHTML =
-            '<span class="safety-card-status status-pending" style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;">Pending</span>' +
+            '<span class="safety-card-status status-pending" >Pending</span>' +
             '<button class="safety-btn safety-btn-sospes" onclick="launchSospes(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Sospes</button>' +
             '<button class="safety-btn safety-btn-primary" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         }
