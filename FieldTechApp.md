@@ -1,13 +1,13 @@
 # Delta — Field Operations Tech App
 
-Single-file web app (`fieldtech-app.html`, ~5500+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~6100+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
 
 ---
 
 ## Repository Layout
 
 ```
-fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~5500+ lines)
+fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~6100+ lines)
 meraki-proxy.js               <- Node.js CORS proxy for Cisco Catalyst Center API
 package.json                  <- { "start": "node meraki-proxy.js" }, Node >=18
 internet-db.json              <- Simulated ISP circuit data (fiber, cable, DSL, wireless)
@@ -59,7 +59,7 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#screen-customer-detail` | Customer Detail | `fetchCustomerDetail(sysId)` |
 | `#screen-network` | Network Equipment | `loadNetworkScreen()` |
 | `#screen-cx360` | CX 360 | `cx360Send()` (mock AI chat) |
-| `#screen-more` | More / Settings | (static) |
+| `#screen-more` | More / Settings | `initSafetyChecks()` + static settings |
 | `#screen-links` | Important Links | (static) |
 | `#login-screen` | Login | (shown by default) |
 
@@ -92,7 +92,7 @@ The only raw `fetch()` calls that intentionally bypass `snFetch` are: `attemptLo
 ### Session lifecycle
 
 1. Login -> `attemptLogin()` -> stores creds + user info in sessionStorage -> `startSession()`
-2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`
+2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`, `initSafetyChecks()`, and `checkSafetyModal()`
 3. Force refresh: `forceAppRefresh()` clears `cachedAssignedTickets` and re-fetches, then navigates to the Tickets tab
 4. Logout: `logout()` clears sessionStorage and reloads the page
 
@@ -195,6 +195,11 @@ let _custLoaded    = false;
 // Network
 let _networkCache = null;
 let _networkView  = 'list'; // 'list' | 'topology'
+
+// Safety Checks
+let _safetyChecks = { vehicle: null, ladder: null };
+let _safetyBannerDismissed = false;
+let _safetyModalShown = false;
 
 // Notifications (all declared together at top of script block)
 let _notifs             = [];        // array of notification objects
@@ -485,6 +490,8 @@ Week view column headers additionally support `.today` (accent-tinted) and `.sel
 State:     pill-open  pill-progress  pill-resolved  pill-pending  pill-enroute
 Priority:  pill-critical  pill-high  pill-medium  pill-low  (CSS exists; not shown in calendar/notifications)
 Type:      type-badge repair | installation | service-call
+Safety:    safety-urgency-pill urgency-{none|low|medium|high}
+           safety-card-status status-{pending|done}
 ```
 
 `PRIORITY_MAP` and `STATE_MAP` (both keyed by SN integer value AND display string) live around line 2360.
@@ -511,6 +518,82 @@ Notification items show ticket number, time ago, company, and description. Prior
 ### Polling backoff
 
 `_notifFailCount` increments on each consecutive polling failure. After `_NOTIF_MAX_FAILS` (3) failures, polling pauses (`clearInterval` + nulls the timer) and logs a warning. Polling resumes automatically on the next manual `refreshCases()` call, which resets `_notifFailCount` to 0 and calls `startNotifPolling()`.
+
+---
+
+## Safety Check Tracker
+
+Monthly vehicle and ladder inspection tracking with escalating urgency reminders. Integrates with the Sospes mobile app for form completion.
+
+### State
+
+```js
+let _safetyChecks = { vehicle: null, ladder: null };  // null = pending, ISO string = completed timestamp
+let _safetyBannerDismissed = false;  // per-session dismiss (resets on logout)
+let _safetyModalShown = false;       // only show once per session
+
+const _SAFETY_TYPES = [
+  { key: 'vehicle', label: 'Vehicle Inspection' },
+  { key: 'ladder',  label: 'Ladder Inspection'  }
+];
+```
+
+Completion state is stored in `localStorage` keyed as `ft_safety_{type}_{YYYY-MM}` (e.g., `ft_safety_vehicle_2026-03`). Checks reset automatically each calendar month — `_safetyMonthKey()` returns `"YYYY-MM"` based on the current date.
+
+### Urgency levels
+
+`getSafetyUrgency()` returns one of four levels based on the current day of the month and whether all checks are complete:
+
+| Level | Condition | Behavior |
+|---|---|---|
+| `none` | All checks complete | Green "All Clear" pill, no banner/badge/modal |
+| `low` | Day 1-7, incomplete | Blue "Due This Month" pill, no banner |
+| `medium` | Day 8-21, incomplete | Yellow "Due Soon" pill, banner on Tickets screen |
+| `high` | Day 22+, incomplete | Red "Overdue" pill (pulses), banner, badge dot on More nav, login modal |
+
+### UI components
+
+**Section header** (More screen): Uses `.section-title` bar with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container matching the Appearance/App/Tools/Account sections.
+
+**Inspection rows** (More screen): Each inspection (Vehicle, Ladder) is a row inside the safety card with icon, label, description, status pill, and action buttons (Sospes + Done when pending; Undo when complete). Completed date shown below label.
+
+**Progress bar**: Below the inspection rows, shows "N of 2 complete" with days remaining and a fill bar (`#safety-progress-bar`). Bar turns green (`.bar-complete`) when all checks are done.
+
+**Safety banner** (`#safety-banner`): Displayed on the Tickets screen (`#screen-list`) for `medium` and `high` urgency. Has a "Review" button (navigates to More) and a dismiss button (per-session). Red variant for `high` urgency.
+
+**Badge dots**: Orange dot on mobile More button (`#safety-badge-mobile`, `.safety-badge-dot`) and desktop More nav (`#safety-badge-desktop`, `.dnav-safety-badge`). Pulses red at `high` urgency. Updated on every `showScreen()` call via `updateSafetyBadge()`.
+
+**Safety modal** (`#safety-modal`): Full-screen overlay shown once per session on login when urgency is `high`. Displays checklist of incomplete inspections with inline "Done" buttons. Options to open Sospes or acknowledge ("I'll complete later today").
+
+### Key functions
+
+| Function | Purpose |
+|---|---|
+| `initSafetyChecks()` | Loads state from localStorage, renders all components |
+| `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
+| `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all |
+| `renderSafetySection()` | Updates cards, pills, progress bar in More screen |
+| `renderSafetyBanner()` | Shows/hides banner on Tickets screen |
+| `updateSafetyBadge()` | Updates badge dots on mobile + desktop nav |
+| `checkSafetyModal()` | Shows modal on login if urgency = high |
+| `launchSospes(type)` | Deep-links to Sospes app with fallback to app store |
+
+### Integration hooks
+
+Three existing functions have safety check hooks:
+- `dismissDisclaimer()`: calls `initSafetyChecks()` + `checkSafetyModal()` after login
+- `showScreen()`: calls `updateSafetyBadge()` on every screen switch (guarded by `typeof` check)
+- `logout()`: resets `_safetyBannerDismissed` and `_safetyModalShown`
+
+`showScreen()` also calls `setDesktopNav()` internally with a mapping table (`network` and `links` map to `more`) to keep the desktop nav active state in sync — this replaced the separate `setDesktopNav()` calls in each desktop nav button's onclick handler.
+
+### Sospes deep-linking
+
+`launchSospes()` attempts `window.location.href = 'sospes://'` to open the native Sospes app. After 1.5 seconds, if the page hasn't navigated away, it falls back to the App Store (iOS) or Play Store (Android) based on user agent detection. The deep-link URL scheme and store IDs are placeholders — replace with actual Sospes values when available.
+
+### Pill styling
+
+Safety pills (urgency pill and status pills) use the same visual pattern as ticket pills: `border-radius:4px`, gradient backgrounds, `1.5px` colored borders, multi-layer box-shadow with glow, and `text-shadow`. Classes: `.safety-urgency-pill.urgency-{none|low|medium|high}` and `.safety-card-status.status-{pending|done}`.
 
 ---
 
@@ -599,9 +682,9 @@ This section governs how edits are made to `fieldtech-app.html`. The file is ~49
 
 | Section | Approximate lines | Contents |
 |---|---|---|
-| CSS | 1 - ~1520 | `<style>` block: dark theme variables, light theme overrides, all component styles (incl. CX 360, week view) |
-| HTML | ~1520 - ~2450 | All screen markup (incl. CX 360 screen, Network Equipment link), modals, nav bars |
-| JS | ~2450 - ~5500 | `<script>` block: state, API calls, rendering, CX 360 chat logic, week view, event handlers |
+| CSS | 1 - ~1810 | `<style>` block: dark theme variables, light theme overrides, all component styles (incl. CX 360, week view, safety check tracker) |
+| HTML | ~1810 - ~2780 | All screen markup (incl. CX 360 screen, Network Equipment link, safety section in More, safety banner, safety modal), modals, nav bars |
+| JS | ~2780 - ~6080 | `<script>` block: state, API calls, rendering, CX 360 chat logic, week view, safety check tracker logic, event handlers |
 
 When reading or editing, use these boundaries to target the right section. Always read the surrounding 20-30 lines of context before making an edit to avoid collisions.
 
@@ -641,6 +724,11 @@ After each section of changes, confirm the following still work in both themes:
 - [ ] Delta logo swaps correctly between dark and light variants on theme toggle
 - [ ] Bottom nav (mobile) and sidebar nav (desktop) both highlight the active screen (5 tabs on mobile)
 - [ ] Network Equipment link in ticket detail accordion navigates to Network tab
+- [ ] Safety check section in More screen renders correctly, Done/Undo buttons work, progress bar updates
+- [ ] Safety banner appears on Tickets screen when urgency is medium or high, dismiss works
+- [ ] Safety modal appears on login when urgency is high, checklist items are interactive
+- [ ] Safety badge dots appear on More nav button when checks are incomplete
+- [ ] Safety check state persists across page reloads (localStorage), resets monthly
 - [ ] No console errors on any screen
 
 ### Git checkpoint strategy
@@ -658,3 +746,4 @@ All six planned improvements have been implemented:
 5. **Code cleanup** -- `fetchCaseDetail` broken into 6 functions (main + 5 helpers), all `.then()` chains converted to async/await, notification globals consolidated
 6. **Responsive polish** -- Tablet breakpoint (800-1024px) narrows list panel, landscape `safe-area-inset-left/right` via `@supports`
 7. **Visual polish** -- Skeleton loading screens, enhanced empty states, button loading states, modal animations, SLA urgency pulse, mobile press feedback, accordion depth, card hover consistency, prefers-reduced-motion, data viz stat bars
+8. **Safety Check Tracker** -- Monthly vehicle + ladder inspection tracking with escalating urgency (none/low/medium/high), Sospes deep-link integration, login gate modal, banner on Tickets screen, badge dots on nav, progress bar. Pills styled to match ticket pill design system. More screen uses standard `.section-title` + `.card` layout pattern with scroll support.
