@@ -6085,20 +6085,15 @@
   }
 
   function launchSospes(type) {
-    // Attempt deep-link to Sospes mobile app — replace URL scheme if actual one is known
-    const deepLink = 'sospes://';
-    const start = Date.now();
-    window.location.href = deepLink;
-    setTimeout(function() {
-      if (Date.now() - start < 2000) {
-        const ua = navigator.userAgent.toLowerCase();
-        if (/iphone|ipad|ipod/.test(ua)) {
-          window.open('https://apps.apple.com/us/app/sospes-safety/id1485744669', '_blank');
-        } else {
-          window.open('https://play.google.com/store/apps/details?id=com.sospesinc.safety', '_blank');
-        }
-      }
-    }, 1500);
+    // Open Sospes app store page — direct link since this is a web app,
+    // not a native app (custom URL schemes like sospes:// cause Safari
+    // "address is invalid" errors in PWA / mobile browser context)
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) {
+      window.open('https://apps.apple.com/us/app/sospes-safety/id1485744669', '_blank');
+    } else {
+      window.open('https://play.google.com/store/apps/details?id=com.sospesinc.safety', '_blank');
+    }
   }
 </script>
 
