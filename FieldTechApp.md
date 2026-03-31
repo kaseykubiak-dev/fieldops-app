@@ -582,12 +582,13 @@ With per-type frequency, each inspection can be at a different urgency level ind
 | `initSafetyChecks()` | Loads state + per-type frequencies from localStorage (with legacy migration), renders all components |
 | `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
 | `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all |
-| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage |
-| `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency |
+| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage, triggers a brief toast confirmation ("Vehicle inspection set to remind every 7 days") via `_showFreqToast()` |
+| `_showFreqToast(msg)` | Displays a transient bottom-anchored toast (`#safety-freq-toast`) with a checkmark and descriptive message; auto-dismisses after ~3 s |
+| `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency (used for urgency/progress calculations; does **not** drive the "Next Inspection Due" display) |
 | `_isSafetyDue(type)` | Checks if inspection is due using that type's frequency |
 | `_getSafetyUrgencyForType(type)` | Returns urgency level (none/low/medium/high) for a specific inspection |
 | `getSafetyUrgency()` | Returns worst urgency across all types |
-| `renderSafetySection()` | Updates accordions, pills, progress bar, per-type frequency inputs in Tech Tools screen |
+| `renderSafetySection()` | Updates accordions, pills, progress bar, per-type frequency inputs, and "Next Inspection Due" date in Tech Tools screen |
 | `renderSafetyBanner()` | Shows/hides banner with per-inspection messages on Tickets screen |
 | `updateSafetyBadge()` | Updates badge dots on mobile + desktop nav |
 | `checkSafetyModal()` | Shows modal on login if urgency = high |
@@ -798,3 +799,4 @@ All six planned improvements have been implemented:
 9. **User menu dropdown** -- Avatar button opens a dropdown panel (matching notification panel pattern) with user profile header, Settings navigation, and Sign Out. Replaces direct `confirmLogout()` on avatar click.
 10. **Tech Tools / Settings split** -- "More" screen split into Tech Tools (nav tab with safety checks + tools) and Settings (user menu only, Appearance/App/Account). Screen ID `screen-more` retained for Settings to avoid breaking references.
 11. **Per-inspection accordion + frequency** -- Each inspection (Vehicle, Ladder) wrapped in an accordion with nested per-type reminder frequency control. Frequency stored independently per type (`ft_safety_freq_{type}`). Banner messages now show per-inspection: "Vehicle Inspection Due in X days" / "Vehicle Inspection Overdue — Please Complete ASAP". Urgency computed per type, overall urgency = worst across all types. Legacy shared `ft_safety_frequency` key auto-migrated on init.
+12. **Inspection next-due date fix + frequency toast** -- "Next Inspection Due" now projects correctly beyond the current month: monthly mode shows end of *next* month; 7/14-day modes show `completionDate + N days` with no end-of-month cap. `setSafetyFrequency()` now calls `_showFreqToast()` after saving, displaying a bottom toast (e.g. "Vehicle inspection set to remind every 7 days") that auto-dismisses after ~3 s. The "Next Inspection Due" field refreshes immediately on frequency change.
