@@ -1,0 +1,12 @@
+{
+  "name": "catalyst-center-proxy",
+  "version": "1.0.0",
+  "description": "CORS proxy for Cisco Catalyst Center API",
+  "main": "meraki-proxy.js",
+  "scripts": {
+    "start": "node meraki-proxy.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

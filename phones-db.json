@@ -1,0 +1,117 @@
+{
+  "models": [
+    {
+      "vendor": "Poly",
+      "model": "VVX 350",
+      "type": "Desktop IP Phone",
+      "lines": 6,
+      "poe": "802.3af",
+      "firmware_versions": ["6.4.2.8626", "6.4.3.1461"]
+    },
+    {
+      "vendor": "Poly",
+      "model": "VVX 450",
+      "type": "Desktop IP Phone",
+      "lines": 12,
+      "poe": "802.3af",
+      "firmware_versions": ["6.4.3.1461", "6.4.4.1902"]
+    },
+    {
+      "vendor": "Poly",
+      "model": "CCX 500",
+      "type": "Business Media Phone",
+      "lines": 5,
+      "poe": "802.3af",
+      "firmware_versions": ["8.1.1.4240", "8.1.3.1480"]
+    },
+    {
+      "vendor": "Poly",
+      "model": "Trio 8800",
+      "type": "Conference Phone",
+      "lines": 3,
+      "poe": "802.3at",
+      "firmware_versions": ["5.9.7.3490", "5.9.9.3560"]
+    },
+    {
+      "vendor": "Cisco",
+      "model": "IP Phone 8841",
+      "type": "Desktop IP Phone",
+      "lines": 5,
+      "poe": "802.3af",
+      "firmware_versions": ["12.8(1)SR2", "14.1(1)", "14.2(1)SR1"]
+    },
+    {
+      "vendor": "Cisco",
+      "model": "IP Phone 8861",
+      "type": "Executive Phone",
+      "lines": 10,
+      "poe": "802.3at",
+      "firmware_versions": ["12.8(1)SR2", "14.1(1)", "14.2(1)SR1"]
+    },
+    {
+      "vendor": "Cisco",
+      "model": "IP Conference Phone 7832",
+      "type": "Conference Phone",
+      "lines": 1,
+      "poe": "802.3af",
+      "firmware_versions": ["12.8(1)SR2", "14.1(1)"]
+    },
+    {
+      "vendor": "Yealink",
+      "model": "T46U",
+      "type": "Desktop IP Phone",
+      "lines": 16,
+      "poe": "802.3af",
+      "firmware_versions": ["66.86.0.10", "66.86.0.20", "66.86.0.25"]
+    },
+    {
+      "vendor": "Yealink",
+      "model": "T58A",
+      "type": "Executive Android Phone",
+      "lines": 16,
+      "poe": "802.3at",
+      "firmware_versions": ["58.86.0.10", "58.86.0.15"]
+    },
+    {
+      "vendor": "Yealink",
+      "model": "CP960",
+      "type": "Conference Phone",
+      "lines": 3,
+      "poe": "802.3af",
+      "firmware_versions": ["73.85.0.15", "73.85.0.20"]
+    },
+    {
+      "vendor": "Grandstream",
+      "model": "GXP2170",
+      "type": "Desktop IP Phone",
+      "lines": 12,
+      "poe": "802.3af",
+      "firmware_versions": ["1.0.9.120", "1.0.9.135", "1.0.9.140"]
+    },
+    {
+      "vendor": "Grandstream",
+      "model": "GXV3370",
+      "type": "Video IP Phone",
+      "lines": 16,
+      "poe": "802.3at",
+      "firmware_versions": ["1.0.1.25", "1.0.1.30"]
+    }
+  ],
+  "unit_counts": [4, 6, 8, 10, 12, 16, 20, 24, 32, 36, 48],
+  "locations": [
+    "General Office",
+    "Reception Desk",
+    "Conference Rooms",
+    "Executive Suite",
+    "Sales Floor",
+    "Support Center",
+    "Operations Floor",
+    "Management Suite"
+  ],
+  "provisioning_servers": [
+    "prov.cspire-voip.net",
+    "sip.cspire-voice.net",
+    "voip-prov.cspire.com",
+    "pbx.cspire-hosted.net"
+  ]
+}

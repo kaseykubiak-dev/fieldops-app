@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delta App — Icon Variants</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #0e1a2a;
+    color: #e0e8f0;
+    padding: 40px 24px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 300;
+    color: #00c0f3;
+    margin-bottom: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #85A7CA;
+    margin-bottom: 48px;
+  }
+
+  .category {
+    margin-bottom: 48px;
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,192,243,0.15);
+  }
+
+  .cat-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e0e8f0;
+    letter-spacing: 1px;
+  }
+
+  .cat-color {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .variants {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+  }
+
+  .variant {
+    background: rgba(22,34,54,0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .variant:hover {
+    border-color: rgba(0,192,243,0.3);
+    box-shadow: 0 4px 24px rgba(0,192,243,0.1), inset 0 1px 0 rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+  }
+
+  .icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .icon-wrap svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Color themes for icon backgrounds */
+  .icon-wrap.cyan    { background: rgba(0,192,243,0.12); border: 1px solid rgba(0,192,243,0.25); color: #00c0f3; }
+  .icon-wrap.green   { background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.25); color: #00e676; }
+  .icon-wrap.orange  { background: rgba(255,103,32,0.12); border: 1px solid rgba(255,103,32,0.25); color: #FF6720; }
+  .icon-wrap.purple  { background: rgba(136,77,157,0.12); border: 1px solid rgba(136,77,157,0.25); color: #884D9D; }
+  .icon-wrap.red     { background: rgba(255,82,82,0.12);  border: 1px solid rgba(255,82,82,0.25);  color: #ff5252; }
+  .icon-wrap.teal    { background: rgba(0,150,136,0.12);  border: 1px solid rgba(0,150,136,0.25);  color: #009688; }
+  .icon-wrap.blue    { background: rgba(66,133,244,0.12); border: 1px solid rgba(66,133,244,0.25); color: #4285f4; }
+  .icon-wrap.gold    { background: rgba(255,193,7,0.12);  border: 1px solid rgba(255,193,7,0.25);  color: #FFC107; }
+
+  .var-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #85A7CA;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .var-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(0,192,243,0.08);
+    color: #00c0f3;
+  }
+
+  /* Section divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,192,243,0.2), transparent);
+    margin: 16px 0 48px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Delta Icon Variants</h1>
+<p class="subtitle">Mockup exploration — stroke-based icons for the Field Tech App</p>
+
+<!-- ═══ FIREWALL ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Firewall</span>
+    <span class="cat-color" style="background:rgba(255,82,82,0.15);color:#ff5252;">Security</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Classic shield with lock -->
+    <div class="variant">
+      <div class="icon-wrap red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <rect x="9" y="10" width="6" height="5" rx="1"/>
+          <path d="M12 10V8a2 2 0 0 0-2-2h0a2 2 0 0 0-2 2v2"/>
+        </svg>
+      </div>
+      <span class="var-label">Shield + Lock</span>
+      <span class="var-tag">Classic</span>
+    </div>
+
+    <!-- B: Brick wall with shield -->
+    <div class="variant">
+      <div class="icon-wrap red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="4" rx="1"/>
+          <rect x="1" y="8" width="11" height="4" rx="0"/>
+          <rect x="12" y="8" width="11" height="4" rx="0"/>
+          <rect x="5.5" y="12" width="13" height="4" rx="0"/>
+          <rect x="1" y="12" width="4.5" height="4" rx="0"/>
+          <rect x="18.5" y="12" width="4.5" height="4" rx="0"/>
+          <path d="M12 22s5-2.5 5-6.5V13l-5-2-5 2v2.5c0 4 5 6.5 5 6.5z" fill="none"/>
+        </svg>
+      </div>
+      <span class="var-label">Brick Wall + Shield</span>
+      <span class="var-tag">Detailed</span>
+    </div>
+
+    <!-- C: Flame barrier -->
+    <div class="variant">
+      <div class="icon-wrap orange">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 17c-1.5 0-3-1.5-3-3.5 0-1.5 1-2.5 1.5-3 .3 1 1 1.5 1.5 1.5s1.2-.5 1.5-1.5c.5.5 1.5 1.5 1.5 3 0 2-1.5 3.5-3 3.5z"/>
+        </svg>
+      </div>
+      <span class="var-label">Shield + Flame</span>
+      <span class="var-tag">Dynamic</span>
+    </div>
+
+    <!-- D: Network shield -->
+    <div class="variant">
+      <div class="icon-wrap red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <line x1="8" y1="9" x2="16" y2="9"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <circle cx="12" cy="9" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="13" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <span class="var-label">Network Shield</span>
+      <span class="var-tag">Technical</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ INTERNET ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Internet</span>
+    <span class="cat-color" style="background:rgba(0,192,243,0.15);color:#00c0f3;">Connectivity</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Globe with signal -->
+    <div class="variant">
+      <div class="icon-wrap cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <span class="var-label">Globe</span>
+      <span class="var-tag">Classic</span>
+    </div>
+
+    <!-- B: Globe with arrow -->
+    <div class="variant">
+      <div class="icon-wrap cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/>
+          <path d="M12 2a15.3 15.3 0 0 0-4 10 15.3 15.3 0 0 0 4 10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M17 7l4-4m0 0h-4m4 0v4" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <span class="var-label">Globe + Arrow</span>
+      <span class="var-tag">Active</span>
+    </div>
+
+    <!-- C: WiFi globe -->
+    <div class="variant">
+      <div class="icon-wrap cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+          <circle cx="12" cy="20" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="var-label">WiFi Broadcast</span>
+      <span class="var-tag">Signal</span>
+    </div>
+
+    <!-- D: Cloud connected -->
+    <div class="variant">
+      <div class="icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          <line x1="12" y1="13" x2="12" y2="17"/>
+          <polyline points="9 15 12 13 15 15"/>
+        </svg>
+      </div>
+      <span class="var-label">Cloud Connect</span>
+      <span class="var-tag">Modern</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ VOICE ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Voice</span>
+    <span class="cat-color" style="background:rgba(136,77,157,0.15);color:#884D9D;">Communication</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Phone handset -->
+    <div class="variant">
+      <div class="icon-wrap purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+      <span class="var-label">Phone Handset</span>
+      <span class="var-tag">Classic</span>
+    </div>
+
+    <!-- B: Headset -->
+    <div class="variant">
+      <div class="icon-wrap purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        </svg>
+      </div>
+      <span class="var-label">Headset</span>
+      <span class="var-tag">Support</span>
+    </div>
+
+    <!-- C: Phone with waves -->
+    <div class="variant">
+      <div class="icon-wrap purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18"/>
+          <path d="M15 8a3 3 0 0 1 0 4"/>
+          <path d="M17.5 6a6 6 0 0 1 0 8"/>
+        </svg>
+      </div>
+      <span class="var-label">VoIP Device</span>
+      <span class="var-tag">Modern</span>
+    </div>
+
+    <!-- D: Mic + waveform -->
+    <div class="variant">
+      <div class="icon-wrap purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <span class="var-label">Microphone</span>
+      <span class="var-tag">Voice Input</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ NETWORK DEVICES ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Network Devices</span>
+    <span class="cat-color" style="background:rgba(0,150,136,0.15);color:#009688;">Infrastructure</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Router/switch -->
+    <div class="variant">
+      <div class="icon-wrap teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="8" width="20" height="8" rx="2"/>
+          <circle cx="6" cy="12" r="1" fill="currentColor"/>
+          <circle cx="10" cy="12" r="1" fill="currentColor"/>
+          <line x1="16" y1="10" x2="16" y2="14"/>
+          <line x1="19" y1="10" x2="19" y2="14"/>
+          <line x1="6" y1="8" x2="6" y2="4"/>
+          <line x1="18" y1="8" x2="18" y2="4"/>
+        </svg>
+      </div>
+      <span class="var-label">Router / Switch</span>
+      <span class="var-tag">Classic</span>
+    </div>
+
+    <!-- B: Server rack -->
+    <div class="variant">
+      <div class="icon-wrap teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2"/>
+          <rect x="2" y="14" width="20" height="8" rx="2"/>
+          <line x1="6" y1="6" x2="6.01" y2="6"/>
+          <line x1="6" y1="18" x2="6.01" y2="18"/>
+          <line x1="10" y1="6" x2="18" y2="6"/>
+          <line x1="10" y1="18" x2="18" y2="18"/>
+        </svg>
+      </div>
+      <span class="var-label">Server Rack</span>
+      <span class="var-tag">Data Center</span>
+    </div>
+
+    <!-- C: Network hub -->
+    <div class="variant">
+      <div class="icon-wrap teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <circle cx="4" cy="5" r="2"/>
+          <circle cx="20" cy="5" r="2"/>
+          <circle cx="4" cy="19" r="2"/>
+          <circle cx="20" cy="19" r="2"/>
+          <line x1="9.5" y1="10" x2="5.5" y2="6.5"/>
+          <line x1="14.5" y1="10" x2="18.5" y2="6.5"/>
+          <line x1="9.5" y1="14" x2="5.5" y2="17.5"/>
+          <line x1="14.5" y1="14" x2="18.5" y2="17.5"/>
+        </svg>
+      </div>
+      <span class="var-label">Network Hub</span>
+      <span class="var-tag">Topology</span>
+    </div>
+
+    <!-- D: Access point -->
+    <div class="variant">
+      <div class="icon-wrap teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="10" width="12" height="8" rx="2"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+          <path d="M8 10V8a4 4 0 0 1 8 0v2"/>
+          <path d="M9 6a6 6 0 0 1 6 0"/>
+          <path d="M7 3.5a9 9 0 0 1 10 0"/>
+        </svg>
+      </div>
+      <span class="var-label">Access Point</span>
+      <span class="var-tag">Wireless</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ CUSTOMER ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Customer</span>
+    <span class="cat-color" style="background:rgba(66,133,244,0.15);color:#4285f4;">People</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Single person -->
+    <div class="variant">
+      <div class="icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <span class="var-label">Person</span>
+      <span class="var-tag">Simple</span>
+    </div>
+
+    <!-- B: Person with home -->
+    <div class="variant">
+      <div class="icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="7" r="3.5"/>
+          <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          <path d="M19 10l3 2.5v6.5h-6v-4h2"/>
+          <path d="M19 10V8"/>
+        </svg>
+      </div>
+      <span class="var-label">Residential</span>
+      <span class="var-tag">Home</span>
+    </div>
+
+    <!-- C: Person with checkmark -->
+    <div class="variant">
+      <div class="icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <polyline points="17 11 19 13 23 9"/>
+        </svg>
+      </div>
+      <span class="var-label">Verified Customer</span>
+      <span class="var-tag">Status</span>
+    </div>
+
+    <!-- D: People group -->
+    <div class="variant">
+      <div class="icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <span class="var-label">Multi-User</span>
+      <span class="var-tag">Group</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ BUSINESS ═══ -->
+<div class="category">
+  <div class="cat-header">
+    <span class="cat-name">Business</span>
+    <span class="cat-color" style="background:rgba(255,193,7,0.15);color:#FFC107;">Enterprise</span>
+  </div>
+  <div class="variants">
+
+    <!-- A: Building -->
+    <div class="variant">
+      <div class="icon-wrap gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="2"/>
+          <line x1="9" y1="22" x2="9" y2="17"/>
+          <line x1="15" y1="22" x2="15" y2="17"/>
+          <rect x="8" y="6" width="3" height="2.5" rx="0.5"/>
+          <rect x="13" y="6" width="3" height="2.5" rx="0.5"/>
+          <rect x="8" y="11" width="3" height="2.5" rx="0.5"/>
+          <rect x="13" y="11" width="3" height="2.5" rx="0.5"/>
+        </svg>
+      </div>
+      <span class="var-label">Office Building</span>
+      <span class="var-tag">Corporate</span>
+    </div>
+
+    <!-- B: Briefcase -->
+    <div class="variant">
+      <div class="icon-wrap gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          <line x1="2" y1="14" x2="22" y2="14"/>
+        </svg>
+      </div>
+      <span class="var-label">Briefcase</span>
+      <span class="var-tag">Professional</span>
+    </div>
+
+    <!-- C: Building with signal -->
+    <div class="variant">
+      <div class="icon-wrap gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="12" height="16" rx="1"/>
+          <rect x="5" y="9" width="2.5" height="2" rx="0.5"/>
+          <rect x="9" y="9" width="2.5" height="2" rx="0.5"/>
+          <rect x="5" y="13" width="2.5" height="2" rx="0.5"/>
+          <rect x="9" y="13" width="2.5" height="2" rx="0.5"/>
+          <line x1="7" y1="22" x2="7" y2="18"/>
+          <line x1="11" y1="22" x2="11" y2="18"/>
+          <path d="M17 12a3 3 0 0 1 0 5"/>
+          <path d="M19.5 9.5a7 7 0 0 1 0 10"/>
+        </svg>
+      </div>
+      <span class="var-label">Connected Office</span>
+      <span class="var-tag">Smart</span>
+    </div>
+
+    <!-- D: Handshake -->
+    <div class="variant">
+      <div class="icon-wrap gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.5 11.5L17 8l-4.5 1L9 6 3.5 11.5"/>
+          <path d="M3.5 11.5L8 16l3-1.5L14.5 18l6-6.5"/>
+          <line x1="2" y1="12" x2="3.5" y2="11.5"/>
+          <line x1="22" y1="12" x2="20.5" y2="11.5"/>
+        </svg>
+      </div>
+      <span class="var-label">Partnership</span>
+      <span class="var-tag">B2B</span>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
