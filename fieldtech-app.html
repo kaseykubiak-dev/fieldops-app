@@ -4713,23 +4713,37 @@
   let _calView = 'month'; // 'month' | 'week'
 
   // Returns [{type, label, shortLabel, dueStr}] for both inspection types.
-  // Reads _safetyChecks and _safetyFrequency to compute each next due date.
-  // freq 0 = monthly (last day of current month); 7/14 = completion + N days.
+  // Mirrors the "Next Inspection Due" date shown in renderSafetySection exactly:
+  //   - Completed + monthly  → last day of NEXT month (month+2, day 0)
+  //   - Completed + cyclic   → completion timestamp + freq days
+  //   - Due / overdue        → current cycle deadline from _safetyCycleInfo
   function getInspectionDueDates() {
     const today = new Date();
     return ['vehicle', 'ladder'].map(type => {
       const freq = (_safetyFrequency && _safetyFrequency[type]) || 0;
+      const isDue = (typeof _isSafetyDue === 'function') ? _isSafetyDue(type) : true;
       let dueDate;
-      if (freq === 0) {
-        dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // last day of month
+
+      if (!isDue) {
+        // Completed this cycle — advance to next cycle, same as safety panel display
+        if (freq <= 0) {
+          // Monthly: end of next month
+          dueDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        } else {
+          // Cyclic: completion date + freq days
+          const lastDone = _safetyChecks && _safetyChecks[type];
+          const completedAt = lastDone ? new Date(lastDone) : today;
+          dueDate = new Date(completedAt.getTime() + freq * 86400000);
+        }
       } else {
-        const lastDone = _safetyChecks && _safetyChecks[type];
-        if (lastDone) {
-          dueDate = new Date(new Date(lastDone).getTime() + freq * 86400000);
+        // Due or overdue — use the current cycle deadline
+        if (typeof _safetyCycleInfo === 'function') {
+          dueDate = _safetyCycleInfo(type).deadline;
         } else {
           dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         }
       }
+
       return {
         type,
         label:      type === 'vehicle' ? 'Vehicle Inspection Due' : 'Ladder Inspection Due',
