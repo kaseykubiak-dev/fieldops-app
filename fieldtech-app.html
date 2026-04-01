@@ -2280,7 +2280,7 @@
       </div>
 
       <div class="refresh-bar">
-        <span class="refresh-label">Refresh Cases</span>
+        <span class="refresh-label" id="refresh-label">Refresh Cases</span>
         <button class="refresh-btn" id="refresh-btn" onclick="refreshCases()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           Refresh
@@ -3444,6 +3444,7 @@
   const CATALYST      = { base: (location.hostname === 'localhost' || location.protocol === 'file:') ? 'http://localhost:3001' : RAILWAY_PROXY };
   let _networkCache   = null;
   let _networkView    = 'list';
+  let _lastTicketUpdate   = null;   // time string of last successful ticket fetch
   let _notifs             = [];
   let _notifSeen          = new Set();
   let _notifLastCheck     = null;
@@ -3621,6 +3622,16 @@
 
   function loginOnEnter(e) { if (e.key === 'Enter') attemptLogin(); }
 
+  function _stampTicketUpdate() {
+    const now  = new Date();
+    let   h    = now.getHours(), m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    _lastTicketUpdate = `${h}:${String(m).padStart(2, '0')} ${ampm}`;
+    const el = document.getElementById('refresh-label');
+    if (el) el.textContent = `Last updated ${_lastTicketUpdate}`;
+  }
+
   async function refreshCases() {
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
@@ -3715,6 +3726,7 @@
       const res = await snFetch(url);
       const data = await res.json();
       renderTickets(data.result, filterState);
+      _stampTicketUpdate();
     } catch (err) {
       list.innerHTML = `
         <div class="list-error">
