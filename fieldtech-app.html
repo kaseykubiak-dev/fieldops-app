@@ -1844,10 +1844,22 @@
   .safety-btn-undo:hover { background:rgba(255,255,255,0.12); transform:translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.45),0 4px 10px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.14),inset 0 -1px 0 rgba(0,0,0,0.2); }
   .safety-btn-undo:active { transform:scale(0.97); box-shadow:0 1px 1px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.16); }
 
+  /* Mileage Reporting — fuchsia with depth */
+  .safety-btn-mileage {
+    background: rgba(217,70,239,0.14);
+    color: #e879f9;
+    border: 1px solid rgba(217,70,239,0.38);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.2), 0 0 8px rgba(217,70,239,0.15), inset 0 1px 0 rgba(240,170,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.22);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .safety-btn-mileage:hover { background:rgba(217,70,239,0.22); transform:translateY(-1px); box-shadow:0 2px 5px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.22),0 0 12px rgba(217,70,239,0.2),inset 0 1px 0 rgba(240,170,255,0.25),inset 0 -1px 0 rgba(0,0,0,0.22); }
+  .safety-btn-mileage:active { transform:scale(0.97); box-shadow:0 1px 1px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.18); }
+
   /* C Spire light theme overrides */
   html[data-theme="cspire"] .safety-btn-sospes { background:rgba(255,103,32,0.09); border-color:rgba(255,103,32,0.28); box-shadow:0 1px 2px rgba(255,103,32,0.12),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
   html[data-theme="cspire"] .safety-btn-truckstock { background:rgba(37,99,235,0.09); color:#1D4ED8; border-color:rgba(37,99,235,0.28); box-shadow:0 1px 2px rgba(37,99,235,0.12),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
   html[data-theme="cspire"] .safety-btn-undo { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.15); box-shadow:0 1px 2px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.8),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
+  html[data-theme="cspire"] .safety-btn-mileage { background:rgba(217,70,239,0.09); color:#A21CAF; border-color:rgba(217,70,239,0.28); box-shadow:0 1px 2px rgba(217,70,239,0.12),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
 
   /* Safety banner — Tickets screen */
   .safety-banner {
@@ -2822,8 +2834,8 @@
       <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Tech Tools</span></div>
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
-        <!-- ── Monthly Safety Checks ── -->
-        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;display:none;"></span></h2>
+        <!-- ── Vehicle Reports ── -->
+        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Vehicle Reports <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;display:none;"></span></h2>
         <div class="card" id="safety-section">
           <div class="card-body" style="padding:0;">
 
@@ -2866,7 +2878,7 @@
             </div>
 
             <!-- Ladder Inspection accordion -->
-            <div class="accordion" id="safety-acc-ladder" style="border-bottom:none;">
+            <div class="accordion" id="safety-acc-ladder" style="border-bottom:1px solid var(--border);">
               <div class="acc-header safety-acc-header" onclick="toggleAcc('safety-ladder')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
@@ -2898,6 +2910,33 @@
                     </select>
                     <button onclick="event.stopPropagation();setSafetyFrequency('ladder',document.getElementById('safety-freq-input-ladder').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Confirm</button>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mileage Report accordion -->
+            <div class="accordion" id="safety-acc-mileage" style="border-bottom:none;">
+              <div class="acc-header safety-acc-header" onclick="toggleAcc('safety-mileage')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
+                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(217,70,239,0.18),rgba(217,70,239,0.06));box-shadow:0 1px 4px rgba(217,70,239,0.15);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e879f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 7.76a6 6 0 0 0 0 8.49"/></svg>
+                </div>
+                <div class="acc-header-info" id="safety-card-mileage">
+                  <span class="acc-title">Mileage Report</span>
+                  <span class="acc-sub">Monthly vehicle mileage submission</span>
+                  <div class="safety-card-completed-date" id="safety-date-mileage" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                  <div id="safety-next-due-mileage" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
+                </div>
+                <div class="acc-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-mileage">
+                  <span class="safety-card-status status-pending">Pending</span>
+                  <button class="safety-btn safety-btn-mileage" onclick="event.stopPropagation();launchMileageReporting()" style="padding:6px 12px;font-size:11px;">Mileage Reporting</button>
+                  <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('mileage')" style="padding:6px 12px;font-size:11px;">Done</button>
+                </div>
+                <svg class="acc-chevron" id="chev-safety-mileage" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="acc-body" id="body-safety-mileage">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px 14px 16px;background:rgba(217,70,239,0.03);border-radius:0 0 12px 12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <div style="font-size:12px;color:var(--text-muted);">Due on the <strong>1st of every month</strong> — no custom frequency needed.</div>
                 </div>
               </div>
             </div>
@@ -3074,13 +3113,14 @@
   // Safety Check Tracker state (must be declared before showScreen references them)
   const _SAFETY_TYPES = [
     { key: 'vehicle', label: 'Vehicle Inspection' },
-    { key: 'ladder',  label: 'Ladder Inspection'  }
+    { key: 'ladder',  label: 'Ladder Inspection'  },
+    { key: 'mileage', label: 'Mileage Report'      }
   ];
-  let _safetyChecks = { vehicle: null, ladder: null };
+  let _safetyChecks = { vehicle: null, ladder: null, mileage: null };
   let _safetyBannerDismissed = false;
   let _safetyModalShown = false;
-  let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month (default), 1-31 = custom cycle in days
-  let _safetyNextDue   = { vehicle: null, ladder: null }; // locked next-due ISO strings — set on Done, never cleared by Reset
+  let _safetyFrequency = { vehicle: 0, ladder: 0, mileage: 0 }; // per-type: 0 = end of month (default), 1-31 = custom cycle in days
+  let _safetyNextDue   = { vehicle: null, ladder: null, mileage: null }; // locked next-due ISO strings — set on Done, never cleared by Reset
 
   // Inventory Tracker state
   const _INVENTORY_TYPES = [
@@ -4819,18 +4859,24 @@
   let _cal = { year: null, month: null, tickets: null, selectedDay: null };
   let _calView = 'month'; // 'month' | 'week'
 
-  // Returns [{type, label, shortLabel, dueStr}] for both inspection types.
-  // Mirrors the "Next Inspection Due" date shown in renderSafetySection exactly:
-  //   - Completed + monthly  → last day of NEXT month (month+2, day 0)
-  //   - Completed + cyclic   → completion timestamp + freq days
-  //   - Due / overdue        → current cycle deadline from _safetyCycleInfo
+  // Returns [{type, label, shortLabel, dueStr}] for all Vehicle Report types + inventory.
+  // Prefers locked next-due dates (persist through Reset, updated only on Done).
   function getInspectionDueDates() {
     const today = new Date();
-    const safetyItems = ['vehicle', 'ladder'].map(type => {
+    const _typeLabels = {
+      vehicle: { label: 'Vehicle Inspection Due', shortLabel: 'Vehicle Insp.' },
+      ladder:  { label: 'Ladder Inspection Due',  shortLabel: 'Ladder Insp.'  },
+      mileage: { label: 'Mileage Report Due',      shortLabel: 'Mileage Rpt.'  }
+    };
+    const safetyItems = (_SAFETY_TYPES || []).map(t => {
+      const type = t.key;
       let dueDate;
       // Prefer locked next-due date (persists through Reset, updated only on Done)
       if (_safetyNextDue && _safetyNextDue[type]) {
         dueDate = new Date(_safetyNextDue[type]);
+      } else if (type === 'mileage') {
+        // No locked date yet — show upcoming 1st of next month
+        dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
       } else {
         const isDue = (typeof _isSafetyDue === 'function') ? _isSafetyDue(type) : true;
         const freq  = (_safetyFrequency && _safetyFrequency[type]) || 0;
@@ -4849,12 +4895,8 @@
         }
       }
 
-      return {
-        type,
-        label:      type === 'vehicle' ? 'Vehicle Inspection Due' : 'Ladder Inspection Due',
-        shortLabel: type === 'vehicle' ? 'Vehicle Insp.'          : 'Ladder Insp.',
-        dueStr:     calDateStr(dueDate)
-      };
+      const lbl = _typeLabels[type] || { label: t.label + ' Due', shortLabel: t.label };
+      return { type, label: lbl.label, shortLabel: lbl.shortLabel, dueStr: calDateStr(dueDate) };
     });
 
     // Append inventory due dates — always cyclic (7 or 14 days), no monthly option.
@@ -6281,8 +6323,17 @@
   // Returns { deadline: Date, daysLeft: number, cycleDays: number } for the current cycle.
   // Per-type cycle info. If frequency is 0 (default), deadline = end of month.
   // If frequency > 0, deadline = last completion + frequency days, capped at end of month.
+  // Mileage: fixed monthly — deadline = 1st of next month, urgency ramps through the month.
   function _safetyCycleInfo(type) {
     const now = new Date();
+
+    if (type === 'mileage') {
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const deadline    = new Date(now.getFullYear(), now.getMonth() + 1, 1); // 1st of next month
+      const daysLeft    = daysInMonth - now.getDate(); // days remaining in current month
+      return { deadline, daysLeft, cycleDays: daysInMonth };
+    }
+
     const eom = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const daysInMonth = eom.getDate();
     const freq = type ? (_safetyFrequency[type] || 0) : 0;
@@ -6373,7 +6424,10 @@
       } else if (_safetyChecks[t.key]) {
         const freq = _safetyFrequency[t.key] || 0;
         let nextDue;
-        if (freq <= 0) {
+        if (t.key === 'mileage') {
+          const now = new Date();
+          nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1); // 1st of next month
+        } else if (freq <= 0) {
           const now = new Date();
           nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
         } else {
@@ -6436,9 +6490,12 @@
     // Lock (or overwrite) the next due date so Reset cannot shift it
     const freq = _safetyFrequency[type] || 0;
     let nextDue;
-    if (freq <= 0) {
+    if (type === 'mileage') {
       const now = new Date();
-      nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+      nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1); // 1st of next month
+    } else if (freq <= 0) {
+      const now = new Date();
+      nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59); // end of next month
     } else {
       const completedAt = new Date(ts);
       nextDue = new Date(completedAt.getTime() + freq * 86400000);
@@ -6505,6 +6562,11 @@
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
               ' Reset</button>';
+        } else if (t.key === 'mileage') {
+          actions.innerHTML =
+            '<span class="safety-card-status status-pending">Pending</span>' +
+            '<button class="safety-btn safety-btn-mileage" onclick="event.stopPropagation();launchMileageReporting()" style="padding:6px 12px;font-size:11px;">Mileage Reporting</button>' +
+            '<button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete(\'mileage\')" style="padding:6px 12px;font-size:11px;">Done</button>';
         } else {
           actions.innerHTML =
             '<span class="safety-card-status status-pending">Pending</span>' +
@@ -6513,19 +6575,27 @@
         }
       }
 
-      // Update per-type frequency dropdown
+      // Update per-type frequency dropdown (mileage has no dropdown — skip gracefully)
       const freq = _safetyFrequency[t.key] || 0;
       const freqSelect = document.getElementById('safety-freq-input-' + t.key);
       if (freqSelect && document.activeElement !== freqSelect) {
         freqSelect.value = String(freq);
       }
 
-      // Update "Next Inspection Due" line — uses locked date (written on Done, persists through Reset)
+      // Update "Next Due" line — uses locked date (written on Done, persists through Reset).
+      // Mileage: falls back to 1st of next month when no locked date yet (first-time state).
       const nextDueEl = document.getElementById('safety-next-due-' + t.key);
       if (nextDueEl) {
         if (_safetyNextDue[t.key]) {
           const nextDate = new Date(_safetyNextDue[t.key]);
-          nextDueEl.textContent = 'Next Inspection Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          const label = t.key === 'mileage' ? 'Next Report Due: ' : 'Next Inspection Due: ';
+          nextDueEl.textContent = label + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.display = '';
+        } else if (t.key === 'mileage') {
+          // No locked date yet — show the upcoming 1st as a static reference
+          const now = new Date();
+          const upcoming = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          nextDueEl.textContent = 'Next Report Due: ' + upcoming.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
           nextDueEl.style.display = '';
         } else {
           nextDueEl.style.display = 'none';
@@ -6762,6 +6832,11 @@
   }
 
   function launchTruckStock() {
+    // URL to be provided — placeholder opens a blank tab
+    window.open('about:blank', '_blank');
+  }
+
+  function launchMileageReporting() {
     // URL to be provided — placeholder opens a blank tab
     window.open('about:blank', '_blank');
   }
