@@ -3080,6 +3080,7 @@
   let _safetyBannerDismissed = false;
   let _safetyModalShown = false;
   let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month (default), 1-31 = custom cycle in days
+  let _safetyNextDue   = { vehicle: null, ladder: null }; // locked next-due ISO strings — set on Done, never cleared by Reset
 
   // Inventory Tracker state
   const _INVENTORY_TYPES = [
@@ -3087,6 +3088,7 @@
   ];
   let _inventoryChecks    = { inventory: null };
   let _inventoryFrequency = { inventory: 7 }; // 7 or 14 days only (no monthly option)
+  let _inventoryNextDue   = { inventory: null }; // locked next-due ISO strings — set on Done, never cleared by Reset
 
   // ── Login / Logout ────────────────────────────────────────────────────────
   async function attemptLogin() {
@@ -4825,27 +4827,25 @@
   function getInspectionDueDates() {
     const today = new Date();
     const safetyItems = ['vehicle', 'ladder'].map(type => {
-      const freq = (_safetyFrequency && _safetyFrequency[type]) || 0;
-      const isDue = (typeof _isSafetyDue === 'function') ? _isSafetyDue(type) : true;
       let dueDate;
-
-      if (!isDue) {
-        // Completed this cycle — advance to next cycle, same as safety panel display
-        if (freq <= 0) {
-          // Monthly: end of next month
-          dueDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-        } else {
-          // Cyclic: completion date + freq days
-          const lastDone = _safetyChecks && _safetyChecks[type];
-          const completedAt = lastDone ? new Date(lastDone) : today;
-          dueDate = new Date(completedAt.getTime() + freq * 86400000);
-        }
+      // Prefer locked next-due date (persists through Reset, updated only on Done)
+      if (_safetyNextDue && _safetyNextDue[type]) {
+        dueDate = new Date(_safetyNextDue[type]);
       } else {
-        // Due or overdue — use the current cycle deadline
-        if (typeof _safetyCycleInfo === 'function') {
-          dueDate = _safetyCycleInfo(type).deadline;
+        const isDue = (typeof _isSafetyDue === 'function') ? _isSafetyDue(type) : true;
+        const freq  = (_safetyFrequency && _safetyFrequency[type]) || 0;
+        if (!isDue) {
+          if (freq <= 0) {
+            dueDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+          } else {
+            const lastDone    = _safetyChecks && _safetyChecks[type];
+            const completedAt = lastDone ? new Date(lastDone) : today;
+            dueDate = new Date(completedAt.getTime() + freq * 86400000);
+          }
         } else {
-          dueDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+          dueDate = (typeof _safetyCycleInfo === 'function')
+            ? _safetyCycleInfo(type).deadline
+            : new Date(today.getFullYear(), today.getMonth() + 1, 0);
         }
       }
 
@@ -4858,10 +4858,12 @@
     });
 
     // Append inventory due dates — always cyclic (7 or 14 days), no monthly option.
-    // _inventoryCycleInfo returns the correct deadline in all states (due or not due).
     const inventoryItems = (_INVENTORY_TYPES || []).map(t => {
       let dueDate;
-      if (typeof _inventoryCycleInfo === 'function') {
+      // Prefer locked next-due date (persists through Reset, updated only on Done)
+      if (_inventoryNextDue && _inventoryNextDue[t.key]) {
+        dueDate = new Date(_inventoryNextDue[t.key]);
+      } else if (typeof _inventoryCycleInfo === 'function') {
         dueDate = _inventoryCycleInfo(t.key).deadline;
       } else {
         dueDate = new Date(today.getTime() + 7 * 86400000); // fallback
@@ -6357,6 +6359,23 @@
       _safetyFrequency[t.key] = storedFreq ? parseInt(storedFreq, 10) || 0 : 0;
       const stored = localStorage.getItem(_safetyLsKey(t.key));
       _safetyChecks[t.key] = stored || null;
+      // Load locked next-due date; backfill from completion timestamp for backward compat
+      const storedNextDue = localStorage.getItem('ft_safety_nextdue_' + t.key);
+      if (storedNextDue) {
+        _safetyNextDue[t.key] = storedNextDue;
+      } else if (_safetyChecks[t.key]) {
+        const freq = _safetyFrequency[t.key] || 0;
+        let nextDue;
+        if (freq <= 0) {
+          const now = new Date();
+          nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+        } else {
+          const completedAt = new Date(_safetyChecks[t.key]);
+          nextDue = new Date(completedAt.getTime() + freq * 86400000);
+        }
+        _safetyNextDue[t.key] = nextDue.toISOString();
+        localStorage.setItem('ft_safety_nextdue_' + t.key, _safetyNextDue[t.key]);
+      }
     });
     // Migrate legacy shared frequency key if present
     const legacyFreq = localStorage.getItem('ft_safety_frequency');
@@ -6407,6 +6426,18 @@
     const ts = new Date().toISOString();
     _safetyChecks[type] = ts;
     localStorage.setItem(_safetyLsKey(type), ts);
+    // Lock (or overwrite) the next due date so Reset cannot shift it
+    const freq = _safetyFrequency[type] || 0;
+    let nextDue;
+    if (freq <= 0) {
+      const now = new Date();
+      nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+    } else {
+      const completedAt = new Date(ts);
+      nextDue = new Date(completedAt.getTime() + freq * 86400000);
+    }
+    _safetyNextDue[type] = nextDue.toISOString();
+    localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
     renderSafetySection();
     updateSafetyBadge();
     renderSafetyBanner();
@@ -6482,23 +6513,11 @@
         freqSelect.value = String(freq);
       }
 
-      // Update "Next Inspection Due" line
+      // Update "Next Inspection Due" line — uses locked date (written on Done, persists through Reset)
       const nextDueEl = document.getElementById('safety-next-due-' + t.key);
       if (nextDueEl) {
-        if (!due) {
-          // Completed — calculate the NEXT due date (not capped to current month)
-          const freq = _safetyFrequency[t.key] || 0;
-          const now = new Date();
-          let nextDate;
-          if (freq <= 0) {
-            // Monthly: next inspection is due at end of next month
-            nextDate = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
-          } else {
-            // 7 or 14 days: next inspection = completion date + freq days
-            const ts = _safetyChecks[t.key];
-            const completedAt = ts ? new Date(ts) : now;
-            nextDate = new Date(completedAt.getTime() + freq * 86400000);
-          }
+        if (_safetyNextDue[t.key]) {
+          const nextDate = new Date(_safetyNextDue[t.key]);
           nextDueEl.textContent = 'Next Inspection Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
           nextDueEl.style.display = '';
         } else {
@@ -6638,6 +6657,17 @@
       _inventoryFrequency[t.key] = (parsed === 7 || parsed === 14) ? parsed : 7;
       const stored = localStorage.getItem(_inventoryLsKey(t.key));
       _inventoryChecks[t.key] = stored || null;
+      // Load locked next-due date; backfill from completion timestamp for backward compat
+      const storedNextDue = localStorage.getItem('ft_inventory_nextdue_' + t.key);
+      if (storedNextDue) {
+        _inventoryNextDue[t.key] = storedNextDue;
+      } else if (_inventoryChecks[t.key]) {
+        const freq = _inventoryFrequency[t.key] || 7;
+        const completedAt = new Date(_inventoryChecks[t.key]);
+        const nextDue = new Date(completedAt.getTime() + freq * 86400000);
+        _inventoryNextDue[t.key] = nextDue.toISOString();
+        localStorage.setItem('ft_inventory_nextdue_' + t.key, _inventoryNextDue[t.key]);
+      }
     });
     renderInventorySection();
   }
@@ -6654,6 +6684,12 @@
     const ts = new Date().toISOString();
     _inventoryChecks[type] = ts;
     localStorage.setItem(_inventoryLsKey(type), ts);
+    // Lock (or overwrite) the next due date so Reset cannot shift it
+    const freq = _inventoryFrequency[type] || 7;
+    const completedAt = new Date(ts);
+    const nextDue = new Date(completedAt.getTime() + freq * 86400000);
+    _inventoryNextDue[type] = nextDue.toISOString();
+    localStorage.setItem('ft_inventory_nextdue_' + type, _inventoryNextDue[type]);
     renderInventorySection();
   }
 
@@ -6704,12 +6740,12 @@
         freqSelect.value = String(_inventoryFrequency[t.key] || 7);
       }
 
-      // "Next Report Due" line
+      // "Next Report Due" line — uses locked date (written on Done, persists through Reset)
       const nextDueEl = document.getElementById('inventory-next-due-' + t.key);
       if (nextDueEl) {
-        if (!due) {
-          const info = _inventoryCycleInfo(t.key);
-          nextDueEl.textContent = 'Next Report Due: ' + info.deadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+        if (_inventoryNextDue[t.key]) {
+          const nextDate = new Date(_inventoryNextDue[t.key]);
+          nextDueEl.textContent = 'Next Report Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
           nextDueEl.style.display = '';
         } else {
           nextDueEl.style.display = 'none';
