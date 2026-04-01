@@ -97,7 +97,7 @@
     --pill-open-text: #0f3d58;
     --pill-progress-text: #7c2d00;
     --pill-resolved-text: #004d32;
-    --pill-enroute-text: #0f3d58;
+    --pill-enroute-text: #6b3a7d;
     --pill-pending-text: #6b3a00;
   }
 
@@ -118,7 +118,7 @@
   html[data-theme="cspire"] .pill-open     { background: linear-gradient(135deg, rgba(0,192,243,0.32) 0%, rgba(0,96,200,0.14) 100%);   border: 1.5px solid rgba(0,152,210,0.52);  color: var(--pill-open-text); }
   html[data-theme="cspire"] .pill-progress { background: linear-gradient(135deg, rgba(255,103,32,0.26) 0%, rgba(255,103,32,0.1) 100%); border: 1.5px solid rgba(255,103,32,0.46);  color: var(--pill-progress-text); }
   html[data-theme="cspire"] .pill-resolved { background: linear-gradient(135deg, rgba(0,135,90,0.22) 0%, rgba(0,135,90,0.09) 100%);    border: 1.5px solid rgba(0,135,90,0.42);   color: var(--pill-resolved-text); }
-  html[data-theme="cspire"] .pill-enroute  { background: linear-gradient(135deg, rgba(0,192,243,0.3) 0%, rgba(136,77,157,0.18) 100%);  border: 1.5px solid rgba(0,152,210,0.44);  color: var(--pill-enroute-text); }
+  html[data-theme="cspire"] .pill-enroute  { background: linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.08) 100%); border: 1.5px solid rgba(122,85,152,0.42); color: var(--pill-enroute-text); }
   html[data-theme="cspire"] .pill-onsite   { background: linear-gradient(135deg, rgba(0,135,90,0.26) 0%, rgba(0,135,90,0.1) 100%);     border: 1.5px solid rgba(0,135,90,0.44);   color: var(--pill-low-text); }
   html[data-theme="cspire"] .pill-pending  { background: linear-gradient(135deg, rgba(184,110,0,0.24) 0%, rgba(184,110,0,0.1) 100%);   border: 1.5px solid rgba(184,110,0,0.44);  color: var(--pill-pending-text); }
   html[data-theme="cspire"] .topbar-logo   { background: rgba(19,30,41,0.45); }
@@ -674,9 +674,9 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,230,118,0.12), inset 0 1px 0 rgba(0,230,118,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
   }
   .pill-enroute {
-    background:linear-gradient(135deg, rgba(0,192,243,0.2) 0%, rgba(0,192,243,0.06) 100%);
-    color:var(--accent); border:1.5px solid rgba(0,192,243,0.42);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+    background:linear-gradient(135deg, rgba(136,77,157,0.22) 0%, rgba(136,77,157,0.07) 100%);
+    color:#b07ccc; border:1.5px solid rgba(136,77,157,0.45);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(136,77,157,0.14), inset 0 1px 0 rgba(136,77,157,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
   }
   .pill-onsite {
     background:linear-gradient(135deg, rgba(0,201,106,0.2) 0%, rgba(0,201,106,0.06) 100%);
@@ -905,30 +905,30 @@
     display:flex; align-items:center; gap:5px;
   }
   .ticket-action-btn::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-  /* State: travel (orange — default) */
+  /* State: travel (blue — matches Open pill) */
   .ticket-action-btn[data-action-state="travel"] {
-    background:linear-gradient(135deg, rgba(255,103,32,0.22) 0%, rgba(255,103,32,0.07) 100%);
-    border-color:rgba(255,103,32,0.44); color:var(--accent2);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(255,103,32,0.12), inset 0 1px 0 rgba(255,103,32,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
-    text-shadow:0 1px 2px rgba(0,0,0,0.3);
-  }
-  .ticket-action-btn[data-action-state="travel"]::before { background:var(--accent2); box-shadow:0 0 5px rgba(255,103,32,0.6); }
-  .ticket-action-btn[data-action-state="travel"]:hover {
-    background:linear-gradient(135deg, rgba(255,103,32,0.32) 0%, rgba(255,103,32,0.12) 100%);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(255,103,32,0.2), inset 0 1px 0 rgba(255,103,32,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
-    transform:translateY(-1px);
-  }
-  /* State: work (cyan/accent) */
-  .ticket-action-btn[data-action-state="work"] {
     background:linear-gradient(135deg, rgba(0,192,243,0.22) 0%, rgba(0,192,243,0.07) 100%);
     border-color:rgba(0,192,243,0.44); color:var(--accent);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
     text-shadow:0 1px 2px rgba(0,0,0,0.3);
   }
-  .ticket-action-btn[data-action-state="work"]::before { background:var(--accent); box-shadow:0 0 5px rgba(0,192,243,0.6); }
-  .ticket-action-btn[data-action-state="work"]:hover {
+  .ticket-action-btn[data-action-state="travel"]::before { background:var(--accent); box-shadow:0 0 5px rgba(0,192,243,0.6); }
+  .ticket-action-btn[data-action-state="travel"]:hover {
     background:linear-gradient(135deg, rgba(0,192,243,0.32) 0%, rgba(0,192,243,0.12) 100%);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,192,243,0.2), inset 0 1px 0 rgba(0,192,243,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
+    transform:translateY(-1px);
+  }
+  /* State: work (purple — matches En Route pill) */
+  .ticket-action-btn[data-action-state="work"] {
+    background:linear-gradient(135deg, rgba(136,77,157,0.22) 0%, rgba(136,77,157,0.07) 100%);
+    border-color:rgba(136,77,157,0.45); color:#b07ccc;
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(136,77,157,0.14), inset 0 1px 0 rgba(136,77,157,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+    text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
+  .ticket-action-btn[data-action-state="work"]::before { background:#b07ccc; box-shadow:0 0 5px rgba(136,77,157,0.6); }
+  .ticket-action-btn[data-action-state="work"]:hover {
+    background:linear-gradient(135deg, rgba(136,77,157,0.32) 0%, rgba(136,77,157,0.12) 100%);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(136,77,157,0.22), inset 0 1px 0 rgba(136,77,157,0.22), inset 0 -1px 0 rgba(0,0,0,0.15);
     transform:translateY(-1px);
   }
   /* State: close (green/success) */
@@ -954,8 +954,10 @@
   .ticket-action-btn[data-action-state="done"]::before { background:var(--text-muted); box-shadow:none; }
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="done"] { border-color:rgba(0,0,0,0.15); color:#7a8fa6; }
   /* C Spire theme overrides */
-  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#8b6aad; box-shadow:0 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(122,85,152,0.14), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.08); text-shadow:none; }
-  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"]::before { background:#8b6aad; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(0,152,210,0.22) 0%, rgba(0,96,200,0.08) 100%); border-color:rgba(0,152,210,0.44); color:#0f3d58; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(0,152,210,0.12), inset 0 1px 0 rgba(0,152,210,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"]::before { background:#0f3d58; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="work"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#6b3a7d; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(122,85,152,0.12), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="work"]::before { background:#6b3a7d; }
 
   .cust-banner-grid { display:grid; grid-template-columns:1fr 1fr; }
   .cust-field { padding:10px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -3590,7 +3592,7 @@
       else if (dateStr === yesterday) label = `Yesterday — ${formatDate(d)}`;
       else label = formatDate(d);
 
-      html += `<div class="date-divider"><span class="date-divider-label">${label}</span><span class="date-divider-line"></span></div>`;
+      html += `<div class="date-divider" data-date="${dateStr}"><span class="date-divider-label">${label}</span><span class="date-divider-line"></span></div>`;
 
       tickets.forEach(inc => {
         const pri      = PRIORITY_MAP[inc.priority] || { label: 'Unknown', cls: 'pill-low' };
@@ -3633,7 +3635,26 @@
     });
 
     list.innerHTML = html;
-    list.scrollTop = 0; // prevent iOS PWA from scrolling window on DOM replace
+
+    // For Assigned and Closed tabs, scroll to today's date divider (or the closest date)
+    if (filterState !== 'today') {
+      const todayStr = new Date().toDateString();
+      let target = list.querySelector(`.date-divider[data-date="${todayStr}"]`);
+      if (!target) {
+        const dividers = [...list.querySelectorAll('.date-divider[data-date]')];
+        if (dividers.length) {
+          const now = Date.now();
+          target = dividers.reduce((best, el) => {
+            const elDiff   = Math.abs(new Date(el.dataset.date).getTime() - now);
+            const bestDiff = Math.abs(new Date(best.dataset.date).getTime() - now);
+            return elDiff < bestDiff ? el : best;
+          });
+        }
+      }
+      list.scrollTop = target ? target.offsetTop : 0;
+    } else {
+      list.scrollTop = 0; // Today tab always starts at top; also prevents iOS PWA scroll
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
