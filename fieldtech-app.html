@@ -1811,12 +1811,43 @@
   .safety-btn-primary { background:var(--accent); color:#fff; }
   .safety-btn-primary:hover { filter:brightness(1.1); }
   .safety-btn-primary:active { transform:scale(0.97); }
-  .safety-btn-sospes { background:rgba(255,103,32,0.15); color:var(--accent2); border:1px solid rgba(255,103,32,0.3); }
-  .safety-btn-sospes:hover { background:rgba(255,103,32,0.25); }
-  .safety-btn-truckstock { background:rgba(0,201,106,0.15); color:var(--success); border:1px solid rgba(0,201,106,0.3); }
-  .safety-btn-truckstock:hover { background:rgba(0,201,106,0.25); }
-  .safety-btn-undo { background:rgba(255,255,255,0.06); color:var(--text-muted); border:1px solid var(--border); }
-  .safety-btn-undo:hover { background:rgba(255,255,255,0.1); }
+  /* Sospes — orange tint with depth */
+  .safety-btn-sospes {
+    background: rgba(255,103,32,0.14);
+    color: var(--accent2);
+    border: 1px solid rgba(255,103,32,0.35);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.2), 0 0 8px rgba(255,103,32,0.12), inset 0 1px 0 rgba(255,180,100,0.18), inset 0 -1px 0 rgba(0,0,0,0.22);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .safety-btn-sospes:hover { background:rgba(255,103,32,0.23); transform:translateY(-1px); box-shadow:0 2px 5px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.22),0 0 12px rgba(255,103,32,0.18),inset 0 1px 0 rgba(255,180,100,0.22),inset 0 -1px 0 rgba(0,0,0,0.22); }
+  .safety-btn-sospes:active { transform:scale(0.97); box-shadow:0 1px 1px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.18); }
+
+  /* Truck Stock — cobalt blue with depth */
+  .safety-btn-truckstock {
+    background: rgba(37,99,235,0.14);
+    color: #4d8ef8;
+    border: 1px solid rgba(37,99,235,0.38);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.2), 0 0 8px rgba(37,99,235,0.15), inset 0 1px 0 rgba(120,170,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.22);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .safety-btn-truckstock:hover { background:rgba(37,99,235,0.22); transform:translateY(-1px); box-shadow:0 2px 5px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.22),0 0 12px rgba(37,99,235,0.2),inset 0 1px 0 rgba(120,170,255,0.25),inset 0 -1px 0 rgba(0,0,0,0.22); }
+  .safety-btn-truckstock:active { transform:scale(0.97); box-shadow:0 1px 1px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.18); }
+
+  /* Reset — neutral with depth */
+  .safety-btn-undo {
+    background: rgba(255,255,255,0.07);
+    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+  .safety-btn-undo:hover { background:rgba(255,255,255,0.12); transform:translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.45),0 4px 10px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.14),inset 0 -1px 0 rgba(0,0,0,0.2); }
+  .safety-btn-undo:active { transform:scale(0.97); box-shadow:0 1px 1px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.16); }
+
+  /* C Spire light theme overrides */
+  html[data-theme="cspire"] .safety-btn-sospes { background:rgba(255,103,32,0.09); border-color:rgba(255,103,32,0.28); box-shadow:0 1px 2px rgba(255,103,32,0.12),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
+  html[data-theme="cspire"] .safety-btn-truckstock { background:rgba(37,99,235,0.09); color:#1D4ED8; border-color:rgba(37,99,235,0.28); box-shadow:0 1px 2px rgba(37,99,235,0.12),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
+  html[data-theme="cspire"] .safety-btn-undo { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.15); box-shadow:0 1px 2px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.8),inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
 
   /* Safety banner — Tickets screen */
   .safety-banner {
@@ -2792,7 +2823,7 @@
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
         <!-- ── Monthly Safety Checks ── -->
-        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;">All Clear</span></h2>
+        <h2 class="section-title" style="display:flex;align-items:center;justify-content:space-between;">Monthly Safety Checks <span class="safety-urgency-pill urgency-none" id="safety-urgency-pill" style="margin-left:auto;display:none;"></span></h2>
         <div class="card" id="safety-section">
           <div class="card-body" style="padding:0;">
 
@@ -2882,13 +2913,13 @@
             <!-- Inventory Report accordion -->
             <div class="accordion" id="inventory-acc-inventory" style="border-bottom:none;">
               <div class="acc-header safety-acc-header" onclick="toggleAcc('inventory-inventory')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
-                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,201,106,0.15),rgba(0,201,106,0.05));box-shadow:0 1px 4px rgba(0,201,106,0.12);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(37,99,235,0.18),rgba(37,99,235,0.06));box-shadow:0 1px 4px rgba(37,99,235,0.15);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4d8ef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 </div>
                 <div class="acc-header-info" id="inventory-card-inventory">
                   <span class="acc-title">Inventory Report</span>
                   <span class="acc-sub">Truck stock, tools, and supplies</span>
-                  <div class="safety-card-completed-date" id="inventory-date-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
+                  <div class="safety-card-completed-date" id="inventory-date-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:#4d8ef8;margin-top:2px;"></div>
                   <div id="inventory-next-due-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
                 <div class="acc-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="inventory-actions-inventory">
@@ -2899,7 +2930,7 @@
                 <svg class="acc-chevron" id="chev-inventory-inventory" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
               </div>
               <div class="acc-body" id="body-inventory-inventory">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(0,201,106,0.03);border-radius:0 0 12px 12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px 16px;gap:10px;background:rgba(37,99,235,0.04);border-radius:0 0 12px 12px;">
                   <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <div style="font-size:12px;font-weight:600;color:var(--text);">Reminder Frequency</div>
@@ -2909,7 +2940,7 @@
                       <option value="7">Remind me every 7 days</option>
                       <option value="14">Remind me every 14 days</option>
                     </select>
-                    <button onclick="event.stopPropagation();setInventoryFrequency('inventory',document.getElementById('inventory-freq-input-inventory').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(0,201,106,0.35);background:rgba(0,201,106,0.1);color:var(--success);cursor:pointer;">Confirm</button>
+                    <button onclick="event.stopPropagation();setInventoryFrequency('inventory',document.getElementById('inventory-freq-input-inventory').value);" style="padding:4px 10px;font-size:10px;font-weight:700;border-radius:5px;border:1px solid rgba(37,99,235,0.35);background:rgba(37,99,235,0.12);color:#4d8ef8;cursor:pointer;">Confirm</button>
                   </div>
                 </div>
               </div>
@@ -6400,9 +6431,14 @@
 
     const pill = document.getElementById('safety-urgency-pill');
     if (pill) {
-      pill.className = 'safety-urgency-pill urgency-' + urgency;
-      const labels = { none: 'All Clear', low: 'Due This Month', medium: 'Due Soon', high: 'Overdue' };
-      pill.textContent = labels[urgency];
+      if (urgency === 'none') {
+        pill.style.display = 'none';
+      } else {
+        pill.style.display = '';
+        pill.className = 'safety-urgency-pill urgency-' + urgency;
+        const labels = { low: 'Due This Month', medium: 'Due Soon', high: 'Overdue' };
+        pill.textContent = labels[urgency] || '';
+      }
     }
 
     _SAFETY_TYPES.forEach(t => {
@@ -6430,7 +6466,7 @@
             '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
-              ' Undo</button>';
+              ' Reset</button>';
         } else {
           actions.innerHTML =
             '<span class="safety-card-status status-pending">Pending</span>' +
@@ -6653,7 +6689,7 @@
             '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoInventoryCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>' +
-              ' Undo</button>';
+              ' Reset</button>';
         } else {
           actions.innerHTML =
             '<span class="safety-card-status status-pending">Pending</span>' +
