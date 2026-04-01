@@ -1,6 +1,6 @@
 # Delta — Field Operations Tech App
 
-Single-file web app (`fieldtech-app.html`, ~6700+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~7100+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
 
 ---
 
@@ -594,9 +594,11 @@ With per-type frequency, each inspection can be at a different urgency level ind
 
 **Section header** (Tech Tools screen): Uses `.section-title` bar titled **Vehicle Reports** with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container.
 
-**Inspection accordions** (Tech Tools screen): Each item (Vehicle, Ladder, Mileage) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding reveals action buttons + details:
-- **Vehicle / Ladder**: Sospes button + Done when pending; Reset when complete. Per-type **Reminder Frequency** dropdown (monthly / 7-day / 14-day) + Confirm in the body.
-- **Mileage Report**: **Mileage Reporting** button (fuchsia) + Done when pending; Reset when complete. No frequency dropdown — accordion body shows a static note ("Due on the 1st of every month"). Urgency ramps through the month toward the 1st of next month.
+**Inspection accordions** (Tech Tools screen): Each item (Vehicle, Ladder, Mileage) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), Done button (or Reset when complete), and a chevron. The launch link to the external service lives **inside the accordion body**, not in the header.
+
+Accordion body contents:
+- **Vehicle / Ladder**: Full-width **Sospes Safety App** button (orange, external-link icon on right edge) + Per-type **Reminder Frequency** dropdown (monthly / 7-day / 14-day) + Confirm.
+- **Mileage Report**: Full-width **Mileage Reporting Tool** button (fuchsia, VPN badge, external-link icon) + static note ("Due on the 1st of every month"). No frequency dropdown. Urgency ramps through the month toward the 1st of next month.
 
 Uses `toggleAcc()` with IDs `safety-vehicle`, `safety-ladder`, `safety-mileage`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds.
 
@@ -617,7 +619,7 @@ Uses `toggleAcc()` with IDs `safety-vehicle`, `safety-ladder`, `safety-mileage`.
 | `initSafetyChecks()` | Loads state + per-type frequencies from localStorage (with legacy migration), renders all components |
 | `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
 | `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all. Shown as the **Reset** button in the UI. |
-| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage, triggers a brief toast confirmation ("Vehicle inspection set to remind every 7 days") via `_showFreqToast()` |
+| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage. If the type already has a completion timestamp, **immediately recalculates and overwrites `_safetyNextDue[type]`** using the new frequency (same branching logic as `markSafetyComplete`). Triggers a brief toast confirmation via `_showFreqToast()`. |
 | `_showFreqToast(msg)` | Displays a transient bottom-anchored toast (`#safety-freq-toast`) with a checkmark and descriptive message; auto-dismisses after ~3 s |
 | `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency (used for urgency/progress calculations; does **not** drive the "Next Inspection Due" display) |
 | `_isSafetyDue(type)` | Checks if inspection is due using that type's frequency |
@@ -707,6 +709,8 @@ let _inventoryFrequency = { inventory: 7 };    // 7 or 14 only
 ### UI structure
 
 The Inventory Report accordion (`#inventory-acc-inventory`) uses the same `.accordion` / `.acc-header` / `.acc-body` pattern as the safety accordions. Action div carries class `acc-actions` and the header carries `safety-acc-header` for the mobile stacking behavior. Icon and body tint use cobalt blue (`rgba(37,99,235,…)`). The frequency confirm button inline style also uses cobalt.
+
+The accordion body contains a full-width **Truck Stock Portal** button (cobalt blue, VPN badge, external-link icon on right edge) above the Reminder Frequency dropdown. The launch button is in the body, not the header — the header shows only the status pill and Done/Reset button.
 
 ---
 
@@ -799,4 +803,54 @@ On `min-width:800px`, `.ticket-inner`, `.cal-mini-card`, and `.cust-card-inner` 
 ## Important Patterns
 
 - **No framework, no build**: pure DOM manipulation. `escHtml(str)` must be used on all user/API data inserted into innerHTML.
-- **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any
+- **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any new SN API calls — never raw `fetch()`.
+- **Urgency vs card display are separate**: `_isSafetyDue()` / `_isInventoryDue()` drive urgency pills and calendar banners. Card Pending/Complete display uses `hasTimestamp = !!_safetyChecks[type]`. These must remain separate — `_isSafetyDue` returns `false` when a locked future date exists (correct for urgency) but must not control card state after Reset.
+- **Locked next-due date pattern**: `_safetyNextDue[type]` / `_inventoryNextDue[type]` are ISO strings written on Done, persisted to `ft_safety_nextdue_{type}` / `ft_inventory_nextdue_{type}` in localStorage, and never cleared by Reset. They are overwritten only when Done is pressed again or when frequency is changed via Confirm (see `setSafetyFrequency`). `_isSafetyDue` uses this locked date when no completion timestamp exists, preventing a false "Overdue" state after Reset.
+- **Single source for links**: `_LINKS_DATA` / `buildLinksHTML()` populate both `#links-container-detail` (ticket detail Links section) and `#links-container-screen` (Important Links screen). Changes to links or link rendering automatically apply to both.
+- **Scroll container per screen**: `html,body` has `overflow:hidden`. Each screen's scrollable area is `.detail-scroll` (or `.ticket-list` for the tickets screen). The pull-to-refresh handler must target the active screen's scroll container, not `document.body`.
+
+---
+
+## Pull-to-Refresh (Mobile)
+
+An IIFE touch handler at the bottom of the `<script>` block implements native-feel pull-to-refresh on mobile.
+
+### Mechanism
+
+- `touchstart`: if the active screen's scroll container (`getActiveScroll()`) is at `scrollTop <= 0`, begin tracking. Records `startY`.
+- `touchmove`: computes `delta = currentY - startY`. Ignores upward pulls or pulls that start mid-scroll. At `delta >= 18px` the indicator fades in; at `delta >= 72px` the label switches to "Release to refresh".
+- `touchend`: if `delta >= 72px`, switches indicator to spinning "Refreshing…" state and calls `location.reload()` after 300ms. Otherwise hides indicator.
+
+All listeners use `{ passive: true }` — no `preventDefault()` calls.
+
+### Indicator (`#ptr-indicator`)
+
+A `position:fixed; top:0` pill that animates from `height:0` to `height:56px` when the `.ptr-visible` class is added. Inner `.ptr-inner` div fades in with a slight upward translate. `.ptr-refreshing` swaps the static icon for a spinning one (reuses `@keyframes spin`). The indicator is `pointer-events:none` and sits at `z-index:9999`.
+
+### `getActiveScroll()`
+
+Finds the current screen's scroll container:
+```js
+const activeScreen = document.querySelector('.screen.active');
+const ds = activeScreen.querySelector('.detail-scroll');  // most screens
+const tl = activeScreen.querySelector('.ticket-list');     // tickets screen
+```
+Returns `null` if neither is found, in which case the handler treats the screen as scrollable from the top.
+
+---
+
+## Portal Links — External Link Icon
+
+`buildLinksHTML()` generates HTML for both the ticket detail **Links** section and the **Important Links** screen from the shared `_LINKS_DATA` array.
+
+Each `<a class="portal-link">` now contains:
+```html
+<span class="link-label">Label Text<span class="vpn-badge">VPN</span></span>  <!-- VPN only if needed -->
+<svg class="ext-icon" ...>  <!-- box-arrow external link icon -->
+```
+
+- `.link-label` has `flex:1; min-width:0` — takes all available width, keeping the VPN badge immediately next to the label text (left-justified).
+- `.ext-icon` has `flex-shrink:0; opacity:0.55; margin-left:auto` — pins the icon to the right edge at reduced opacity as a subtle affordance.
+- VPN badge sits **inside** `.link-label` so it is always adjacent to the text regardless of label length.
+
+The same box-arrow SVG (`path d="M18 13v6…"` + `polyline 15 3 21 3 21 9` + `line 10 14 21 3`) is also used in the Vehicle Reports and Inventory Management accordion launch buttons.
