@@ -119,6 +119,7 @@
   html[data-theme="cspire"] .pill-progress { background: linear-gradient(135deg, rgba(255,103,32,0.26) 0%, rgba(255,103,32,0.1) 100%); border: 1.5px solid rgba(255,103,32,0.46);  color: var(--pill-progress-text); }
   html[data-theme="cspire"] .pill-resolved { background: linear-gradient(135deg, rgba(0,135,90,0.22) 0%, rgba(0,135,90,0.09) 100%);    border: 1.5px solid rgba(0,135,90,0.42);   color: var(--pill-resolved-text); }
   html[data-theme="cspire"] .pill-enroute  { background: linear-gradient(135deg, rgba(0,192,243,0.3) 0%, rgba(136,77,157,0.18) 100%);  border: 1.5px solid rgba(0,152,210,0.44);  color: var(--pill-enroute-text); }
+  html[data-theme="cspire"] .pill-onsite   { background: linear-gradient(135deg, rgba(0,135,90,0.26) 0%, rgba(0,135,90,0.1) 100%);     border: 1.5px solid rgba(0,135,90,0.44);   color: var(--pill-low-text); }
   html[data-theme="cspire"] .pill-pending  { background: linear-gradient(135deg, rgba(184,110,0,0.24) 0%, rgba(184,110,0,0.1) 100%);   border: 1.5px solid rgba(184,110,0,0.44);  color: var(--pill-pending-text); }
   html[data-theme="cspire"] .topbar-logo   { background: rgba(19,30,41,0.45); }
   html[data-theme="cspire"] .select-field  { background-color: var(--surface2); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a90aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
@@ -677,6 +678,11 @@
     color:var(--accent); border:1.5px solid rgba(0,192,243,0.42);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
   }
+  .pill-onsite {
+    background:linear-gradient(135deg, rgba(0,201,106,0.2) 0%, rgba(0,201,106,0.06) 100%);
+    color:var(--success); border:1.5px solid rgba(0,201,106,0.42);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,201,106,0.12), inset 0 1px 0 rgba(0,201,106,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
+  }
   .pill-pending {
     background:linear-gradient(135deg, rgba(255,215,64,0.2) 0%, rgba(255,215,64,0.06) 100%);
     color:var(--warning); border:1.5px solid rgba(255,215,64,0.4);
@@ -890,6 +896,57 @@
   .cust-bn-name { font-size:16px; font-weight:700; color:var(--text); }
   .cust-bn-id { font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:1px; }
   .cust-tier { margin-left:auto; padding:3px 9px; border-radius:5px; background:linear-gradient(135deg, rgba(255,103,32,0.2) 0%, rgba(255,103,32,0.06) 100%); border:1.5px solid rgba(255,103,32,0.42); color:var(--accent2); font-size:11px; font-weight:600; font-family:var(--mono); flex-shrink:0; box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 7px rgba(255,103,32,0.09), inset 0 1px 0 rgba(255,103,32,0.13), inset 0 -1px 0 rgba(0,0,0,0.15); text-shadow:0 1px 2px rgba(0,0,0,0.3); }
+
+  /* ── TICKET ACTION BUTTON ── */
+  .ticket-action-btn {
+    margin-left:auto; padding:5px 12px; border-radius:6px; cursor:pointer;
+    font-size:11px; font-weight:700; font-family:var(--mono); letter-spacing:.04em;
+    flex-shrink:0; border:1.5px solid; transition:all .2s ease;
+    display:flex; align-items:center; gap:5px;
+  }
+  .ticket-action-btn::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  /* State: travel (orange — default) */
+  .ticket-action-btn[data-action-state="travel"] {
+    background:linear-gradient(135deg, rgba(255,103,32,0.22) 0%, rgba(255,103,32,0.07) 100%);
+    border-color:rgba(255,103,32,0.44); color:var(--accent2);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(255,103,32,0.12), inset 0 1px 0 rgba(255,103,32,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
+    text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
+  .ticket-action-btn[data-action-state="travel"]::before { background:var(--accent2); box-shadow:0 0 5px rgba(255,103,32,0.6); }
+  .ticket-action-btn[data-action-state="travel"]:hover {
+    background:linear-gradient(135deg, rgba(255,103,32,0.32) 0%, rgba(255,103,32,0.12) 100%);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(255,103,32,0.2), inset 0 1px 0 rgba(255,103,32,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
+    transform:translateY(-1px);
+  }
+  /* State: work (cyan/accent) */
+  .ticket-action-btn[data-action-state="work"] {
+    background:linear-gradient(135deg, rgba(0,192,243,0.22) 0%, rgba(0,192,243,0.07) 100%);
+    border-color:rgba(0,192,243,0.44); color:var(--accent);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
+    text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
+  .ticket-action-btn[data-action-state="work"]::before { background:var(--accent); box-shadow:0 0 5px rgba(0,192,243,0.6); }
+  .ticket-action-btn[data-action-state="work"]:hover {
+    background:linear-gradient(135deg, rgba(0,192,243,0.32) 0%, rgba(0,192,243,0.12) 100%);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,192,243,0.2), inset 0 1px 0 rgba(0,192,243,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
+    transform:translateY(-1px);
+  }
+  /* State: close (green/success) */
+  .ticket-action-btn[data-action-state="close"] {
+    background:linear-gradient(135deg, rgba(0,201,106,0.22) 0%, rgba(0,201,106,0.07) 100%);
+    border-color:rgba(0,201,106,0.44); color:var(--success);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(0,201,106,0.12), inset 0 1px 0 rgba(0,201,106,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
+    text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
+  .ticket-action-btn[data-action-state="close"]::before { background:var(--success); box-shadow:0 0 5px rgba(0,201,106,0.6); }
+  .ticket-action-btn[data-action-state="close"]:hover {
+    background:linear-gradient(135deg, rgba(0,201,106,0.32) 0%, rgba(0,201,106,0.12) 100%);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,201,106,0.2), inset 0 1px 0 rgba(0,201,106,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
+    transform:translateY(-1px);
+  }
+  /* C Spire theme overrides */
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#8b6aad; box-shadow:0 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(122,85,152,0.14), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.08); text-shadow:none; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"]::before { background:#8b6aad; }
 
   .cust-banner-grid { display:grid; grid-template-columns:1fr 1fr; }
   .cust-field { padding:10px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -2238,7 +2295,7 @@
               <div class="cust-bn-name" id="detail-cust-name">—</div>
               <div class="cust-bn-id" id="detail-cust-id">—</div>
             </div>
-            <div class="cust-tier" id="detail-cust-tier">—</div>
+            <button class="ticket-action-btn" id="ticket-action-btn" data-action-state="travel" onclick="advanceTicketAction()">Start Travel</button>
           </div>
           <div class="cust-banner-grid">
             <!-- Row 1: SLA -->
@@ -2594,7 +2651,7 @@
         </div>
 
         <!-- UPDATE -->
-        <div class="section">
+        <div class="section" id="close-ticket-section">
           <h2 class="section-title">Update Ticket <span style="font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent2);">· Pushes updates and closures realtime to ServiceNow</span></h2>
           <div class="card">
             <div class="card-body">
@@ -3577,6 +3634,70 @@
   let currentCaseNumber  = null;
   const _closedThisSession = new Set();
 
+  // ── Ticket Action Button state machine ───────────────────────────────────
+  // _ticketActionState maps ticket number → current state key
+  // States: 'travel' → 'work' → 'close' (close stays; re-click just scrolls)
+  const _ticketActionState = {};
+
+  // enterPill: applied to the ticket list when entering that next state
+  const _ACTION_CONFIG = {
+    travel: { label: 'Start Travel', next: 'work',  enterPill: { cls: 'pill-enroute', text: 'En Route' } },
+    work:   { label: 'Start Work',   next: 'close', enterPill: { cls: 'pill-onsite',  text: 'On Site'  } },
+    close:  { label: 'Close Ticket', next: null,    enterPill: null },
+  };
+
+  function renderTicketActionButton(number) {
+    const btn = document.getElementById('ticket-action-btn');
+    if (!btn) return;
+    const state = _ticketActionState[number] || 'travel';
+    const cfg   = _ACTION_CONFIG[state];
+    btn.dataset.actionState = state;
+    btn.textContent = cfg.label;
+  }
+
+  function _updateTicketListPill(number, pillCfg) {
+    if (!pillCfg) return;
+    const card = document.querySelector(`.ticket-card[data-number="${number}"]`);
+    if (!card) return;
+    const pill = card.querySelector('.ticket-pills .pill');
+    if (!pill) return;
+    pill.className = pill.className.replace(/\bpill-\S+/g, '').trim();
+    pill.classList.add('pill', pillCfg.cls);
+    pill.textContent = pillCfg.text;
+  }
+
+  function _scrollToUpdateTicket() {
+    const closeSection = document.getElementById('close-ticket-section');
+    if (!closeSection) return;
+    const scrollPane = closeSection.closest('.detail-scroll') || document.querySelector('.detail-scroll');
+    if (scrollPane) {
+      const offset = closeSection.offsetTop - (scrollPane.offsetTop || 0);
+      scrollPane.scrollTo({ top: offset, behavior: 'smooth' });
+    } else {
+      closeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function advanceTicketAction() {
+    const number = currentCaseNumber;
+    if (!number) return;
+    const state = _ticketActionState[number] || 'travel';
+    const cfg   = _ACTION_CONFIG[state];
+
+    if (state === 'close') {
+      // Final state — re-click scrolls to the Update Ticket form
+      _scrollToUpdateTicket();
+      return;
+    }
+
+    // Advance to next state and apply its entry side-effects
+    const nextState = cfg.next;
+    const nextCfg   = _ACTION_CONFIG[nextState];
+    _updateTicketListPill(number, nextCfg.enterPill);
+    _ticketActionState[number] = nextState;
+    renderTicketActionButton(number);
+  }
+
   // ── Open current case directly in ServiceNow ─────────────────────────────
   function openInServiceNow() {
     if (!currentCaseSysId) return;
@@ -3627,11 +3748,9 @@
       const acct = a.result;
       document.getElementById('detail-cust-name').textContent = acct?.name || fallbackName || '—';
       document.getElementById('detail-cust-id').textContent   = acct?.number || '—';
-      document.getElementById('detail-cust-tier').textContent = acct?.u_tier || acct?.account_type || 'Standard';
     } catch {
       document.getElementById('detail-cust-name').textContent = fallbackName || '—';
       document.getElementById('detail-cust-id').textContent   = '—';
-      document.getElementById('detail-cust-tier').textContent = '—';
     }
   }
 
@@ -3672,7 +3791,7 @@
 
   async function fetchCaseDetail(number) {
     ['detail-tb-id','detail-tb-title','detail-cust-name','detail-cust-id',
-     'detail-cust-tier','detail-cust-addr','detail-cust-contact',
+     'detail-cust-addr','detail-cust-contact',
      'detail-cust-phone','detail-cust-sla','detail-description','detail-assigned',
      'detail-cust-pc','detail-cust-sr'
     ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '…'; });
@@ -3750,6 +3869,7 @@
       renderFirewallSection(accountSysId || currentCaseSysId);
       renderVoipSection(accountSysId || currentCaseSysId);
       renderProjectContacts(accountSysId || currentCaseSysId);
+      renderTicketActionButton(currentCaseNumber);
 
       // Travel estimate
       fetchTravelEstimate();
