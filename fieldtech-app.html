@@ -918,6 +918,10 @@
     .contact-row-inner { flex-direction:column !important; align-items:stretch !important; }
     .contact-row-phone { flex-shrink:unset !important; text-align:left !important; margin-top:8px; }
   }
+  /* Desktop: travel box and navigate button sit side by side */
+  @media(min-width:800px) {
+    .addr-row-actions { flex-direction:row !important; align-items:center !important; gap:8px !important; }
+  }
   .travel-box-time { font-size:13px; font-weight:700; color:var(--accent); line-height:1.2; }
   .travel-box-dist { font-size:10px; color:var(--text); margin-top:1px; }
   .travel-box-loading { font-size:11px; color:var(--text-muted); font-style:italic; }
