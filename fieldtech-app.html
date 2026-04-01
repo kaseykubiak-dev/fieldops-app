@@ -4680,11 +4680,16 @@
     const href = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(email);
     return `<a href="${href}" target="_blank" rel="noopener" title="Chat in Teams"` +
       ` onclick="event.stopPropagation();"` +
-      ` style="display:flex;align-items:center;flex-shrink:0;color:var(--text-muted);` +
-        `opacity:0.5;transition:opacity .15s;"` +
-      ` onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">` +
-      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"` +
-        ` stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
+      ` style="display:flex;align-items:center;justify-content:center;flex-shrink:0;` +
+        `padding:5px;border-radius:9px;text-decoration:none;color:var(--accent);` +
+        `background:linear-gradient(135deg,rgba(0,192,243,0.18) 0%,rgba(0,192,243,0.06) 100%);` +
+        `border:1.5px solid rgba(0,192,243,0.35);` +
+        `box-shadow:0 2px 4px rgba(0,0,0,0.3),0 4px 8px rgba(0,0,0,0.15),` +
+          `0 0 10px rgba(0,192,243,0.12),inset 0 1px 0 rgba(0,192,243,0.18),` +
+          `inset 0 -1px 0 rgba(0,0,0,0.15);transition:all .15s;">` +
+      `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"` +
+        ` stroke-width="2" stroke-linecap="round" stroke-linejoin="round"` +
+        ` style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4)) drop-shadow(0 0 4px rgba(0,192,243,0.5));">` +
         `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>` +
       `</svg></a>`;
   }
