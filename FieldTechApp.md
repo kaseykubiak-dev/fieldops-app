@@ -1,13 +1,17 @@
 # Delta — Field Operations Tech App
 
-Single-file web app (`fieldtech-app.html`, ~7100+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~7500+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+
+> **v0.1 tag**: Git tag `v0.1` marks the baseline before the April 2026 workflow features were added. To push the tag to GitHub: `git push origin v0.1`.
+
+> **v0.2 tag**: Git tag `v0.2` marks the addition of the On-Call section to Tech Tools (schedule, contact list, and call tree). To push: `git push origin v0.2 --force` (force required as the tag was moved to include the consolidation commit).
 
 ---
 
 ## Repository Layout
 
 ```
-fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~6700+ lines)
+fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~7500+ lines)
 meraki-proxy.js               <- Node.js CORS proxy for Cisco Catalyst Center API
 package.json                  <- { "start": "node meraki-proxy.js" }, Node >=18
 internet-db.json              <- Simulated ISP circuit data (fiber, cable, DSL, wireless)
@@ -59,7 +63,7 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#screen-customer-detail` | Customer Detail | `fetchCustomerDetail(sysId)` |
 | `#screen-network` | Network Equipment | `loadNetworkScreen()` |
 | `#screen-cx360` | CX 360 | `cx360Send()` (mock AI chat) |
-| `#screen-techtools` | Tech Tools | `initSafetyChecks()` + `initInventoryChecks()` + static tools |
+| `#screen-techtools` | Tech Tools | `initSafetyChecks()` + `initInventoryChecks()` + static On-Call + static tools |
 | `#screen-more` | Settings | (static — Appearance, App, Account) |
 | `#screen-links` | Important Links | (static) |
 | `#login-screen` | Login | (shown by default) |
@@ -218,6 +222,18 @@ const _NOTIF_MAX_FAILS  = 3;         // pause polling after this many failures
 
 // Tickets closed this browser session (shown as resolved without re-fetch)
 const _closedThisSession = new Set();
+
+// Ticket workflow action state — keyed by case number
+// Values: 'travel' | 'work' | 'close' | 'done'
+const _ticketActionState = {};
+
+// State machine config for the 4-state ticket action button
+const _ACTION_CONFIG = {
+  travel: { label: 'Start Travel', next: 'work',  pill: { cls: 'pill-enroute', text: 'En Route' } },
+  work:   { label: 'Start Work',   next: 'close', pill: { cls: 'pill-onsite',  text: 'On Site'  } },
+  close:  { label: 'Close Ticket', next: 'done',  pill: null },
+  done:   { label: 'Ticket Closed', next: null,   pill: null },
+};
 ```
 
 ---
@@ -230,11 +246,68 @@ const _closedThisSession = new Set();
 |---|---|---|
 | `fetchDetailAssignee(sysId)` | `sys_user` | `#detail-assigned` |
 | `fetchDetailSLA(caseSysId)` | `task_sla` | `#detail-cust-sla` |
-| `fetchDetailAccount(sysId, fallback)` | `customer_account` | `#detail-cust-name`, `#detail-cust-id`, `#detail-cust-tier` |
+| `fetchDetailAccount(sysId, fallback)` | `customer_account` | `#detail-cust-name`, `#detail-cust-id` |
 | `fetchDetailContact(sysId)` | `customer_contact` | `#detail-cust-contact`, `#detail-cust-phone` |
 | `fetchDetailDevice(sysId)` | `cmdb_ci_netgear` | `#affected-device-section` and children |
 
 After the sub-fetches, `fetchCaseDetail` also triggers mock-data renders (`renderInternetSection`, `renderFirewallSection`, `renderVoipSection`), `fetchTravelEstimate()`, `restoreDraft()`, and `fetchTimeline()`.
+
+### Ticket Action Button (4-State Workflow)
+
+The customer banner no longer shows a static tier pill. Instead, it contains a `<button class="ticket-action-btn" id="ticket-action-btn">` that progresses through four states as the tech works the ticket.
+
+| State key | Button label | Effect on ticket list pill | Button color |
+|---|---|---|---|
+| `travel` | Start Travel | → `pill-enroute` "En Route" (purple) | Accent blue (`--accent` / `#00c0f3`) |
+| `work` | Start Work | → `pill-onsite` "On Site" (green) | Magnetic purple (`#884d9d`) |
+| `close` | Close Ticket | Triggers close flow; list refresh picks up SN state | Success green |
+| `done` | Ticket Closed | (non-interactive muted pill — see below) | Muted, `cursor:default`, `pointer-events:none` |
+
+The detail-view state pill (`#detail-pill-state`) mirrors every pill change: it updates alongside the ticket list card pill on each button press. `#detail-pill-priority` was removed from the detail header — the priority pill no longer appears there.
+
+**CSS attribute selectors** drive button appearance:
+```css
+.ticket-action-btn[data-action-state="travel"] { /* blue */ }
+.ticket-action-btn[data-action-state="work"]   { /* purple */ }
+.ticket-action-btn[data-action-state="close"]  { /* green */ }
+.ticket-action-btn[data-action-state="done"]   { opacity:0.7; pointer-events:none; cursor:default; }
+```
+
+**Key functions:**
+
+| Function | Purpose |
+|---|---|
+| `renderTicketActionButton(number)` | Reads `_ticketActionState[number]`, sets `data-action-state` and label text on the button |
+| `advanceTicketAction()` | Reads current state, applies pill side-effect (`_updateTicketListPill`), advances `_ticketActionState`, calls `renderTicketActionButton` |
+| `_updateTicketListPill(number, pill)` | Finds `.ticket-card[data-number="…"]` in the list and updates its pill class + text. Also updates `#detail-pill-state`. |
+| `_scrollToUpdateTicket()` | Smooth-scrolls `.detail-scroll` to `#close-ticket-section` (the Update Ticket section) when the Close Ticket button is pressed |
+
+State is stored in `_ticketActionState[caseNumber]` (keyed by ticket number, session-local only). `fetchCaseDetail` calls `renderTicketActionButton(currentCaseNumber)` so the button reflects the correct state if the tech navigates away and returns.
+
+### Close Ticket UX
+
+When the tech clicks **Close Ticket** (`state === 'close'`), the following sequence runs:
+
+1. **`_scrollToUpdateTicket()`** scrolls the detail view to `#close-ticket-section` so the tech can fill out the update form.
+2. The tech submits the update; `closeTicket()` fires.
+3. On success:
+   - `_closedThisSession.add(number)`
+   - `banner.classList.add('collapsed')` — hides the customer banner with a CSS `max-height` + `opacity` transition
+   - `fetchTickets(activeFilter)` — force-refreshes the ticket list
+   - `showCloseSuccessPopup(closeDetail)` — shows a centered success overlay; on dismiss (auto after 2 s or tap), calls `closeDetail()` to return to the default view
+4. `closeDetail()`:
+   - Mobile: removes `.active` from `#screen-detail` (returns to ticket list)
+   - Desktop: shows `#no-ticket-overlay` ("No Ticket Selected" panel)
+
+**Customer banner collapse CSS:**
+```css
+.cust-banner { transition: opacity .35s ease, max-height .4s ease, margin .35s ease; overflow: hidden; }
+.cust-banner.collapsed { opacity:0; max-height:0 !important; margin-top:0 !important; margin-bottom:0 !important; pointer-events:none; }
+```
+
+`fetchCaseDetail` removes `.collapsed` at the very top of its execution (before any async work) so the banner is always visible when a new ticket is loaded.
+
+**`showCloseSuccessPopup(onDismiss)`** shows `#close-success-overlay` (fixed, full-screen, blurred backdrop). The popup auto-dismisses after 2 seconds or on tap; then calls the `onDismiss` callback (i.e. `closeDetail`). The overlay uses `opacity` + `scale` CSS transitions for a smooth scale-in entrance.
 
 ### Network Equipment Link
 
@@ -336,8 +409,27 @@ Several sections of the ticket detail screen are populated from local JSON datab
 | Firewall | `firewall-db.json` | Firewall model, serial, uptime, interface IPs |
 | Voice/VoIP | `webex-phones-db.json` | Webex Calling phones, extension list |
 | Service Order | `_SO_CATALOG` (inline JS) | Install/repair service order items |
+| Project Coordinator / Sales Rep | `_PC_NAMES` / `_SR_NAMES` (inline JS) | Contact names on the customer banner |
 
 The `_hash(str)` function produces a stable integer from a ticket number, used to deterministically pick items from each database so the same ticket always shows the same equipment.
+
+### Project Coordinator & Sales Rep
+
+`renderProjectContacts(seed)` is called from `fetchCaseDetail` with the account `sysId` as seed. It uses `_hash(sysId)` to pick deterministic, non-overlapping names from two separate pools so the same account always shows the same contacts.
+
+```js
+// Two pools are kept disjoint so no name can appear in both roles
+const _PC_NAMES = ['Sarah Mitchell','David Nguyen','Lauren Hargrove','Marcus Webb',
+  'Priya Sharma','Jordan Calloway','Danielle Fox','Ethan Broussard','Rachel Tindall',
+  "Kevin O'Brien",'Tasha Moreno','Brian Hollingsworth','Caitlin Dukes',
+  'Derrick Canady','Amy Strickland'];
+const _SR_NAMES = ['Trevor Simmons','Valerie Cross','Nathan Hurst','Monica Graves',
+  'Jason Elrod','Brittany Lawson','Curtis Pendleton','Heather Lanier','Shane Dougherty',
+  'Candace Ruiz','Greg Tillman','Stacy Blackwell','Damon Whitfield',
+  'Paula Crenshaw','Eric Vanderburg'];
+```
+
+DOM targets: `#detail-cust-pc` (Project Coordinator) and `#detail-cust-sr` (Sales Rep). These fields appear in the customer banner grid below Phone. Phone and Project Coordinator are positioned so that Phone comes after the address fields and Project Coordinator follows.
 
 ---
 
@@ -411,6 +503,16 @@ Do not use `-webkit-fill-available` on `.app` height — it caused double-counti
 | > 1024px (desktop) | Desktop topbar, list panel 340px + detail pane side by side | `@media(min-width:800px)` base rules |
 
 The `data-mobile-preview` HTML attribute forces mobile layout at any width for dev/testing.
+
+### Desktop Unstack — Travel Time + Navigate Button
+
+On desktop (≥800px), the Travel Time estimate and Navigate button in the customer banner's address row sit side-by-side on one line. On mobile they stack vertically (default). Controlled by:
+
+```css
+@media(min-width:800px) {
+  .addr-row-actions { flex-direction:row !important; align-items:center !important; gap:8px !important; }
+}
+```
 
 ---
 
@@ -508,12 +610,15 @@ Week view column headers additionally support `.today` (accent-tinted) and `.sel
 ## Pill & Badge Classes
 
 ```
-State:     pill-open  pill-progress  pill-resolved  pill-pending  pill-enroute
+State:     pill-open  pill-progress  pill-resolved  pill-pending  pill-enroute  pill-onsite
 Priority:  pill-critical  pill-high  pill-medium  pill-low  (CSS exists; not shown in calendar/notifications)
 Type:      type-badge repair | installation | service-call
 Safety:    safety-urgency-pill urgency-{none|low|medium|high}
            safety-card-status status-{pending|done}
 ```
+
+- **`pill-enroute`** — purple (`rgba(136,77,157,…)` / `#b07ccc` text). Applied to ticket list cards when the tech clicks "Start Travel".
+- **`pill-onsite`** — green (`rgba(0,201,106,…)` / `var(--success)` text). Applied to ticket list cards when the tech clicks "Start Work".
 
 `PRIORITY_MAP` and `STATE_MAP` (both keyed by SN integer value AND display string) live around line 2360.
 
@@ -714,6 +819,52 @@ The accordion body contains a full-width **Truck Stock Portal** button (cobalt b
 
 ---
 
+## On-Call
+
+Static reference section in Tech Tools displaying the weekly on-call rotation and the company on-call phone tree. Sourced from the weekly on-call distribution email sent by management. Data is **hardcoded for demo purposes** — no live data source.
+
+Sits between the Inventory Management card and the Tools card in `#screen-techtools`. Uses one `<h2 class="section-title">On-Call</h2>` header wrapping a single `.card` that contains two independent accordions, matching the multi-accordion layout of the Vehicle Reports card.
+
+### On-Call Schedule accordion (`oncall-sched`)
+
+Displays the five regional on-call technicians for the current rotation week.
+
+**Header**: Calendar icon (cyan), title "On-Call Schedule", subtitle "Week of Mar 27, 2026 · Static demo", chevron.
+
+**Body**: Five rows, one per region. Each row shows a color-coded region pill on the left and a tappable `tel:` phone chip on the right. Tapping the chip dials the tech directly.
+
+| Region pill | Color | Tech (demo) | Number |
+|---|---|---|---|
+| N MS | Cyan (`--accent`) | Marcus Webb | 662-801-4523 |
+| C MS | Green (`#22c55e`) | Derek Holloway | 662-553-7819 |
+| S MS | Teal (`#0d9488`) | Tyler Barnett | 769-347-2841 |
+| N AL | Orange (`--accent2`) | Jason Mercer | 205-912-6374 |
+| S AL | Purple (`#884d9d`) | Brandon Holt | 251-448-9037 |
+
+Tech names are randomized male names — not real personnel. Region color coding is consistent across both accordions.
+
+### On-Call Line & Call Tree accordion (`oncall-line`)
+
+Displays the single on-call phone number and its 9-extension IVR tree.
+
+**Header**: Phone icon (cyan), title "On-Call Line & Call Tree", subtitle `601-487-2727` (monospace), a **Call** pill button (`tel:6014872727`) in the `acc-actions` slot, chevron. The Call button uses `event.stopPropagation()` so tapping it dials without toggling the accordion.
+
+**Body**: Extension rows grouped under three labeled dividers:
+
+| Group | Extensions | Badge color |
+|---|---|---|
+| Field Areas | 1 — North MS / Memphis TN, 2 — Central MS, 3 — South MS, 4 — Central / North AL, 5 — South AL | Cyan |
+| Supervisors | 6 — North/Central MS Supervisor, 7 — South MS Supervisor, 8 — AL Supervisor | Orange (`--accent2`) |
+| Management | 9 — CSB Management | Purple (`#884d9d`) |
+
+### Pill styling
+
+All region and phone chips use fully-rounded pills (`border-radius:20px`) with `inset 0 1px 0 rgba(255,255,255,0.12)` highlight and `0 1px 3px rgba(0,0,0,0.2)` drop shadow, matching the ticket pill visual treatment. Extension number circles use the same inset shadow treatment.
+
+Both accordions use `toggleAcc()` with IDs `oncall-sched` and `oncall-line`. They share the same `.accordion` / `.acc-header` / `.acc-body` / `.acc-icon-wrap` pattern as the safety and inventory accordions.
+
+---
+
 ## User Menu
 
 The user avatar button (`.avatar-sm`, `#user-avatar`) in the topbar opens a dropdown panel (`.user-menu-panel`) instead of directly triggering logout. The panel follows the same pattern as the notification panel: fixed positioning anchored below the avatar via `getBoundingClientRect()`, backdrop overlay for click-to-close, `.show` class toggle, `aria-expanded`/`aria-hidden` sync.
@@ -766,7 +917,11 @@ The app includes ARIA attributes and semantic HTML added in March 2026:
 
 ---
 
-## Visual Polish (March 2026)
+## Visual Polish (March – April 2026)
+
+### Icon Glow Treatment
+
+Service Order section icons and the customer banner house icon/pill were given the same gradient + border + glow + SVG drop-shadow treatment as the Service & Equipment section icons. All icon glow intensities are tuned to ~75% of the initial values (dialed back 25% from the first pass for a subtler effect).
 
 ### Skeleton loading screens
 All list/grid loading states use shimmer skeleton placeholders instead of spinners. The `skeleton-shimmer` keyframe animates a gradient sweep on `.skeleton` elements. Variants: `.skeleton-card` (110px, ticket shape), `.skeleton-card-sm` (72px, customer rows), `.skeleton-line` / `.skeleton-line-short`, `.skeleton-divider` (date header shape). Stagger with `animation-delay` and descending opacity for natural appearance. Light theme has its own skeleton gradient override.
@@ -797,6 +952,48 @@ On `min-width:800px`, `.ticket-inner`, `.cal-mini-card`, and `.cust-card-inner` 
 
 ### Data viz stat bars
 `.stat-bar-wrap` / `.stat-bar` provide a thin (3px) animated fill bar for numeric values. Variants: `.bar-good` (green), `.bar-warn` (amber), `.bar-bad` (red). Currently used in firewall uptime display. `statBarFill` keyframe animates width from 0.
+
+---
+
+## Ticket List
+
+`fetchTickets(filterState)` loads tickets for the active tab ('today' | 'assigned' | 'closed'). `renderTickets(tickets, filterState)` builds the HTML and updates `#ticket-list`.
+
+### Tabs & `activeFilter`
+
+`activeFilter` is a global string tracking the currently displayed tab. It is read by `closeTicket()` to know which list to refresh after a successful close.
+
+### Date Dividers
+
+Each date group in the list renders a `.date-divider` element with a `data-date` attribute (e.g. `data-date="Wed Apr 01 2026"`). This attribute is required for the auto-scroll feature.
+
+### Auto-scroll to Today on Tab Switch
+
+When the **Assigned** or **Closed** tab is selected, `renderTickets` automatically scrolls the list to today's date divider (or the nearest available date) after rendering:
+
+```js
+if (filterState !== 'today') {
+  const todayStr = new Date().toDateString();
+  let target = list.querySelector(`.date-divider[data-date="${todayStr}"]`);
+  if (!target) {
+    // Fallback: find the divider with the date closest to now
+    const dividers = [...list.querySelectorAll('.date-divider[data-date]')];
+    if (dividers.length) {
+      const now = Date.now();
+      target = dividers.reduce((best, el) => {
+        const elDiff   = Math.abs(new Date(el.dataset.date).getTime() - now);
+        const bestDiff = Math.abs(new Date(best.dataset.date).getTime() - now);
+        return elDiff < bestDiff ? el : best;
+      });
+    }
+  }
+  list.scrollTop = target ? target.offsetTop : 0;
+} else {
+  list.scrollTop = 0;
+}
+```
+
+`list.scrollTop = el.offsetTop` is used intentionally instead of `scrollIntoView()`, which shifts the iOS PWA viewport when called on elements inside a scroll container.
 
 ---
 
