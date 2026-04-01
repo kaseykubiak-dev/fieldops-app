@@ -7036,23 +7036,26 @@
     } else {
       localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
     }
-    // If this type was already completed, relock the next-due date using the new frequency
-    if (_safetyChecks[type]) {
-      const newFreq = _safetyFrequency[type] || 0;
-      let nextDue;
-      if (type === 'mileage') {
-        const now = new Date();
-        nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      } else if (newFreq <= 0) {
+    // Recalculate next-due date using the new frequency.
+    // Base = completion timestamp when already done; today (provisional) when not yet done.
+    // This ensures the Next Due Date updates immediately on both desktop and mobile,
+    // regardless of whether the inspection has been completed yet.
+    const newFreq = _safetyFrequency[type] || 0;
+    let nextDue;
+    if (type === 'mileage') {
+      const now = new Date();
+      nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    } else {
+      const baseDate = _safetyChecks[type] ? new Date(_safetyChecks[type]) : new Date();
+      if (newFreq <= 0) {
         const now = new Date();
         nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
       } else {
-        const completedAt = new Date(_safetyChecks[type]);
-        nextDue = new Date(completedAt.getTime() + newFreq * 86400000);
+        nextDue = new Date(baseDate.getTime() + newFreq * 86400000);
       }
-      _safetyNextDue[type] = nextDue.toISOString();
-      localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
     }
+    _safetyNextDue[type] = nextDue.toISOString();
+    localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
     // Build a human-readable confirmation label
     const typeLabel = type === 'vehicle' ? 'Vehicle' : type === 'ladder' ? 'Ladder' : type.charAt(0).toUpperCase() + type.slice(1);
     const freqLabel = _safetyFrequency[type] === 0 ? 'monthly' : 'every ' + _safetyFrequency[type] + ' days';
@@ -7060,6 +7063,7 @@
     renderSafetySection();
     updateSafetyBadge();
     renderSafetyBanner();
+    renderCalendar();
   }
 
   function markSafetyComplete(type) {
@@ -7358,8 +7362,15 @@
     const days = parseInt(val, 10) || 7;
     _inventoryFrequency[type] = (days === 14) ? 14 : 7; // clamp to 7 or 14
     localStorage.setItem('ft_inventory_freq_' + type, String(_inventoryFrequency[type]));
+    // Recalculate next-due date: base = completion date (if done) or today (provisional).
+    // Keeps the Next Due Date in sync on both mobile and desktop after a frequency change.
+    const baseDate = _inventoryChecks[type] ? new Date(_inventoryChecks[type]) : new Date();
+    const invNextDue = new Date(baseDate.getTime() + _inventoryFrequency[type] * 86400000);
+    _inventoryNextDue[type] = invNextDue.toISOString();
+    localStorage.setItem('ft_inventory_nextdue_' + type, _inventoryNextDue[type]);
     _showFreqToast('Inventory report set to remind every ' + _inventoryFrequency[type] + ' days');
     renderInventorySection();
+    renderCalendar();
   }
 
   function markInventoryComplete(type) {
