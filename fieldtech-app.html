@@ -2321,7 +2321,6 @@
       </div>
 
       <div class="detail-pills">
-        <span class="pill" id="detail-pill-priority"></span>
         <span class="pill" id="detail-pill-state"></span>
         <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">Assigned: <strong style="color:var(--text)" id="detail-assigned">—</strong></span>
         <button class="sn-link-btn" id="sn-link-btn" onclick="openInServiceNow()" title="Open in ServiceNow" style="display:none;margin-left:auto;">
@@ -3737,6 +3736,16 @@
 
     // Apply this button's side-effects before advancing
     _updateTicketListPill(number, cfg.pill);
+
+    // Mirror the same pill text/class into the detail state pill
+    if (cfg.pill) {
+      const detailPill = document.getElementById('detail-pill-state');
+      if (detailPill) {
+        detailPill.className = `pill ${cfg.pill.cls}`;
+        detailPill.textContent = cfg.pill.text;
+      }
+    }
+
     if (state === 'close') _scrollToUpdateTicket();
 
     _ticketActionState[number] = cfg.next;
@@ -3866,11 +3875,8 @@
       document.getElementById('detail-tb-id').textContent    = `${c.number} · ${dateStr}`;
       document.getElementById('detail-tb-title').textContent = c.short_description || '—';
 
-      // Priority & state pills
-      const pri   = PRIORITY_MAP[c.priority?.value || c.priority] || { label: 'Unknown', cls: 'pill-low' };
-      const state = STATE_MAP[c.state?.value || c.state]          || { label: 'Open', cls: 'pill-open' };
-      const priEl = document.getElementById('detail-pill-priority');
-      priEl.textContent = pri.label; priEl.className = `pill ${pri.cls}`;
+      // State pill (priority pill removed)
+      const state = STATE_MAP[c.state?.value || c.state] || { label: 'Open', cls: 'pill-open' };
       const stateEl = document.getElementById('detail-pill-state');
       stateEl.textContent = state.label; stateEl.className = `pill ${state.cls}`;
 
@@ -4787,8 +4793,8 @@
       // Force refresh the ticket list so the closed state is reflected immediately
       fetchTickets(activeFilter);
 
-      // Show centered success popup (replaces inline feedback)
-      showCloseSuccessPopup();
+      // Show centered success popup; navigate back to ticket list on dismiss
+      showCloseSuccessPopup(closeDetail);
 
     } catch (err) {
       showFeedback(feedback, 'error', `Close failed: ${err.message}`);
@@ -4881,18 +4887,18 @@
 
   function hideFeedback(el) { el.style.display = 'none'; }
 
-  function showCloseSuccessPopup() {
+  function showCloseSuccessPopup(onDismiss) {
     const overlay = document.getElementById('close-success-overlay');
     if (!overlay) return;
-    overlay.classList.add('show');
-    // Auto-dismiss after 2.4s
-    clearTimeout(overlay._dismissTimer);
-    overlay._dismissTimer = setTimeout(() => overlay.classList.remove('show'), 2400);
-    // Also dismiss on click/tap
-    overlay.onclick = () => {
+    const dismiss = () => {
       clearTimeout(overlay._dismissTimer);
       overlay.classList.remove('show');
+      if (typeof onDismiss === 'function') onDismiss();
     };
+    overlay.classList.add('show');
+    clearTimeout(overlay._dismissTimer);
+    overlay._dismissTimer = setTimeout(dismiss, 2000);
+    overlay.onclick = dismiss;
   }
 
   // Restore any saved draft when a case is opened
