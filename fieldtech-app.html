@@ -2045,6 +2045,44 @@
   }
   #safety-freq-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+  /* ── Ticket closed success popup ── */
+  #close-success-overlay {
+    position:fixed; inset:0; z-index:10100;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  #close-success-overlay.show { opacity:1; pointer-events:auto; }
+  #close-success-popup {
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:var(--surface2,#1a2535);
+    border:1px solid rgba(0,201,106,0.35); border-radius:16px;
+    padding:32px 40px; text-align:center;
+    box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,201,106,0.12), 0 0 30px rgba(0,201,106,0.08);
+    transform:scale(0.92); transition:transform .25s ease;
+  }
+  #close-success-overlay.show #close-success-popup { transform:scale(1); }
+  #close-success-icon {
+    width:56px; height:56px; border-radius:50%;
+    background:linear-gradient(135deg, rgba(0,201,106,0.22) 0%, rgba(0,201,106,0.07) 100%);
+    border:1.5px solid rgba(0,201,106,0.4);
+    box-shadow:0 0 20px rgba(0,201,106,0.18);
+    display:flex; align-items:center; justify-content:center; color:var(--success,#00c96a);
+  }
+  #close-success-title {
+    font-size:18px; font-weight:700; color:var(--text,#e2eaf3); letter-spacing:-.01em;
+  }
+  #close-success-sub {
+    font-size:12px; color:var(--text-muted,#6a8099); font-family:var(--mono);
+  }
+  html[data-theme="cspire"] #close-success-popup { background:var(--surface); border-color:rgba(0,135,90,0.35); box-shadow:0 8px 40px rgba(0,0,0,0.18), 0 0 20px rgba(0,135,90,0.08); }
+  html[data-theme="cspire"] #close-success-icon { background:rgba(0,135,90,0.12); border-color:rgba(0,135,90,0.35); color:#00875a; box-shadow:0 0 16px rgba(0,135,90,0.1); }
+
+  /* ── Customer banner collapse on ticket close ── */
+  .cust-banner { transition:opacity .35s ease, max-height .4s ease, margin .35s ease; overflow:hidden; }
+  .cust-banner.collapsed { opacity:0; max-height:0 !important; margin-top:0 !important; margin-bottom:0 !important; pointer-events:none; }
+
   /* Light theme overrides */
   html[data-theme="cspire"] .safety-card { background:var(--card-bg); border:1px solid var(--card-border); box-shadow:var(--card-shadow); border-left:3px solid var(--accent); }
   html[data-theme="cspire"] .safety-card.safety-complete { border-left-color:var(--success); }
@@ -3797,6 +3835,10 @@
   // ── Main case detail loader ────────────────────────────────────────────────
 
   async function fetchCaseDetail(number) {
+    // Restore banner visibility any time a ticket is (re-)opened
+    const _banner = document.querySelector('.cust-banner');
+    if (_banner) _banner.classList.remove('collapsed');
+
     ['detail-tb-id','detail-tb-title','detail-cust-name','detail-cust-id',
      'detail-cust-addr','detail-cust-contact',
      'detail-cust-phone','detail-cust-sla','detail-description','detail-assigned',
@@ -4733,18 +4775,20 @@
       document.getElementById('detail-resolution-select').value = '';
       syncCloseState();
 
-      showFeedback(feedback, 'success', 'Ticket closed successfully.');
       fetchTimeline(currentCaseSysId);
 
       // Track this ticket so re-renders also show Closed
       if (currentCaseNumber) _closedThisSession.add(currentCaseNumber);
 
-      // Mirror the pill update into the ticket list card without re-fetching
-      const card = document.querySelector(`.ticket-card[data-number="${currentCaseNumber}"]`);
-      if (card) {
-        const listPill = card.querySelectorAll('.ticket-pills .pill')[1];
-        if (listPill) { listPill.textContent = 'Closed'; listPill.className = 'pill pill-resolved'; }
-      }
+      // Collapse the customer banner to de-emphasise the now-closed ticket body
+      const banner = document.querySelector('.cust-banner');
+      if (banner) banner.classList.add('collapsed');
+
+      // Force refresh the ticket list so the closed state is reflected immediately
+      fetchTickets(activeFilter);
+
+      // Show centered success popup (replaces inline feedback)
+      showCloseSuccessPopup();
 
     } catch (err) {
       showFeedback(feedback, 'error', `Close failed: ${err.message}`);
@@ -4836,6 +4880,20 @@
   }
 
   function hideFeedback(el) { el.style.display = 'none'; }
+
+  function showCloseSuccessPopup() {
+    const overlay = document.getElementById('close-success-overlay');
+    if (!overlay) return;
+    overlay.classList.add('show');
+    // Auto-dismiss after 2.4s
+    clearTimeout(overlay._dismissTimer);
+    overlay._dismissTimer = setTimeout(() => overlay.classList.remove('show'), 2400);
+    // Also dismiss on click/tap
+    overlay.onclick = () => {
+      clearTimeout(overlay._dismissTimer);
+      overlay.classList.remove('show');
+    };
+  }
 
   // Restore any saved draft when a case is opened
   function restoreDraft(sysId) {
@@ -7218,6 +7276,17 @@
 <div id="safety-freq-toast" role="status" aria-live="polite">
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   <span id="safety-freq-toast-msg">Reminder frequency updated</span>
+</div>
+
+<!-- Ticket closed success popup -->
+<div id="close-success-overlay" role="dialog" aria-modal="true" aria-labelledby="close-success-title">
+  <div id="close-success-popup">
+    <div id="close-success-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div id="close-success-title">Ticket Closed</div>
+    <div id="close-success-sub">Successfully submitted to ServiceNow</div>
+  </div>
 </div>
 
 </body>
