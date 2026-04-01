@@ -1,6 +1,6 @@
 # Delta — Field Operations Tech App
 
-Single-file web app (`fieldtech-app.html`, ~7500+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~7700+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
 
 > **v0.1 tag**: Git tag `v0.1` marks the baseline before the April 2026 workflow features were added. To push the tag to GitHub: `git push origin v0.1`.
 
@@ -69,6 +69,12 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#login-screen` | Login | (shown by default) |
 
 Desktop uses a top nav bar (`#desktop-topbar` / `.desktop-nav`). Mobile uses a bottom nav bar (`.bottom-nav` / `.bnav-btn`) with 5 tabs: Tickets, Calendar, CX 360, Tech Tools. The primary breakpoint is `800px` — see `isMobileView()`. A tablet breakpoint at `1024px` narrows the list panel and tightens nav spacing.
+
+### Mobile Persistent Topbar
+
+`#mobile-topbar` (Delta logo, tagline shimmer, notification bell, user avatar) is a **direct sibling of `.screen-wrap`** inside `.app { display:flex; flex-direction:column }`. This makes it persist across all screens on mobile using the same flex mechanism as the bottom nav bar — no JS required. It is hidden on desktop via `@media(min-width:800px) { #mobile-topbar { display:none; } }`.
+
+Sub-topbars inside `#screen-calendar` and `#screen-cx360` are compacted on mobile (`min-height:auto; padding-top:7px; padding-bottom:7px`) because the persistent topbar already occupies the top of the viewport; the sub-topbar only needs to show the screen-specific controls without the logo row.
 
 Settings (`#screen-more` in code) is accessed via the user avatar dropdown menu, not via a nav tab. When Settings is active, no nav tab is highlighted. The screen ID remains `screen-more` in code to avoid breaking existing references.
 
@@ -431,6 +437,23 @@ const _SR_NAMES = ['Trevor Simmons','Valerie Cross','Nathan Hurst','Monica Grave
 
 DOM targets: `#detail-cust-pc` (Project Coordinator) and `#detail-cust-sr` (Sales Rep). These fields appear in the customer banner grid below Phone. Phone and Project Coordinator are positioned so that Phone comes after the address fields and Project Coordinator follows.
 
+### Teams Presence Integration
+
+Each PC/SR contact renders an inline presence indicator using four helper functions. All data is **mocked** via `_hash()` for demo stability — TODO comments mark each hook for live Microsoft Graph API replacement.
+
+| Helper | Purpose |
+|---|---|
+| `_teamsEmail(fullName)` | Derives `first.last@cspire.com` from display name |
+| `_teamsPresence(name)` | Returns a deterministic presence status from `['Available','Busy','Away','DoNotDisturb','OOO','Offline']` |
+| `_teamsAvatarHTML(name, size)` | Renders a 28px circle with initials + a colored presence dot (bottom-right). Colors from `_TEAMS_STATUS_STYLES`. |
+| `_teamsChatIconHTML(email)` | Renders a `.btn-ghost`-styled chat bubble button with a `https://teams.microsoft.com/l/chat/0/0?users={email}` deep-link |
+
+`buildContactHTML(name)` inside `renderProjectContacts` assembles: avatar → name link → presence label → chat icon, all in a flex row. On mobile, `.teams-contact-name { white-space:normal; overflow:visible; }` allows long names to wrap to a second line instead of crowding adjacent grid cells.
+
+**Live API hookup path**: Replace `_teamsPresence()` with `POST /communications/getPresencesByUserId` (Microsoft Graph) and `_teamsAvatarHTML()` with a `/users/{id}/photo/$value` fetch. The mock layer is a transparent drop-in replacement.
+
+**Phone cell structure**: The Phone field uses the standard `cf-label + cf-val` pattern with a flex wrapper inside `cf-val` to keep the phone number and Call button side-by-side. This aligns the Call button on the same baseline as the Teams chat icon in adjacent cells.
+
 ---
 
 ## CSS Architecture
@@ -545,6 +568,14 @@ box-shadow: var(--card-shadow);
 Applies to: `.ticket-inner`, `.device-card`, `.cust-banner`, `.cust-card-inner`, `.cust-detail-banner`, `.net-summary`, `.stat-chip`, `.cal-week-card`.
 
 All of these have `position: relative` and `overflow: hidden` set.
+
+### Section Title Sizing
+
+`.section-title` uses `font-size:13px` and `padding:7px 14px` (tightened from 10px for ~15% height reduction). Layout is `display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px` to support optional `.section-title-note` child spans that wrap below the main label on mobile (`display:block; width:100%` at `max-width:799px`, `font-size:10px`).
+
+### `.btn-ghost` Pattern
+
+Used for action buttons in the ticket body (Call, Navigate) and the Teams chat icon. Visual recipe: cyan gradient background (`rgba(0,192,243,0.12)` → `rgba(0,160,210,0.08)`), `1.5px` border (`rgba(0,192,243,0.4)`), three-layer box-shadow including ambient glow (`0 0 8px rgba(0,192,243,0.15)`), and an SVG `drop-shadow` filter for icon glow. Hover lifts `translateY(-1px)`; active presses `scale(0.96)`.
 
 ### Depth & Dimension — Section Titles
 
@@ -724,13 +755,13 @@ Uses `toggleAcc()` with IDs `safety-vehicle`, `safety-ladder`, `safety-mileage`.
 | `initSafetyChecks()` | Loads state + per-type frequencies from localStorage (with legacy migration), renders all components |
 | `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
 | `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all. Shown as the **Reset** button in the UI. |
-| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage. If the type already has a completion timestamp, **immediately recalculates and overwrites `_safetyNextDue[type]`** using the new frequency (same branching logic as `markSafetyComplete`). Triggers a brief toast confirmation via `_showFreqToast()`. |
+| `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage. **Always recalculates `_safetyNextDue[type]`**: mileage → 1st of next month; vehicle/ladder with completion → completion date + freq days; vehicle/ladder without completion → clears `_safetyNextDue` (so `renderSafetySection` shows "You must complete an inspection first." in muted color). Calls `renderCalendar()` to refresh inspection dates in all calendar views. Triggers a brief toast via `_showFreqToast()`. |
 | `_showFreqToast(msg)` | Displays a transient bottom-anchored toast (`#safety-freq-toast`) with a checkmark and descriptive message; auto-dismisses after ~3 s |
 | `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency (used for urgency/progress calculations; does **not** drive the "Next Inspection Due" display) |
 | `_isSafetyDue(type)` | Checks if inspection is due using that type's frequency |
 | `_getSafetyUrgencyForType(type)` | Returns urgency level (none/low/medium/high) for a specific inspection |
 | `getSafetyUrgency()` | Returns worst urgency across all types |
-| `renderSafetySection()` | Updates accordions, pills, progress bar, per-type frequency inputs, and "Next Inspection Due" date in Tech Tools screen |
+| `renderSafetySection()` | Updates accordions, pills, progress bar, per-type frequency inputs, and "Next Inspection Due" line in Tech Tools screen. Shows the due date (orange `--accent2`) when `_safetyNextDue[type]` is set; shows "You must complete an inspection first." (muted `--text-muted`) for vehicle/ladder when no date is locked; shows the upcoming 1st-of-next-month fallback for mileage. |
 | `renderSafetyBanner()` | Shows/hides banner with per-inspection messages on Tickets screen |
 | `updateSafetyBadge()` | Updates badge dots on mobile + desktop nav |
 | `checkSafetyModal()` | Shows modal on login if urgency = high |
@@ -807,8 +838,8 @@ let _inventoryFrequency = { inventory: 7 };    // 7 or 14 only
 | `initInventoryChecks()` | Loads frequency (clamped to 7 or 14) and completion timestamp from localStorage, renders section |
 | `markInventoryComplete(type)` | Saves ISO timestamp to `ft_inventory_{type}`, re-renders |
 | `undoInventoryCheck(type)` | Clears localStorage entry, re-renders. Shown as **Reset** button in UI. |
-| `setInventoryFrequency(type, val)` | Saves frequency (7 or 14) to `ft_inventory_freq_{type}`, triggers freq toast |
-| `renderInventorySection()` | Updates accordion actions, completed date, Next Report Due line, frequency dropdown |
+| `setInventoryFrequency(type, val)` | Saves frequency (7 or 14) to `ft_inventory_freq_{type}`. Recalculates `_inventoryNextDue[type]`: if completed, base = completion date + freq days; if not completed, clears `_inventoryNextDue` so the "You must complete a report first." prompt shows. Calls `renderCalendar()` to keep calendar banners in sync. Triggers freq toast. |
+| `renderInventorySection()` | Updates accordion actions, completed date, Next Report Due line (orange `--accent2` when set; "You must complete a report first." in muted color when null), frequency dropdown |
 | `launchTruckStock()` | Opens Truck Stock URL in new tab (URL TBD — currently `about:blank`) |
 
 ### UI structure
@@ -1002,7 +1033,7 @@ if (filterState !== 'today') {
 - **No framework, no build**: pure DOM manipulation. `escHtml(str)` must be used on all user/API data inserted into innerHTML.
 - **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any new SN API calls — never raw `fetch()`.
 - **Urgency vs card display are separate**: `_isSafetyDue()` / `_isInventoryDue()` drive urgency pills and calendar banners. Card Pending/Complete display uses `hasTimestamp = !!_safetyChecks[type]`. These must remain separate — `_isSafetyDue` returns `false` when a locked future date exists (correct for urgency) but must not control card state after Reset.
-- **Locked next-due date pattern**: `_safetyNextDue[type]` / `_inventoryNextDue[type]` are ISO strings written on Done, persisted to `ft_safety_nextdue_{type}` / `ft_inventory_nextdue_{type}` in localStorage, and never cleared by Reset. They are overwritten only when Done is pressed again or when frequency is changed via Confirm (see `setSafetyFrequency`). `_isSafetyDue` uses this locked date when no completion timestamp exists, preventing a false "Overdue" state after Reset.
+- **Locked next-due date pattern**: `_safetyNextDue[type]` / `_inventoryNextDue[type]` are ISO strings written on Done, persisted to `ft_safety_nextdue_{type}` / `ft_inventory_nextdue_{type}` in localStorage, and **not** cleared by Reset. They are overwritten when Done is pressed again or when frequency is changed via Confirm. For vehicle/ladder: if no completion timestamp exists when Confirm is pressed, `_safetyNextDue[type]` is explicitly cleared (null + localStorage removal) so `renderSafetySection()` shows the "must complete first" prompt rather than a date. Mileage always recalculates to 1st of next month regardless of completion state. `_isSafetyDue` uses the locked date when no completion timestamp exists, preventing a false "Overdue" state after Reset.
 - **Single source for links**: `_LINKS_DATA` / `buildLinksHTML()` populate both `#links-container-detail` (ticket detail Links section) and `#links-container-screen` (Important Links screen). Changes to links or link rendering automatically apply to both.
 - **Scroll container per screen**: `html,body` has `overflow:hidden`. Each screen's scrollable area is `.detail-scroll` (or `.ticket-list` for the tickets screen). The pull-to-refresh handler must target the active screen's scroll container, not `document.body`.
 
