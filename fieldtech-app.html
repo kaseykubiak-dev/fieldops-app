@@ -6315,7 +6315,14 @@
   // Check if a specific type needs to be done in the current cycle.
   function _isSafetyDue(type) {
     const ts = _safetyChecks[type];
-    if (!ts) return true; // never completed this month
+    if (!ts) {
+      // No completion timestamp — if there's a locked next-due date still in the future,
+      // the inspection is not yet due (e.g. after Reset, the cycle clock keeps ticking).
+      if (_safetyNextDue && _safetyNextDue[type]) {
+        return Date.now() >= new Date(_safetyNextDue[type]).getTime();
+      }
+      return true; // no timestamp and no locked date — treat as due
+    }
     const freq = _safetyFrequency[type] || 0;
     if (freq <= 0 || freq >= _safetyDaysInMonth()) return false; // monthly mode, completed = done
     const completedAt = new Date(ts);
