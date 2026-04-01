@@ -721,6 +721,36 @@
   .list-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:48px 24px; color:var(--text-muted); }
   .spinner { width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
   @keyframes spin { to { transform:rotate(360deg); } }
+  /* Pull-to-refresh indicator */
+  #ptr-indicator {
+    position:fixed; top:0; left:0; right:0; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    height:0; overflow:hidden;
+    transition:height .15s ease, opacity .15s ease;
+    background:transparent;
+    pointer-events:none;
+  }
+  #ptr-indicator.ptr-visible { height:56px; }
+  #ptr-indicator.ptr-refreshing { height:56px; }
+  .ptr-inner {
+    display:flex; align-items:center; gap:9px;
+    background:rgba(14,26,42,0.88); backdrop-filter:blur(12px);
+    border:1px solid rgba(0,192,243,0.28); border-radius:24px;
+    padding:7px 18px 7px 12px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.5);
+    opacity:0; transform:translateY(-8px);
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  #ptr-indicator.ptr-visible .ptr-inner,
+  #ptr-indicator.ptr-refreshing .ptr-inner { opacity:1; transform:translateY(0); }
+  .ptr-icon {
+    width:18px; height:18px;
+    border:2px solid rgba(0,192,243,0.35);
+    border-top-color:var(--accent);
+    border-radius:50%;
+  }
+  #ptr-indicator.ptr-refreshing .ptr-icon { animation:spin .7s linear infinite; }
+  .ptr-label { font-size:12px; font-weight:600; color:var(--accent); letter-spacing:.04em; }
   @keyframes tagline-shimmer { 0% { background-position:200% center; } 100% { background-position:-200% center; } }
   .list-error { margin:16px; padding:14px; background:rgba(255,82,82,0.08); border:1px solid rgba(255,82,82,0.25); border-radius:10px; font-size:13px; color:var(--danger); line-height:1.5; }
   .list-error strong { display:block; margin-bottom:4px; }
@@ -6476,6 +6506,23 @@
     } else {
       localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
     }
+    // If this type was already completed, relock the next-due date using the new frequency
+    if (_safetyChecks[type]) {
+      const newFreq = _safetyFrequency[type] || 0;
+      let nextDue;
+      if (type === 'mileage') {
+        const now = new Date();
+        nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      } else if (newFreq <= 0) {
+        const now = new Date();
+        nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+      } else {
+        const completedAt = new Date(_safetyChecks[type]);
+        nextDue = new Date(completedAt.getTime() + newFreq * 86400000);
+      }
+      _safetyNextDue[type] = nextDue.toISOString();
+      localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
+    }
     // Build a human-readable confirmation label
     const typeLabel = type === 'vehicle' ? 'Vehicle' : type === 'ladder' ? 'Ladder' : type.charAt(0).toUpperCase() + type.slice(1);
     const freqLabel = _safetyFrequency[type] === 0 ? 'monthly' : 'every ' + _safetyFrequency[type] + ' days';
@@ -6889,6 +6936,74 @@
     // URL to be provided — placeholder opens a blank tab
     window.open('about:blank', '_blank');
   }
+
+  // ── Pull-to-refresh (mobile) ─────────────────────────────────────────────
+  (function() {
+    const THRESHOLD    = 72;   // px to pull before release triggers reload
+    const SHOW_AT      = 18;   // px pulled before indicator appears
+    let startY         = 0;
+    let pulling        = false;
+    let delta          = 0;
+    let released       = false;
+
+    const indicator    = document.getElementById('ptr-indicator');
+    const labelEl      = document.getElementById('ptr-label');
+
+    function getActiveScroll() {
+      // Find the scrollable container of the currently visible screen
+      const activeScreen = document.querySelector('.screen.active');
+      if (!activeScreen) return null;
+      const ds = activeScreen.querySelector('.detail-scroll');
+      if (ds) return ds;
+      const tl = activeScreen.querySelector('.ticket-list');
+      if (tl) return tl;
+      return null;
+    }
+
+    function isAtTop() {
+      const el = getActiveScroll();
+      return !el || el.scrollTop <= 0;
+    }
+
+    document.addEventListener('touchstart', function(e) {
+      if (!isAtTop()) return;
+      startY   = e.touches[0].clientY;
+      pulling  = true;
+      released = false;
+      delta    = 0;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      if (!pulling || released) return;
+      delta = e.touches[0].clientY - startY;
+      if (delta <= 0) { pulling = false; return; }
+      if (!isAtTop()) { pulling = false; return; }
+
+      if (delta >= SHOW_AT) {
+        indicator.classList.add('ptr-visible');
+        if (labelEl) labelEl.textContent = delta >= THRESHOLD ? 'Release to refresh' : 'Pull to refresh';
+      } else {
+        indicator.classList.remove('ptr-visible');
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function() {
+      if (!pulling) return;
+      pulling  = false;
+      released = true;
+
+      if (delta >= THRESHOLD) {
+        indicator.classList.remove('ptr-visible');
+        indicator.classList.add('ptr-refreshing');
+        if (labelEl) labelEl.textContent = 'Refreshing…';
+        setTimeout(function() { location.reload(); }, 300);
+      } else {
+        indicator.classList.remove('ptr-visible');
+      }
+      delta = 0;
+    }, { passive: true });
+  })();
+  // ── End pull-to-refresh ──────────────────────────────────────────────────
 </script>
 
 <!-- Safety Check Modal (high urgency login gate) -->
@@ -6906,6 +7021,14 @@
       <button class="safety-modal-btn safety-modal-btn-sospes" onclick="launchSospes('all')">Open Sospes to Complete</button>
       <button class="safety-modal-btn safety-modal-btn-acknowledge" onclick="acknowledgeSafetyModal()">I'll complete later today</button>
     </div>
+  </div>
+</div>
+
+<!-- Pull-to-refresh indicator -->
+<div id="ptr-indicator" aria-hidden="true">
+  <div class="ptr-inner">
+    <div class="ptr-icon"></div>
+    <span class="ptr-label" id="ptr-label">Pull to refresh</span>
   </div>
 </div>
 
