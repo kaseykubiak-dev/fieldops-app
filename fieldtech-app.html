@@ -1183,11 +1183,8 @@
   @media(min-width:800px){
     .app { flex-direction:column; }
     .bottom-nav { display:none; }
+    #mobile-topbar { display:none; }
     #desktop-topbar { display:flex !important; }
-    /* Desktop topbar owns these — hide duplicates inside screen topbars */
-    #screen-list .topbar .theme-toggle,
-    #screen-list .topbar .notif-bell,
-    #screen-list .topbar .avatar-sm { display:none !important; }
     .mobile-only-logo { display:none !important; }
     .screen-wrap { display:flex; flex:1; min-height:0; overflow:hidden; }
     /* Default: tickets view — list (340px) + detail side by side */
@@ -1233,6 +1230,7 @@
   /* ── DEV: MOBILE PREVIEW OVERRIDE ── */
   html[data-mobile-preview] .app { flex-direction:column !important; }
   html[data-mobile-preview] .bottom-nav { display:flex !important; }
+  html[data-mobile-preview] #mobile-topbar { display:flex !important; }
   html[data-mobile-preview] .screen-wrap { display:block !important; overflow:hidden !important; }
   html[data-mobile-preview] .screen { display:none !important; }
   html[data-mobile-preview] .screen.active { display:flex !important; animation:none; }
@@ -2230,33 +2228,35 @@
     </div>
   </header>
 
+  <!-- MOBILE PERSISTENT TOPBAR — hidden on desktop via @media(min-width:800px) -->
+  <div class="topbar" id="mobile-topbar">
+    <div class="cspire-logo-svg mobile-only-logo">
+      <img src="delta-logo-dark-transparent.png" alt="Delta" height="31" class="delta-logo" style="object-fit:contain;">
+    </div>
+    <div class="topbar-right">
+      <span style="
+        font-family:var(--sans);
+        font-size:12px;
+        font-weight:800;
+        letter-spacing:0.02em;
+        white-space:nowrap;
+        background:linear-gradient(90deg, #00c0f3 0%, #B9DEF3 60%, #00c0f3 100%);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        background-clip:text;
+        background-size:200% auto;
+        animation:tagline-shimmer 4s linear infinite;
+        filter:drop-shadow(0 1px 6px rgba(0,192,243,0.45));
+      ">We Are Customer Inspired</span>
+      <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
+      <button class="avatar-sm" id="user-avatar" onclick="toggleUserMenu(this)" title="User menu" aria-label="User menu" aria-expanded="false" aria-controls="user-menu-panel">??</button>
+    </div>
+  </div>
+
   <div class="screen-wrap">
 
     <!-- ══ LIST SCREEN ══ -->
     <div class="screen active" id="screen-list">
-      <div class="topbar">
-        <div class="cspire-logo-svg mobile-only-logo">
-          <img src="delta-logo-dark-transparent.png" alt="Delta" height="31" class="delta-logo" style="object-fit:contain;">
-        </div>
-        <div class="topbar-right">
-          <span style="
-            font-family:var(--sans);
-            font-size:12px;
-            font-weight:800;
-            letter-spacing:0.02em;
-            white-space:nowrap;
-            background:linear-gradient(90deg, #00c0f3 0%, #B9DEF3 60%, #00c0f3 100%);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-            background-size:200% auto;
-            animation:tagline-shimmer 4s linear infinite;
-            filter:drop-shadow(0 1px 6px rgba(0,192,243,0.45));
-          ">We Are Customer Inspired</span>
-          <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
-          <button class="avatar-sm" id="user-avatar" onclick="toggleUserMenu(this)" title="User menu" aria-label="User menu" aria-expanded="false" aria-controls="user-menu-panel">??</button>
-        </div>
-      </div>
 
       <div class="list-header">
         <div class="search-box">
@@ -2903,7 +2903,6 @@
     <!-- ══ MORE ══ -->
     <!-- SETTINGS SCREEN (formerly More — accessed via user menu) -->
     <div class="screen" id="screen-more">
-      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Settings</span></div>
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
         <h2 class="section-title">Appearance</h2>
@@ -2981,7 +2980,6 @@
 
     <!-- TECH TOOLS SCREEN -->
     <div class="screen" id="screen-techtools">
-      <div class="topbar"><span class="topbar-title" style="margin-left:4px;">Tech Tools</span></div>
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
         <!-- ── Vehicle Reports ── -->
