@@ -1,13 +1,13 @@
 # Delta — Field Operations Tech App
 
-Single-file web app (`fieldtech-app.html`, ~6100+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
+Single-file web app (`fieldtech-app.html`, ~6700+ lines) built for C Spire field technicians. Formerly known as FieldOps, now branded as **Delta**. It connects to a ServiceNow CSM instance to show assigned tickets, customer details, equipment data, and AI-powered customer intelligence via CX 360. There is no build step — everything is inline HTML/CSS/JS in one file.
 
 ---
 
 ## Repository Layout
 
 ```
-fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~6100+ lines)
+fieldtech-app.html            <- The entire app (HTML + CSS + JS, ~6700+ lines)
 meraki-proxy.js               <- Node.js CORS proxy for Cisco Catalyst Center API
 package.json                  <- { "start": "node meraki-proxy.js" }, Node >=18
 internet-db.json              <- Simulated ISP circuit data (fiber, cable, DSL, wireless)
@@ -59,7 +59,7 @@ Navigation is handled by `showScreen(name, btn)` which toggles `.active` on the 
 | `#screen-customer-detail` | Customer Detail | `fetchCustomerDetail(sysId)` |
 | `#screen-network` | Network Equipment | `loadNetworkScreen()` |
 | `#screen-cx360` | CX 360 | `cx360Send()` (mock AI chat) |
-| `#screen-techtools` | Tech Tools | `initSafetyChecks()` + static tools |
+| `#screen-techtools` | Tech Tools | `initSafetyChecks()` + `initInventoryChecks()` + static tools |
 | `#screen-more` | Settings | (static — Appearance, App, Account) |
 | `#screen-links` | Important Links | (static) |
 | `#login-screen` | Login | (shown by default) |
@@ -95,7 +95,7 @@ The only raw `fetch()` calls that intentionally bypass `snFetch` are: `attemptLo
 ### Session lifecycle
 
 1. Login -> `attemptLogin()` -> stores creds + user info in sessionStorage -> `startSession()`
-2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`, `initSafetyChecks()`, and `checkSafetyModal()`
+2. First load shows a disclaimer modal; `dismissDisclaimer()` proceeds to `fetchTickets()`, `initSafetyChecks()`, `checkSafetyModal()`, and `initInventoryChecks()`
 3. Force refresh: `forceAppRefresh()` clears `cachedAssignedTickets` and re-fetches, then navigates to the Tickets tab
 4. Logout: `logout()` clears sessionStorage and reloads the page
 
@@ -204,6 +204,10 @@ let _safetyChecks = { vehicle: null, ladder: null };
 let _safetyBannerDismissed = false;
 let _safetyModalShown = false;
 
+// Inventory Tracker
+let _inventoryChecks    = { inventory: null }; // null | ISO timestamp
+let _inventoryFrequency = { inventory: 7 };    // 7 or 14 days
+
 // Notifications (all declared together at top of script block)
 let _notifs             = [];        // array of notification objects
 let _notifSeen          = new Set(); // ticket numbers already shown
@@ -301,6 +305,20 @@ The calendar topbar uses a **3-column flex layout** to keep the month/year label
 ```
 
 Do not switch back to `position:absolute` on the label or move the picker to the right side — the picker dropdown clips against the screen edge when placed near the refresh button.
+
+### Inspection & Inventory Due Banners
+
+`getInspectionDueDates()` returns a merged array of `{ type, label, shortLabel, dueStr }` objects for all three tracked items: vehicle inspection, ladder inspection, and inventory report. All three calendar renderers call this function and inject the matching entries as red banners (`.chip-inspection`, `.cal-week-inspection`, `.cal-agenda-inspection`) on the due date.
+
+Safety item date logic (vehicle / ladder):
+- Completed + monthly (`freq=0`) → end of next month
+- Completed + cyclic → completion timestamp + freq days
+- Due / overdue → `_safetyCycleInfo(type).deadline`
+
+Inventory item date logic:
+- Always cyclic — uses `_inventoryCycleInfo(type).deadline` in all states (never completed → today; completed → completion + freq days)
+
+The function is defined once (near the calendar state, around line 4770) and shared by all three views.
 
 ### Date strings
 
@@ -544,6 +562,13 @@ let _safetyChecks = { vehicle: null, ladder: null };  // null = pending, ISO str
 let _safetyBannerDismissed = false;  // per-session dismiss (resets on logout)
 let _safetyModalShown = false;       // only show once per session
 let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month, 1-31 = custom days
+
+// Inventory tracker — declared alongside safety state (same TDZ reasons)
+const _INVENTORY_TYPES = [
+  { key: 'inventory', label: 'Inventory Report' }
+];
+let _inventoryChecks    = { inventory: null }; // null = pending, ISO string = completed timestamp
+let _inventoryFrequency = { inventory: 7 };    // 7 or 14 days only (no monthly option)
 ```
 
 Completion state is stored in `localStorage` keyed as `ft_safety_{type}_{YYYY-MM}` (e.g., `ft_safety_vehicle_2026-03`). Checks reset automatically each calendar month — `_safetyMonthKey()` returns `"YYYY-MM"` based on the current date. Per-type reminder frequency stored as `ft_safety_freq_{type}` (e.g., `ft_safety_freq_vehicle`). Legacy shared key `ft_safety_frequency` is auto-migrated to per-type keys on init.
@@ -554,10 +579,12 @@ Urgency is now computed **per inspection type** via `_getSafetyUrgencyForType(ty
 
 | Level | Condition | Behavior |
 |---|---|---|
-| `none` | All checks complete | Green "All Clear" pill, no banner/badge/modal |
+| `none` | All checks complete | Urgency pill **hidden** (no "All Clear" text shown), no banner/badge/modal |
 | `low` | ≤25% of cycle elapsed, incomplete | Blue "Due This Month" pill, no banner |
 | `medium` | 25-75% of cycle elapsed, incomplete | Yellow "Due Soon" pill, banner on Tickets screen |
 | `high` | >75% of cycle elapsed, incomplete | Red "Overdue" pill (pulses), banner, badge dot on Tech Tools nav, login modal |
+
+The urgency pill (`#safety-urgency-pill`) is hidden via `style.display = 'none'` when urgency is `none`. It is only shown (and populated) for `low`, `medium`, and `high` states. The initial HTML also renders it with `display:none`.
 
 With per-type frequency, each inspection can be at a different urgency level independently. The cycle length is either the full month (default, freq=0) or the custom day count.
 
@@ -565,7 +592,9 @@ With per-type frequency, each inspection can be at a different urgency level ind
 
 **Section header** (Tech Tools screen): Uses `.section-title` bar with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container.
 
-**Inspection accordions** (Tech Tools screen): Each inspection (Vehicle, Ladder) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding the accordion reveals action buttons (Sospes + Done when pending; Undo when complete) and a per-type **Reminder Frequency** control (number input + Reset button). The frequency setting is nested inside each accordion body, allowing independent frequency per inspection. Uses the existing `toggleAcc()` function with IDs `safety-vehicle` and `safety-ladder`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds via CSS overrides.
+**Inspection accordions** (Tech Tools screen): Each inspection (Vehicle, Ladder) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding the accordion reveals action buttons (Sospes + Done when pending; Reset when complete) and a per-type **Reminder Frequency** control (dropdown + Confirm button). The frequency setting is nested inside each accordion body, allowing independent frequency per inspection. Uses the existing `toggleAcc()` function with IDs `safety-vehicle` and `safety-ladder`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds via CSS overrides.
+
+**Mobile action layout**: The accordion header `div` carries class `safety-acc-header`. The actions container carries class `acc-actions`. On `max-width:799px`, `.safety-acc-header` enables `flex-wrap:wrap` and `.safety-acc-header .acc-actions` breaks to its own full-width row below the title text (left-aligned with a 42px offset matching the icon column). Button font/padding reduce slightly on mobile. Desktop layout is unchanged. This resolves overflow clipping caused by `.card { overflow:hidden }` when the row contains multiple buttons.
 
 **Progress bar**: Above the inspection accordions (top of the safety card), shows "N of 2 complete" with nearest deadline info and a fill bar (`#safety-progress-bar`). Bar turns green (`.bar-complete`) when all checks are done.
 
@@ -581,7 +610,7 @@ With per-type frequency, each inspection can be at a different urgency level ind
 |---|---|
 | `initSafetyChecks()` | Loads state + per-type frequencies from localStorage (with legacy migration), renders all components |
 | `markSafetyComplete(type)` | Saves timestamp to localStorage, re-renders all |
-| `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all |
+| `undoSafetyCheck(type)` | Clears localStorage entry, re-renders all. Shown as the **Reset** button in the UI. |
 | `setSafetyFrequency(type, val)` | Sets per-type reminder frequency, saves to `ft_safety_freq_{type}` in localStorage, triggers a brief toast confirmation ("Vehicle inspection set to remind every 7 days") via `_showFreqToast()` |
 | `_showFreqToast(msg)` | Displays a transient bottom-anchored toast (`#safety-freq-toast`) with a checkmark and descriptive message; auto-dismisses after ~3 s |
 | `_safetyCycleInfo(type)` | Returns deadline, daysLeft, cycleDays for a specific inspection type based on its frequency (used for urgency/progress calculations; does **not** drive the "Next Inspection Due" display) |
@@ -611,6 +640,67 @@ Three existing functions have safety check hooks:
 
 Safety pills (urgency pill and status pills) use the same visual pattern as ticket pills: `border-radius:4px`, gradient backgrounds, `1.5px` colored borders, multi-layer box-shadow with glow, and `text-shadow`. Classes: `.safety-urgency-pill.urgency-{none|low|medium|high}` and `.safety-card-status.status-{pending|done}`.
 
+### Action button depth
+
+The three secondary action buttons — **Sospes** (orange), **Truck Stock** (cobalt blue), and **Reset** (neutral) — use a layered depth treatment:
+- **Outer shadows**: `0 1px 2px rgba(0,0,0,0.4)` + `0 2px 6px rgba(0,0,0,0.2)`
+- **Colored ambient glow**: e.g. `0 0 8px rgba(255,103,32,0.12)` for Sospes, `rgba(37,99,235,0.15)` for Truck Stock
+- **Inset top highlight**: `inset 0 1px 0 rgba(255,…,0.18-0.22)` — simulates a light source from above
+- **Inset bottom shadow**: `inset 0 -1px 0 rgba(0,0,0,0.22)`
+- **Hover**: `translateY(-1px)` lift + enhanced shadow stack
+- **Active**: `scale(0.97)` press + reduced shadow
+- **C Spire light theme**: softer shadows, `inset 0 1px 0 rgba(255,255,255,0.7)` highlight for the white surface
+
+CSS classes: `.safety-btn-sospes`, `.safety-btn-truckstock`, `.safety-btn-undo`.
+
+---
+
+## Inventory Tracker
+
+Tracks periodic truck stock inventory reports. Lives in the **Inventory Management** section of the Tech Tools screen (`#screen-techtools`), between Monthly Safety Checks and the Tools card. Behavior mirrors the safety check system but is entirely independent state.
+
+### Key differences from Safety Checks
+
+- **Frequency**: cyclic-only — 7 or 14 days. No monthly option. Default is 7 days.
+- **External link**: "Truck Stock" button (cobalt blue, `.safety-btn-truckstock`) opens `launchTruckStock()`. URL is a placeholder (`about:blank`) pending the real Truck Stock link.
+- **No urgency modal**: does not affect the safety urgency pill, safety banner, badge dot, or login modal.
+- **Storage keys**: `ft_inventory_{type}` (completion timestamp) and `ft_inventory_freq_{type}` (frequency, 7 or 14).
+
+### State
+
+```js
+const _INVENTORY_TYPES = [{ key: 'inventory', label: 'Inventory Report' }];
+let _inventoryChecks    = { inventory: null }; // null | ISO timestamp
+let _inventoryFrequency = { inventory: 7 };    // 7 or 14 only
+```
+
+### Cycle logic
+
+`_inventoryCycleInfo(type)` always uses cyclic logic (no monthly branch):
+- Never completed → deadline = end of today (overdue from start)
+- Completed → deadline = `completedAt + freq * 86400000`
+
+`_isInventoryDue(type)` returns `true` if never completed or `elapsed >= freq`.
+
+### Calendar banner
+
+`getInspectionDueDates()` returns a merged array of safety + inventory items. The inventory item uses `_inventoryCycleInfo(type).deadline` in all states, producing an "Inventory Report Due" banner on the due date in all three calendar views (month chip, week row, mobile agenda). Uses the same `.chip-inspection` / `.cal-week-inspection` / `.cal-agenda-inspection` red styling as the safety inspection banners.
+
+### Key functions
+
+| Function | Purpose |
+|---|---|
+| `initInventoryChecks()` | Loads frequency (clamped to 7 or 14) and completion timestamp from localStorage, renders section |
+| `markInventoryComplete(type)` | Saves ISO timestamp to `ft_inventory_{type}`, re-renders |
+| `undoInventoryCheck(type)` | Clears localStorage entry, re-renders. Shown as **Reset** button in UI. |
+| `setInventoryFrequency(type, val)` | Saves frequency (7 or 14) to `ft_inventory_freq_{type}`, triggers freq toast |
+| `renderInventorySection()` | Updates accordion actions, completed date, Next Report Due line, frequency dropdown |
+| `launchTruckStock()` | Opens Truck Stock URL in new tab (URL TBD — currently `about:blank`) |
+
+### UI structure
+
+The Inventory Report accordion (`#inventory-acc-inventory`) uses the same `.accordion` / `.acc-header` / `.acc-body` pattern as the safety accordions. Action div carries class `acc-actions` and the header carries `safety-acc-header` for the mobile stacking behavior. Icon and body tint use cobalt blue (`rgba(37,99,235,…)`). The frequency confirm button inline style also uses cobalt.
+
 ---
 
 ## User Menu
@@ -638,7 +728,7 @@ The header shows a larger avatar circle with user initials and full name (from `
 
 The original "More" screen was split into two screens:
 
-**Tech Tools** (`#screen-techtools`) — visible as a nav tab (wrench icon) in both mobile bottom nav and desktop top nav. Contains Monthly Safety Checks and Tools sections (Network Equipment, Important Links). Safety badge dots appear on this tab.
+**Tech Tools** (`#screen-techtools`) — visible as a nav tab (wrench icon) in both mobile bottom nav and desktop top nav. Contains three sections: Monthly Safety Checks, Inventory Management, and Tools (Network Equipment, Important Links). Safety badge dots appear on this tab.
 
 **Settings** (`#screen-more` in code) — accessible only via the user avatar dropdown menu "Settings" option. Contains Appearance (theme toggle, mobile preview), App (force refresh), and Account (sign out) sections. No nav tab highlights when Settings is active. The screen ID remains `screen-more` in code to avoid breaking existing references.
 
@@ -702,112 +792,4 @@ On `min-width:800px`, `.ticket-inner`, `.cal-mini-card`, and `.cust-card-inner` 
 ## Important Patterns
 
 - **No framework, no build**: pure DOM manipulation. `escHtml(str)` must be used on all user/API data inserted into innerHTML.
-- **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any new SN API call.
-- **`isMobileView()`**: `window.innerWidth < 800 || document.documentElement.hasAttribute('data-mobile-preview')`. The `data-mobile-preview` attribute enables mobile layout on desktop for dev/testing.
-- **ServiceNow dates**: always internal format `"YYYY-MM-DD HH:MM:SS"` UTC. Use `parseSNDate(str)` or `.replace(' ','T')+'Z'` before `new Date()`.
-- **Detail screen sections** (Internet, Firewall, Voice, Service Order) are conditionally shown/hidden based on ticket type (`getCaseType(inc)`).
-- **Draft notes**: `saveDraft()` / `restoreDraft(sysId)` persist the update textarea to `localStorage` keyed by ticket sys_id.
-- **`_closedThisSession`**: a Set of ticket numbers closed in this browser session. `renderTickets` and detail view check this to show closed state without waiting for a re-fetch.
-- **Seed scripts**: require `tzdata` pip package on Windows (`python -m pip install tzdata`). Use ASCII-only print statements — Windows terminal (cp1252) can't encode Unicode symbols.
-
----
-
-## Active Development Notes
-
-- The `/delta-app` skill contains Delta's brand identity, logo specs, and color system. The `/cspire-brand` Claude Code slash command (`~/.claude/commands/cspire-brand.md`) contains the full C Spire Brand Guidelines — invoke either when making design/copy/color decisions.
-- Both themes are actively maintained. Dark mode is the default; light mode (C Spire branded) is the secondary theme. Each theme has its own Delta logo variant (see Delta Branding section).
-- The calendar agenda scroll implementation (double-rAF + `getBoundingClientRect` delta) is the stable solution. Do not revert to `scrollIntoView`, `offsetTop`, or single-`setTimeout`.
-- Mock data sections (Internet, Firewall, Voice, CX 360) intentionally use local JSON / inline mock data rather than live APIs — this is by design for demo/training use. CX 360 is a demo mockup of a future integration and is not connected to a live backend.
-- The `u_scheduled_start` custom field on `sn_customerservice_case` drives the calendar display for install/repair appointment times. Always populate this field when seeding tickets.
-- `overflow: hidden` on card containers clips `::before`/`::after` pseudo-elements — useful for brand shape accents, but means z-index layering inside cards requires `position: relative` on the container and `z-index: -1` on pseudo-elements so they render behind content.
-
----
-
-## Change Protocol
-
-This section governs how edits are made to `fieldtech-app.html`. The file is ~4950 lines of inline HTML + CSS + JS with no build step, so discipline around changes is critical.
-
-### File structure boundaries
-
-| Section | Approximate lines | Contents |
-|---|---|---|
-| CSS | 1 - ~1810 | `<style>` block: dark theme variables, light theme overrides, all component styles (incl. CX 360, week view, safety check tracker) |
-| HTML | ~1810 - ~2780 | All screen markup (incl. CX 360 screen, Network Equipment link, safety section in More, safety banner, safety modal), modals, nav bars |
-| JS | ~2780 - ~6080 | `<script>` block: state, API calls, rendering, CX 360 chat logic, week view, safety check tracker logic, event handlers |
-
-When reading or editing, use these boundaries to target the right section. Always read the surrounding 20-30 lines of context before making an edit to avoid collisions.
-
-### Edit rules
-
-1. **Batch size**: No more than 5-10 related changes per editing pass. After each pass, verify nothing broke before continuing.
-2. **One section at a time**: Complete all work in a logical section (e.g., "accessibility — forms/modals") before moving to the next. Do not interleave unrelated changes.
-3. **Theme parity**: Any CSS change must be checked against both dark and light themes. If a variable is added or renamed, update both `:root` and `html[data-theme="cspire"]` blocks.
-4. **No behavioral regressions**: Refactors (renaming functions, reorganizing globals, standardizing async patterns) must not change user-visible behavior. If the before/after behavior might differ, note it explicitly.
-5. **Preserve documented patterns**: The following are battle-tested and must not be reverted:
-   - Calendar agenda scroll: double-`requestAnimationFrame` + `getBoundingClientRect` delta
-   - Calendar topbar: 3-column flex layout with spacer
-   - `pickerPickDay` ordering: `closeCalDayPanel()` before setting `_cal.selectedDay`
-   - `escHtml()` on all user/API data inserted via innerHTML
-   - `calDateStr(d)` for local-time date strings
-   - `parseSNDate()` / `.replace(' ','T')+'Z'` for ServiceNow dates
-   - `snFetch()` for all ServiceNow API calls (do not revert to raw `fetch`)
-   - Detail sub-fetch helpers (`fetchDetailAssignee`, etc.) — do not inline back into `fetchCaseDetail`
-6. **innerHTML safety**: Every new `innerHTML =` assignment that includes dynamic data must use `escHtml()`. If building onclick handlers in HTML strings, prefer `data-*` attributes + delegated event listeners instead.
-
-### Verification checklist
-
-After each section of changes, confirm the following still work in both themes:
-
-- [ ] Login flow (enter credentials -> disclaimer modal -> ticket list)
-- [ ] Ticket list loads, search/filter works
-- [ ] Ticket detail opens, accordion sections expand/collapse
-- [ ] Calendar month view renders, day selection highlights correctly, agenda view scrolls correctly on mobile
-- [ ] Calendar week view renders on desktop (Week/Month toggle), shows ticket cards, clicking cards opens detail
-- [ ] Customer list loads, sort toggles work
-- [ ] Customer detail opens with service summary
-- [ ] Network screen loads (or gracefully errors if proxy is down)
-- [ ] Theme toggle switches cleanly in both directions
-- [ ] Notification bell shows badge, dropdown opens/closes
-- [ ] CX 360 tab opens, suggested questions work, mock responses render with agent badges
-- [ ] CX 360 does NOT block navigation to other tabs on mobile (CSS specificity bug — see CX 360 section)
-- [ ] Delta logo swaps correctly between dark and light variants on theme toggle
-- [ ] Bottom nav (mobile) and sidebar nav (desktop) both highlight the active screen (5 tabs on mobile)
-- [ ] Network Equipment link in ticket detail accordion navigates to Network tab
-- [ ] Safety check section in Tech Tools screen renders correctly, Done/Undo buttons work, accordions expand/collapse
-- [ ] Safety banner appears on Tickets screen when urgency is medium or high, dismiss works
-- [ ] Safety modal appears on login when urgency is high, checklist items are interactive
-- [ ] Safety badge dots appear on More nav button when checks are incomplete
-- [ ] Safety check state persists across page reloads (localStorage), resets monthly
-- [ ] No console errors on any screen
-
-### Git checkpoint strategy
-
-Commit after each verified section with a message like: `a11y: add ARIA attributes to accordion sections and modals`. This gives clean rollback points if a later section introduces a regression.
-
-### Git commit reminder
-
-After any change to files in the `fieldops-app-main` directory, always offer to commit the changes to Git, or provide the terminal commands to do it manually:
-
-```bash
-cd /path/to/fieldops-app-main
-git add fieldtech-app.html        # or whichever files changed
-git commit -m "short description of change"
-```
-
-### Completed refactoring (March 2026)
-
-All six planned improvements have been implemented:
-
-1. **Accessibility pass** -- ARIA attributes, form labels, heading hierarchy, `.sr-only`, semantic HTML
-2. **Color contrast fixes** -- `--text-muted` bumped to `#6889a5` for WCAG AA (4.5:1)
-3. **Network resilience** -- `snFetch()` with AbortController timeouts on all SN calls, notification polling backoff after 3 failures
-4. **Light theme CSS refactor** -- 15+ CSS variables (`--card-*`, `--header-*`, `--pill-*-text`, `--resize-*`) replacing hardcoded rgba values
-5. **Code cleanup** -- `fetchCaseDetail` broken into 6 functions (main + 5 helpers), all `.then()` chains converted to async/await, notification globals consolidated
-6. **Responsive polish** -- Tablet breakpoint (800-1024px) narrows list panel, landscape `safe-area-inset-left/right` via `@supports`
-7. **Visual polish** -- Skeleton loading screens, enhanced empty states, button loading states, modal animations, SLA urgency pulse, mobile press feedback, accordion depth, card hover consistency, prefers-reduced-motion, data viz stat bars
-8. **Safety Check Tracker** -- Monthly vehicle + ladder inspection tracking with escalating urgency (none/low/medium/high), Sospes app store integration (App Store `id1485744669`, Play Store `com.sospesinc.safety`), login gate modal, banner on Tickets screen, badge dots on nav, progress bar. Pills styled to match ticket pill design system.
-9. **User menu dropdown** -- Avatar button opens a dropdown panel (matching notification panel pattern) with user profile header, Settings navigation, and Sign Out. Replaces direct `confirmLogout()` on avatar click.
-10. **Tech Tools / Settings split** -- "More" screen split into Tech Tools (nav tab with safety checks + tools) and Settings (user menu only, Appearance/App/Account). Screen ID `screen-more` retained for Settings to avoid breaking references.
-11. **Per-inspection accordion + frequency** -- Each inspection (Vehicle, Ladder) wrapped in an accordion with nested per-type reminder frequency control. Frequency stored independently per type (`ft_safety_freq_{type}`). Banner messages now show per-inspection: "Vehicle Inspection Due in X days" / "Vehicle Inspection Overdue — Please Complete ASAP". Urgency computed per type, overall urgency = worst across all types. Legacy shared `ft_safety_frequency` key auto-migrated on init.
-12. **Inspection next-due date fix + frequency toast** -- "Next Inspection Due" now projects correctly beyond the current month: monthly mode shows end of *next* month; 7/14-day modes show `completionDate + N days` with no end-of-month cap. `setSafetyFrequency()` now calls `_showFreqToast()` after saving, displaying a bottom toast (e.g. "Vehicle inspection set to remind every 7 days") that auto-dismisses after ~3 s. The "Next Inspection Due" field refreshes immediately on frequency change.
-13. **Safety progress bar removed** (2026-03-31) -- Removed the "N of 2 complete" progress bar row from the Monthly Safety Checks card. Cleaned from CSS (dark + light theme rules), HTML, and `renderSafetySection()` JS. Reminder frequency settings confirmed to already persist across sessions via `localStorage` (`ft_safety_freq_{type}` keys) — no code change needed.
+- **`snFetch(url, opts, timeoutMs)`**: wraps all ServiceNow API calls with auth headers and AbortController timeout. Use this for any
