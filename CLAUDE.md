@@ -1,0 +1,3 @@
+This folder is for a demo version of a single source of truth app for field technicians working for a medium size MSP. Choices should be made from the point of view of a technician working a ticket in the field and how to better equip them with information and the status of equipment on site.
+
+When making choices in regards to color, scheme, tone, or overall presentation, reference the /brand-alignment skill for additional context.
