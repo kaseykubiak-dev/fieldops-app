@@ -944,6 +944,15 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,201,106,0.2), inset 0 1px 0 rgba(0,201,106,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
     transform:translateY(-1px);
   }
+  /* State: done (muted — ticket closed, non-interactive) */
+  .ticket-action-btn[data-action-state="done"] {
+    background:linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border-color:rgba(255,255,255,0.14); color:var(--text-muted);
+    box-shadow:0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+    cursor:default; pointer-events:none; opacity:0.7;
+  }
+  .ticket-action-btn[data-action-state="done"]::before { background:var(--text-muted); box-shadow:none; }
+  html[data-theme="cspire"] .ticket-action-btn[data-action-state="done"] { border-color:rgba(0,0,0,0.15); color:#7a8fa6; }
   /* C Spire theme overrides */
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#8b6aad; box-shadow:0 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(122,85,152,0.14), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.08); text-shadow:none; }
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"]::before { background:#8b6aad; }
@@ -3636,14 +3645,15 @@
 
   // ── Ticket Action Button state machine ───────────────────────────────────
   // _ticketActionState maps ticket number → current state key
-  // States: 'travel' → 'work' → 'close' (close stays; re-click just scrolls)
+  // States: 'travel' → 'work' → 'close' → 'done' (done = non-interactive closed pill)
   const _ticketActionState = {};
 
-  // enterPill: applied to the ticket list when entering that next state
+  // pill: applied to the ticket list WHEN CLICKING this button (i.e. side-effect of this action)
   const _ACTION_CONFIG = {
-    travel: { label: 'Start Travel', next: 'work',  enterPill: { cls: 'pill-enroute', text: 'En Route' } },
-    work:   { label: 'Start Work',   next: 'close', enterPill: { cls: 'pill-onsite',  text: 'On Site'  } },
-    close:  { label: 'Close Ticket', next: null,    enterPill: null },
+    travel: { label: 'Start Travel', next: 'work',  pill: { cls: 'pill-enroute', text: 'En Route' } },
+    work:   { label: 'Start Work',   next: 'close', pill: { cls: 'pill-onsite',  text: 'On Site'  } },
+    close:  { label: 'Close Ticket', next: 'done',  pill: null },
+    done:   { label: 'Ticket Closed', next: null,   pill: null },
   };
 
   function renderTicketActionButton(number) {
@@ -3684,17 +3694,14 @@
     const state = _ticketActionState[number] || 'travel';
     const cfg   = _ACTION_CONFIG[state];
 
-    if (state === 'close') {
-      // Final state — re-click scrolls to the Update Ticket form
-      _scrollToUpdateTicket();
-      return;
-    }
+    // 'done' is terminal — pointer-events:none on the button prevents clicks, but guard here too
+    if (state === 'done' || !cfg.next) return;
 
-    // Advance to next state and apply its entry side-effects
-    const nextState = cfg.next;
-    const nextCfg   = _ACTION_CONFIG[nextState];
-    _updateTicketListPill(number, nextCfg.enterPill);
-    _ticketActionState[number] = nextState;
+    // Apply this button's side-effects before advancing
+    _updateTicketListPill(number, cfg.pill);
+    if (state === 'close') _scrollToUpdateTicket();
+
+    _ticketActionState[number] = cfg.next;
     renderTicketActionButton(number);
   }
 
