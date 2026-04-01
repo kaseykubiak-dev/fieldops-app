@@ -712,6 +712,8 @@
   .portal-link::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:radial-gradient(circle at 35% 35%, rgba(0,220,255,0.9), var(--accent) 60%, rgba(0,140,200,0.8)); flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,0.4), 0 0 6px rgba(0,192,243,0.35), inset 0 -1px 1px rgba(0,0,0,0.3); }
   .portal-link:hover { background:rgba(0,192,243,0.05); text-decoration:underline; }
   .portal-link.last { /* last in group — no special styling needed, border handled by next sibling */ }
+  .portal-link .link-label { flex:1; min-width:0; }
+  .portal-link .ext-icon { flex-shrink:0; opacity:0.55; margin-left:auto; }
   .vpn-badge { margin-left:6px; font-size:9px; font-weight:700; letter-spacing:.04em; padding:2px 6px; border-radius:4px; background:linear-gradient(135deg, rgba(255,215,64,0.24) 0%, rgba(255,215,64,0.08) 100%); color:var(--warning); border:1.5px solid rgba(255,215,64,0.42); flex-shrink:0; text-shadow:0 1px 2px rgba(0,0,0,0.3); box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,215,64,0.12), inset 0 1px 0 rgba(255,215,64,0.18), inset 0 -1px 0 rgba(0,0,0,0.15); }
   html[data-theme="cspire"] .vpn-badge { background:linear-gradient(135deg, rgba(255,215,64,0.18) 0%, rgba(255,180,0,0.07) 100%); border:1.5px solid rgba(255,180,0,0.35); box-shadow:0 2px 4px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.08), 0 0 10px rgba(255,215,64,0.08), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.1); text-shadow:0 1px 2px rgba(0,0,0,0.15); }
 
@@ -4098,8 +4100,9 @@
   function buildLinksHTML() {
     return _LINKS_DATA.map((section, i) => {
       const labelStyle = i === 0 ? ' style="border-top:none;"' : '';
+      const extIcon = `<svg class="ext-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
       const items = section.links.map(link =>
-        `<a href="#" onclick="return false;" class="portal-link">${escHtml(link.label)}${link.vpn ? '<span class="vpn-badge">VPN</span>' : ''}</a>`
+        `<a href="#" onclick="return false;" class="portal-link"><span class="link-label">${escHtml(link.label)}</span>${link.vpn ? '<span class="vpn-badge">VPN</span>' : ''}${extIcon}</a>`
       ).join('');
       return `<div class="link-group-label"${labelStyle}>${section.group}</div>${items}`;
     }).join('');
