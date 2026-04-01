@@ -556,12 +556,14 @@ Monthly vehicle and ladder inspection tracking with escalating urgency reminders
 // section code at the bottom of the script.
 const _SAFETY_TYPES = [
   { key: 'vehicle', label: 'Vehicle Inspection' },
-  { key: 'ladder',  label: 'Ladder Inspection'  }
+  { key: 'ladder',  label: 'Ladder Inspection'  },
+  { key: 'mileage', label: 'Mileage Report'      }  // fixed monthly, no frequency dropdown
 ];
-let _safetyChecks = { vehicle: null, ladder: null };  // null = pending, ISO string = completed timestamp
+let _safetyChecks = { vehicle: null, ladder: null, mileage: null };  // null = pending, ISO string = completed timestamp
 let _safetyBannerDismissed = false;  // per-session dismiss (resets on logout)
 let _safetyModalShown = false;       // only show once per session
-let _safetyFrequency = { vehicle: 0, ladder: 0 }; // per-type: 0 = end of month, 1-31 = custom days
+let _safetyFrequency = { vehicle: 0, ladder: 0, mileage: 0 }; // per-type: 0 = end of month, 1-31 = custom days
+let _safetyNextDue   = { vehicle: null, ladder: null, mileage: null }; // locked next-due ISO strings — set on Done, never cleared by Reset
 
 // Inventory tracker — declared alongside safety state (same TDZ reasons)
 const _INVENTORY_TYPES = [
@@ -590,9 +592,13 @@ With per-type frequency, each inspection can be at a different urgency level ind
 
 ### UI components
 
-**Section header** (Tech Tools screen): Uses `.section-title` bar with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container.
+**Section header** (Tech Tools screen): Uses `.section-title` bar titled **Vehicle Reports** with the urgency pill (`#safety-urgency-pill`) inline. Wraps content in a standard `.card` > `.card-body` container.
 
-**Inspection accordions** (Tech Tools screen): Each inspection (Vehicle, Ladder) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding the accordion reveals action buttons (Sospes + Done when pending; Reset when complete) and a per-type **Reminder Frequency** control (dropdown + Confirm button). The frequency setting is nested inside each accordion body, allowing independent frequency per inspection. Uses the existing `toggleAcc()` function with IDs `safety-vehicle` and `safety-ladder`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds via CSS overrides.
+**Inspection accordions** (Tech Tools screen): Each item (Vehicle, Ladder, Mileage) is wrapped in an `.accordion` container inside the safety card. The accordion header shows the icon, label, description, status pill (Pending/Complete), and a chevron. Expanding reveals action buttons + details:
+- **Vehicle / Ladder**: Sospes button + Done when pending; Reset when complete. Per-type **Reminder Frequency** dropdown (monthly / 7-day / 14-day) + Confirm in the body.
+- **Mileage Report**: **Mileage Reporting** button (fuchsia) + Done when pending; Reset when complete. No frequency dropdown — accordion body shows a static note ("Due on the 1st of every month"). Urgency ramps through the month toward the 1st of next month.
+
+Uses `toggleAcc()` with IDs `safety-vehicle`, `safety-ladder`, `safety-mileage`. Nested accordions inside `.card-body` have `border-radius:0` and subtler expanded backgrounds.
 
 **Mobile action layout**: The accordion header `div` carries class `safety-acc-header`. The actions container carries class `acc-actions`. On `max-width:799px`, `.safety-acc-header` enables `flex-wrap:wrap` and `.safety-acc-header .acc-actions` breaks to its own full-width row below the title text (left-aligned with a 42px offset matching the icon column). Button font/padding reduce slightly on mobile. Desktop layout is unchanged. This resolves overflow clipping caused by `.card { overflow:hidden }` when the row contains multiple buttons.
 
@@ -622,6 +628,7 @@ With per-type frequency, each inspection can be at a different urgency level ind
 | `updateSafetyBadge()` | Updates badge dots on mobile + desktop nav |
 | `checkSafetyModal()` | Shows modal on login if urgency = high |
 | `launchSospes(type)` | Opens Sospes app store page (App Store on iOS, Play Store on Android) |
+| `launchMileageReporting()` | Opens mileage reporting tool (URL pending — placeholder opens `about:blank`) |
 
 ### Integration hooks
 
@@ -642,7 +649,7 @@ Safety pills (urgency pill and status pills) use the same visual pattern as tick
 
 ### Action button depth
 
-The three secondary action buttons — **Sospes** (orange), **Truck Stock** (cobalt blue), and **Reset** (neutral) — use a layered depth treatment:
+The four secondary action buttons — **Sospes** (orange), **Truck Stock** (cobalt blue), **Mileage Reporting** (fuchsia `#D946EF`), and **Reset** (neutral) — use a layered depth treatment:
 - **Outer shadows**: `0 1px 2px rgba(0,0,0,0.4)` + `0 2px 6px rgba(0,0,0,0.2)`
 - **Colored ambient glow**: e.g. `0 0 8px rgba(255,103,32,0.12)` for Sospes, `rgba(37,99,235,0.15)` for Truck Stock
 - **Inset top highlight**: `inset 0 1px 0 rgba(255,…,0.18-0.22)` — simulates a light source from above
@@ -651,13 +658,13 @@ The three secondary action buttons — **Sospes** (orange), **Truck Stock** (cob
 - **Active**: `scale(0.97)` press + reduced shadow
 - **C Spire light theme**: softer shadows, `inset 0 1px 0 rgba(255,255,255,0.7)` highlight for the white surface
 
-CSS classes: `.safety-btn-sospes`, `.safety-btn-truckstock`, `.safety-btn-undo`.
+CSS classes: `.safety-btn-sospes`, `.safety-btn-truckstock`, `.safety-btn-mileage`, `.safety-btn-undo`.
 
 ---
 
 ## Inventory Tracker
 
-Tracks periodic truck stock inventory reports. Lives in the **Inventory Management** section of the Tech Tools screen (`#screen-techtools`), between Monthly Safety Checks and the Tools card. Behavior mirrors the safety check system but is entirely independent state.
+Tracks periodic truck stock inventory reports. Lives in the **Inventory Management** section of the Tech Tools screen (`#screen-techtools`), between Vehicle Reports and the Tools card. Behavior mirrors the safety check system but is entirely independent state.
 
 ### Key differences from Safety Checks
 
@@ -728,7 +735,7 @@ The header shows a larger avatar circle with user initials and full name (from `
 
 The original "More" screen was split into two screens:
 
-**Tech Tools** (`#screen-techtools`) — visible as a nav tab (wrench icon) in both mobile bottom nav and desktop top nav. Contains three sections: Monthly Safety Checks, Inventory Management, and Tools (Network Equipment, Important Links). Safety badge dots appear on this tab.
+**Tech Tools** (`#screen-techtools`) — visible as a nav tab (wrench icon) in both mobile bottom nav and desktop top nav. Contains three sections: Vehicle Reports (Vehicle Inspection, Ladder Inspection, Mileage Report), Inventory Management, and Tools (Network Equipment, Important Links). Safety badge dots appear on this tab.
 
 **Settings** (`#screen-more` in code) — accessible only via the user avatar dropdown menu "Settings" option. Contains Appearance (theme toggle, mobile preview), App (force refresh), and Account (sign out) sections. No nav tab highlights when Settings is active. The screen ID remains `screen-more` in code to avoid breaking existing references.
 
