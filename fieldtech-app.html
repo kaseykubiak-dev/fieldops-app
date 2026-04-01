@@ -2945,7 +2945,7 @@
         </div>
 
         <!-- ── Inventory Management ── -->
-        <h2 class="section-title" style="margin-top:4px;">Inventory Management</h2>
+        <h2 class="section-title" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;">Inventory Management <span class="safety-urgency-pill urgency-none" id="inventory-urgency-pill" style="margin-left:auto;display:none;"></span></h2>
         <div class="card" id="inventory-section">
           <div class="card-body" style="padding:0;">
 
@@ -6407,7 +6407,9 @@
   }
 
   function _safetyIncompleteCount() {
-    return _SAFETY_TYPES.filter(t => _isSafetyDue(t.key)).length;
+    // Use timestamp presence — _isSafetyDue can return false after Reset when a locked
+    // future date exists, which would incorrectly count reset items as complete.
+    return _SAFETY_TYPES.filter(t => !_safetyChecks[t.key]).length;
   }
 
   function initSafetyChecks() {
@@ -6554,9 +6556,12 @@
         } else { dateEl.style.display = 'none'; }
       }
 
-      // Update status + action buttons in accordion header
+      // Update status + action buttons in accordion header.
+      // Use hasTimestamp (not _isSafetyDue) so Reset correctly flips back to Pending —
+      // _isSafetyDue returns false when a locked future date exists, which is correct for
+      // urgency/pill logic but must not control the card Complete/Pending display.
       if (actions) {
-        if (!due) {
+        if (hasTimestamp) {
           actions.innerHTML =
             '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoSafetyCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
@@ -6720,11 +6725,40 @@
   // Returns true if the inventory report is due or overdue.
   function _isInventoryDue(type) {
     const ts = _inventoryChecks[type];
-    if (!ts) return true; // never completed
+    if (!ts) {
+      // No completion timestamp — if there's a locked next-due date still in the future,
+      // the report is not yet due (e.g. after Reset, the cycle clock keeps ticking).
+      if (_inventoryNextDue && _inventoryNextDue[type]) {
+        return Date.now() >= new Date(_inventoryNextDue[type]).getTime();
+      }
+      return true; // no timestamp and no locked date — treat as due
+    }
     const freq      = _inventoryFrequency[type] || 7;
     const completed = new Date(ts);
     const elapsed   = (Date.now() - completed.getTime()) / 86400000;
     return elapsed >= freq;
+  }
+
+  // Per-type inventory urgency (mirrors safety urgency pattern)
+  function _getInventoryUrgencyForType(type) {
+    if (!_isInventoryDue(type)) return 'none';
+    const info = _inventoryCycleInfo(type);
+    const elapsed = info.cycleDays - info.daysLeft;
+    const pct = info.cycleDays > 0 ? elapsed / info.cycleDays : 1;
+    if (pct <= 0.25) return 'low';
+    if (pct <= 0.75) return 'medium';
+    return 'high';
+  }
+
+  // Overall inventory urgency (worst across all inventory types)
+  function getInventoryUrgency() {
+    const levels = { none: 0, low: 1, medium: 2, high: 3 };
+    let worst = 'none';
+    _INVENTORY_TYPES.forEach(t => {
+      const u = _getInventoryUrgencyForType(t.key);
+      if (levels[u] > levels[worst]) worst = u;
+    });
+    return worst;
   }
 
   function initInventoryChecks() {
@@ -6777,6 +6811,20 @@
   }
 
   function renderInventorySection() {
+    // Update inventory urgency pill
+    const invPill = document.getElementById('inventory-urgency-pill');
+    if (invPill) {
+      const invUrgency = getInventoryUrgency();
+      if (invUrgency === 'none') {
+        invPill.style.display = 'none';
+      } else {
+        invPill.style.display = '';
+        invPill.className = 'safety-urgency-pill urgency-' + invUrgency;
+        const labels = { low: 'Due Soon', medium: 'Due Soon', high: 'Overdue' };
+        invPill.textContent = labels[invUrgency] || '';
+      }
+    }
+
     _INVENTORY_TYPES.forEach(t => {
       const dateEl  = document.getElementById('inventory-date-' + t.key);
       const actions = document.getElementById('inventory-actions-' + t.key);
@@ -6795,9 +6843,10 @@
         }
       }
 
-      // Action buttons
+      // Action buttons — use hasTs (not _isInventoryDue) so Reset correctly shows Pending
+      // even when the locked next-due date causes _isInventoryDue to return false.
       if (actions) {
-        if (!due) {
+        if (hasTs) {
           actions.innerHTML =
             '<span class="safety-card-status status-done">Complete</span>' +
             '<button class="safety-btn safety-btn-undo" onclick="event.stopPropagation();undoInventoryCheck(\'' + escHtml(t.key) + '\')" style="padding:6px 12px;font-size:11px;">' +
