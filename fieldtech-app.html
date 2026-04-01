@@ -7037,25 +7037,31 @@
       localStorage.setItem('ft_safety_freq_' + type, String(_safetyFrequency[type]));
     }
     // Recalculate next-due date using the new frequency.
-    // Base = completion timestamp when already done; today (provisional) when not yet done.
-    // This ensures the Next Due Date updates immediately on both desktop and mobile,
-    // regardless of whether the inspection has been completed yet.
+    // Mileage: always 1st of next month regardless of completion state.
+    // Vehicle/Ladder: base = completion timestamp. If not yet completed, clear the
+    // date so renderSafetySection() shows "You must complete an inspection first."
     const newFreq = _safetyFrequency[type] || 0;
-    let nextDue;
     if (type === 'mileage') {
       const now = new Date();
-      nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    } else {
-      const baseDate = _safetyChecks[type] ? new Date(_safetyChecks[type]) : new Date();
+      const nextDue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      _safetyNextDue[type] = nextDue.toISOString();
+      localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
+    } else if (_safetyChecks[type]) {
+      let nextDue;
       if (newFreq <= 0) {
         const now = new Date();
         nextDue = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
       } else {
-        nextDue = new Date(baseDate.getTime() + newFreq * 86400000);
+        const completedAt = new Date(_safetyChecks[type]);
+        nextDue = new Date(completedAt.getTime() + newFreq * 86400000);
       }
+      _safetyNextDue[type] = nextDue.toISOString();
+      localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
+    } else {
+      // Not yet completed — clear so the prompt message shows in the card
+      _safetyNextDue[type] = null;
+      localStorage.removeItem('ft_safety_nextdue_' + type);
     }
-    _safetyNextDue[type] = nextDue.toISOString();
-    localStorage.setItem('ft_safety_nextdue_' + type, _safetyNextDue[type]);
     // Build a human-readable confirmation label
     const typeLabel = type === 'vehicle' ? 'Vehicle' : type === 'ladder' ? 'Ladder' : type.charAt(0).toUpperCase() + type.slice(1);
     const freqLabel = _safetyFrequency[type] === 0 ? 'monthly' : 'every ' + _safetyFrequency[type] + ' days';
@@ -7164,21 +7170,27 @@
 
       // Update "Next Due" line — uses locked date (written on Done, persists through Reset).
       // Mileage: falls back to 1st of next month when no locked date yet (first-time state).
+      // Vehicle/Ladder with no completion: show a prompt instead of hiding.
       const nextDueEl = document.getElementById('safety-next-due-' + t.key);
       if (nextDueEl) {
         if (_safetyNextDue[t.key]) {
           const nextDate = new Date(_safetyNextDue[t.key]);
           const label = t.key === 'mileage' ? 'Next Report Due: ' : 'Next Inspection Due: ';
           nextDueEl.textContent = label + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.color = 'var(--accent2)';
           nextDueEl.style.display = '';
         } else if (t.key === 'mileage') {
           // No locked date yet — show the upcoming 1st as a static reference
           const now = new Date();
           const upcoming = new Date(now.getFullYear(), now.getMonth() + 1, 1);
           nextDueEl.textContent = 'Next Report Due: ' + upcoming.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.color = 'var(--accent2)';
           nextDueEl.style.display = '';
         } else {
-          nextDueEl.style.display = 'none';
+          // Not yet completed — prompt the tech to complete an inspection first
+          nextDueEl.textContent = 'You must complete an inspection first.';
+          nextDueEl.style.color = 'var(--text-muted)';
+          nextDueEl.style.display = '';
         }
       }
     });
@@ -7362,12 +7374,16 @@
     const days = parseInt(val, 10) || 7;
     _inventoryFrequency[type] = (days === 14) ? 14 : 7; // clamp to 7 or 14
     localStorage.setItem('ft_inventory_freq_' + type, String(_inventoryFrequency[type]));
-    // Recalculate next-due date: base = completion date (if done) or today (provisional).
-    // Keeps the Next Due Date in sync on both mobile and desktop after a frequency change.
-    const baseDate = _inventoryChecks[type] ? new Date(_inventoryChecks[type]) : new Date();
-    const invNextDue = new Date(baseDate.getTime() + _inventoryFrequency[type] * 86400000);
-    _inventoryNextDue[type] = invNextDue.toISOString();
-    localStorage.setItem('ft_inventory_nextdue_' + type, _inventoryNextDue[type]);
+    // Recalculate next-due date: base = completion date. If not yet completed, clear the
+    // date so renderInventorySection() shows "You must complete a report first."
+    if (_inventoryChecks[type]) {
+      const invNextDue = new Date(new Date(_inventoryChecks[type]).getTime() + _inventoryFrequency[type] * 86400000);
+      _inventoryNextDue[type] = invNextDue.toISOString();
+      localStorage.setItem('ft_inventory_nextdue_' + type, _inventoryNextDue[type]);
+    } else {
+      _inventoryNextDue[type] = null;
+      localStorage.removeItem('ft_inventory_nextdue_' + type);
+    }
     _showFreqToast('Inventory report set to remind every ' + _inventoryFrequency[type] + ' days');
     renderInventorySection();
     renderCalendar();
@@ -7453,9 +7469,13 @@
         if (_inventoryNextDue[t.key]) {
           const nextDate = new Date(_inventoryNextDue[t.key]);
           nextDueEl.textContent = 'Next Report Due: ' + nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+          nextDueEl.style.color = 'var(--accent2)';
           nextDueEl.style.display = '';
         } else {
-          nextDueEl.style.display = 'none';
+          // Not yet completed — prompt the tech to complete a report first
+          nextDueEl.textContent = 'You must complete a report first.';
+          nextDueEl.style.color = 'var(--text-muted)';
+          nextDueEl.style.display = '';
         }
       }
     });
