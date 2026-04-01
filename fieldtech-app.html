@@ -1868,6 +1868,24 @@
   @media(min-width:800px)  { .safety-card:hover { transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,0.5),0 8px 24px rgba(0,0,0,0.4),0 14px 40px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.18); transition:transform 0.2s,box-shadow 0.2s; } }
   @media(prefers-reduced-motion:reduce) { .safety-banner,.safety-modal-overlay,.safety-modal-card,.safety-badge-dot { animation:none !important; } }
 
+  /* Mobile: stack action buttons below the title row in safety/inventory accordions.
+     The card has overflow:hidden so items that overflow the row are clipped.
+     Wrapping forces them into their own row where they're fully visible. */
+  @media(max-width:799px) {
+    .safety-acc-header { flex-wrap:wrap; row-gap:6px; }
+    .safety-acc-header .acc-actions {
+      order:10;                         /* always after icon/title/chevron */
+      flex-basis:100%;                  /* own row */
+      margin:0 0 4px 42px !important;  /* 32px icon + 10px gap = align with text */
+      justify-content:flex-start;
+      gap:6px !important;
+    }
+    .safety-acc-header .acc-actions .safety-btn {
+      padding:4px 9px !important;
+      font-size:10px !important;
+    }
+  }
+
   /* Frequency-saved toast */
   #safety-freq-toast {
     position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
@@ -2781,7 +2799,7 @@
 
             <!-- Vehicle Inspection accordion -->
             <div class="accordion" id="safety-acc-vehicle" style="border-bottom:1px solid var(--border);">
-              <div class="acc-header" onclick="toggleAcc('safety-vehicle')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
+              <div class="acc-header safety-acc-header" onclick="toggleAcc('safety-vehicle')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
                 </div>
@@ -2791,7 +2809,7 @@
                   <div class="safety-card-completed-date" id="safety-date-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                   <div id="safety-next-due-vehicle" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-vehicle">
+                <div class="acc-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-vehicle">
                   <span class="safety-card-status status-pending" id="safety-status-vehicle">Pending</span>
                   <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('vehicle')" style="padding:6px 12px;font-size:11px;">Sospes</button>
                   <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('vehicle')" style="padding:6px 12px;font-size:11px;">Done</button>
@@ -2818,7 +2836,7 @@
 
             <!-- Ladder Inspection accordion -->
             <div class="accordion" id="safety-acc-ladder" style="border-bottom:none;">
-              <div class="acc-header" onclick="toggleAcc('safety-ladder')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
+              <div class="acc-header safety-acc-header" onclick="toggleAcc('safety-ladder')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,192,243,0.15),rgba(0,192,243,0.05));box-shadow:0 1px 4px rgba(0,192,243,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M16 3v18M8 8h8M8 13h8M8 18h8"/></svg>
                 </div>
@@ -2828,7 +2846,7 @@
                   <div class="safety-card-completed-date" id="safety-date-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                   <div id="safety-next-due-ladder" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-ladder">
+                <div class="acc-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="safety-actions-ladder">
                   <span class="safety-card-status status-pending" id="safety-status-ladder">Pending</span>
                   <button class="safety-btn safety-btn-sospes" onclick="event.stopPropagation();launchSospes('ladder')" style="padding:6px 12px;font-size:11px;">Sospes</button>
                   <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markSafetyComplete('ladder')" style="padding:6px 12px;font-size:11px;">Done</button>
@@ -2863,7 +2881,7 @@
 
             <!-- Inventory Report accordion -->
             <div class="accordion" id="inventory-acc-inventory" style="border-bottom:none;">
-              <div class="acc-header" onclick="toggleAcc('inventory-inventory')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
+              <div class="acc-header safety-acc-header" onclick="toggleAcc('inventory-inventory')" role="button" tabindex="0" aria-expanded="false" style="padding:14px 16px;">
                 <div class="acc-icon-wrap" style="background:linear-gradient(135deg,rgba(0,201,106,0.15),rgba(0,201,106,0.05));box-shadow:0 1px 4px rgba(0,201,106,0.12);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 </div>
@@ -2873,7 +2891,7 @@
                   <div class="safety-card-completed-date" id="inventory-date-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-top:2px;"></div>
                   <div id="inventory-next-due-inventory" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent2);margin-top:2px;"></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="inventory-actions-inventory">
+                <div class="acc-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:8px;" id="inventory-actions-inventory">
                   <span class="safety-card-status status-pending" id="inventory-status-inventory">Pending</span>
                   <button class="safety-btn safety-btn-truckstock" onclick="event.stopPropagation();launchTruckStock()" style="padding:6px 12px;font-size:11px;">Truck Stock</button>
                   <button class="safety-btn safety-btn-primary" onclick="event.stopPropagation();markInventoryComplete('inventory')" style="padding:6px 12px;font-size:11px;">Done</button>
