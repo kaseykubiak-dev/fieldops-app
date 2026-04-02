@@ -1444,7 +1444,7 @@
   }
   .cal-week {
     display:grid; grid-template-columns:repeat(7,1fr);
-    flex-shrink:0; min-height:90px;
+    flex:1 0 auto; min-height:90px;
     border-bottom:1px solid var(--border);
   }
   .cal-week:last-child { border-bottom:none; }
@@ -5809,7 +5809,7 @@
               <span class="cal-mini-company">${escHtml(company)}</span>
               <span class="cal-mini-time">${timeStr}</span>
             </div>
-            <div class="cal-mini-pills" style="margin-top:3px;">
+            <div class="cal-mini-pills" style="margin-top:3px;justify-content:space-between;">
               <span class="pill ${state.cls}">${state.label}</span>
               <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
             </div>
