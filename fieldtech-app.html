@@ -1009,6 +1009,12 @@
   @media(max-width:799px) { .section-title-note { display:block; width:100%; margin-top:1px; font-size:10px; } }
   /* Teams contact name — truncate on desktop, wrap on mobile */
   .teams-contact-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Teams presence label — full text on desktop, short on mobile */
+  .tpl-short { display:none; }
+  @media(max-width:799px) {
+    .tpl-full  { display:none; }
+    .tpl-short { display:inline; }
+  }
   @media(max-width:799px) {
     .teams-contact-name { white-space:normal; overflow:visible; text-overflow:clip; line-height:1.25; }
     /* Compact sub-topbars on Calendar and CX360 — they now sit below the persistent mobile topbar */
@@ -4692,7 +4698,7 @@
     'Busy':         { color: '#ef4444', label: 'Busy'      },
     'Away':         { color: '#f59e0b', label: 'Away'      },
     'DoNotDisturb': { color: '#ef4444', label: 'DND'       },
-    'OOO':          { color: '#8b5cf6', label: 'Out of Office' },
+    'OOO':          { color: '#8b5cf6', label: 'Out of Office', shortLabel: 'Out' },
     'Offline':      { color: '#6b7280', label: 'Offline'   }
   };
 
@@ -4763,8 +4769,10 @@
           ` style="color:var(--text);text-decoration:none;font-size:13px;font-weight:500;` +
             `flex:1;min-width:0;"` +
           ` title="Open Teams chat with ${name}">${name}</a>` +
-        `<span style="font-size:10px;font-weight:600;color:${sStyle.color};` +
-          `letter-spacing:0.02em;flex-shrink:0;">${sStyle.label}</span>` +
+        `<span class="teams-pres-label" style="font-size:10px;font-weight:600;color:${sStyle.color};letter-spacing:0.02em;flex-shrink:0;">` +
+          `<span class="tpl-full">${sStyle.label}</span>` +
+          `<span class="tpl-short">${sStyle.shortLabel || sStyle.label}</span>` +
+        `</span>` +
         _teamsChatIconHTML(email) +
       `</div>`;
     }
