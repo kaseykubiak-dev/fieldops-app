@@ -1833,7 +1833,7 @@
   .cx-input { flex:1; padding:10px 14px; font-size:14px; border-radius:24px; border:1.5px solid var(--border); background:var(--surface2); color:var(--text); outline:none; font-family:var(--sans); transition:border-color 0.15s; }
   .cx-input:focus { border-color:var(--accent); }
   .cx-input::placeholder { color:var(--text-muted); }
-  .cx-send-btn { width:38px; height:38px; border-radius:50%; border:none; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:opacity 0.15s; }
+  .cx-send-btn { flex-shrink:0; padding:8px 18px; border-radius:20px; border:none; background:var(--accent); color:#061420; font-family:var(--sans); font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; display:flex; align-items:center; }
   .cx-send-btn:hover { opacity:0.85; }
 
   .cx-msg { display:flex; flex-direction:column; gap:4px; max-width:85%; animation:cx-fadein 0.25s ease; }
@@ -1859,6 +1859,39 @@
 
   html[data-theme="cspire"] .cx-msg.user .cx-msg-bubble { background:linear-gradient(135deg, #0f3d58, #00689c); }
   html[data-theme="cspire"] .cx-agent-badge { background:rgba(15,61,88,0.1); color:#0f3d58; border-color:rgba(15,61,88,0.25); }
+
+  /* ── CX 360 ONE CUSTOMER PANEL ── */
+  .cx-top-panel { flex-shrink:0; padding:10px 14px 0; }
+  .cx-top-panel-card {
+    background:rgba(14,22,36,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(0,192,243,0.18); border-radius:14px; padding:12px 14px 12px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.35),inset 0 1px 0 rgba(0,192,243,0.08);
+  }
+  .cx-account-row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:9px; }
+  .cx-account-label { font-family:var(--sans); font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--text); margin-bottom:3px; }
+  .cx-account-sub { font-family:var(--body); font-size:11px; color:var(--text-muted); line-height:1.4; }
+  .cx-all-accounts-btn { flex-shrink:0; padding:5px 13px; border-radius:20px; border:1.5px solid rgba(0,192,243,0.3); background:rgba(0,192,243,0.06); color:var(--text); font-family:var(--sans); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
+  .cx-all-accounts-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,192,243,0.1); }
+  .cx-account-search-wrap { position:relative; margin-bottom:10px; }
+  .cx-account-search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+  .cx-account-search { width:100%; box-sizing:border-box; padding:9px 12px 9px 32px; font-family:var(--sans); font-size:13px; color:var(--text); background:rgba(0,192,243,0.05); border:1.5px solid rgba(0,192,243,0.22); border-radius:24px; outline:none; transition:border-color 0.15s; }
+  .cx-account-search:focus { border-color:rgba(0,192,243,0.5); background:rgba(0,192,243,0.08); }
+  .cx-account-search::placeholder { color:var(--text-muted); }
+  .cx-query-pills { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; padding-bottom:1px; }
+  .cx-query-pills::-webkit-scrollbar { display:none; }
+  .cx-query-pill { flex-shrink:0; padding:6px 13px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface2); color:var(--text-muted); font-family:var(--sans); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+  .cx-query-pill:hover { border-color:var(--accent); color:var(--accent); }
+  .cx-query-pill.active { background:var(--accent); color:#061420; border-color:var(--accent); box-shadow:0 0 10px rgba(0,192,243,0.28); }
+  .cx-action-btn { flex-shrink:0; padding:8px 14px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.12); background:rgba(22,34,54,0.9); color:var(--text); font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+  .cx-action-btn:hover { border-color:var(--accent); color:var(--accent); }
+  /* C Spire theme */
+  html[data-theme="cspire"] .cx-top-panel-card { background:linear-gradient(135deg,rgba(15,61,88,0.88) 0%,rgba(0,90,145,0.75) 100%); border-color:rgba(0,120,180,0.3); }
+  html[data-theme="cspire"] .cx-account-search { background:rgba(0,120,180,0.08); border-color:rgba(0,120,180,0.28); }
+  html[data-theme="cspire"] .cx-account-search:focus { border-color:rgba(0,120,180,0.55); background:rgba(0,120,180,0.13); }
+  html[data-theme="cspire"] .cx-query-pill.active { color:#fff; }
+  html[data-theme="cspire"] .cx-send-btn { color:#fff; }
+  html[data-theme="cspire"] .cx-all-accounts-btn { border-color:rgba(0,120,180,0.35); }
+  html[data-theme="cspire"] .cx-action-btn { background:rgba(15,61,88,0.85); border-color:rgba(0,120,180,0.28); }
 
   /* ── SAFETY CHECK TRACKER ─────────────────────────────────────────────── */
 
@@ -3341,6 +3374,34 @@
         </button>
       </div>
 
+      <!-- ONE CUSTOMER panel -->
+      <div class="cx-top-panel">
+        <div class="cx-top-panel-card">
+          <div class="cx-account-row">
+            <div>
+              <div class="cx-account-label">One Customer</div>
+              <div class="cx-account-sub">Select one customer for one-account questions. Leave it blank for all-account questions.</div>
+            </div>
+            <button class="cx-all-accounts-btn" onclick="cx360ClearAccount()">All accounts</button>
+          </div>
+          <div class="cx-account-search-wrap">
+            <svg class="cx-account-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="cx-account-search" id="cx360-account" placeholder="Search company name for one account" autocomplete="off">
+          </div>
+          <div class="cx-query-pills" id="cx360-query-pills">
+            <button class="cx-query-pill active" onclick="cx360SetPill(this)">Auto</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Executive Summary</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Support Trend Review</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Product Coverage</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">QBR Draft</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Top Customers</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Renewal Status</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Billing Snapshot</button>
+            <button class="cx-query-pill" onclick="cx360SetPill(this)">Accounts Needing Attention</button>
+          </div>
+        </div>
+      </div>
+
       <div class="cx-chat-area" id="cx360-chat">
         <div class="cx-welcome">
           <div class="cx-welcome-icon">
@@ -3353,15 +3414,17 @@
             <button class="cx-chip" onclick="cx360Ask(this.textContent)">Show open tickets for Baptist Memorial Health</button>
             <button class="cx-chip" onclick="cx360Ask(this.textContent)">Any billing discrepancies for Sanderson Farms?</button>
             <button class="cx-chip" onclick="cx360Ask(this.textContent)">When does the contract renew for Cal-Maine Foods?</button>
+            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Give me an executive summary for Sanderson Farms</button>
+            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Which accounts are up for renewal this quarter?</button>
           </div>
         </div>
       </div>
 
       <div class="cx-input-bar">
-        <input type="text" class="cx-input" id="cx360-input" placeholder="Ask CX 360 about any customer..." autocomplete="off" onkeydown="if(event.key==='Enter')cx360Send()">
-        <button class="cx-send-btn" id="cx360-send" onclick="cx360Send()" aria-label="Send">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+        <input type="text" class="cx-input" id="cx360-input" placeholder="Ask a question. Search above first when it is about one customer." autocomplete="off" onkeydown="if(event.key==='Enter')cx360Send()">
+        <button class="cx-action-btn" onclick="cx360Attach()">Attach</button>
+        <button class="cx-action-btn" onclick="cx360ShowAgents()">Agents</button>
+        <button class="cx-send-btn" id="cx360-send" onclick="cx360Send()">Send</button>
       </div>
     </div>
 
@@ -5316,6 +5379,33 @@
     cx360Send();
   }
 
+  function cx360SetPill(el) {
+    document.querySelectorAll('#cx360-query-pills .cx-query-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function cx360ClearAccount() {
+    const input = document.getElementById('cx360-account');
+    if (input) input.value = '';
+  }
+
+  function cx360Attach() {
+    // Placeholder — file attachment will be wired to CX 360 agents in production
+  }
+
+  function cx360ShowAgents() {
+    // Show a quick peek at the available agents in the chat for demo purposes
+    const chat = document.getElementById('cx360-chat');
+    const welcome = chat.querySelector('.cx-welcome');
+    if (welcome) welcome.style.display = 'none';
+    const agentMsg = document.createElement('div');
+    agentMsg.className = 'cx-msg assistant';
+    const agentList = cx360Agents.map(a => `<div class="cx-data-row"><span class="cx-data-label">&bull;</span><span class="cx-data-val">${a}</span></div>`).join('');
+    agentMsg.innerHTML = `<div class="cx-msg-meta"><span class="cx-agent-badge">CX 360</span></div><div class="cx-msg-bubble">Available agents:<div class="cx-data-card">${agentList}</div></div>`;
+    chat.appendChild(agentMsg);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
   function cx360Send() {
     const input = document.getElementById('cx360-input');
     const query = input.value.trim();
@@ -5389,6 +5479,8 @@
         <button class="cx-chip" onclick="cx360Ask(this.textContent)">Show open tickets for Baptist Memorial Health</button>
         <button class="cx-chip" onclick="cx360Ask(this.textContent)">Any billing discrepancies for Sanderson Farms?</button>
         <button class="cx-chip" onclick="cx360Ask(this.textContent)">When does the contract renew for Cal-Maine Foods?</button>
+        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Give me an executive summary for Sanderson Farms</button>
+        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Which accounts are up for renewal this quarter?</button>
       </div>`;
     chat.appendChild(welcome);
   }
