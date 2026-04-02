@@ -538,12 +538,10 @@
   .screen.active { display:flex; }
 
   /* BOTTOM NAV */
-  /* align-items:flex-start + padding-top keeps buttons pinned to their visual position
-     regardless of how tall env(safe-area-inset-bottom) is in PWA vs browser mode.
-     In browser: safe-area ≈ 0, nav stays 64px, 6px gap below buttons.
-     In PWA standalone: safe-area ≈ 34px, nav grows to 98px, buttons still at top+6px,
-     home-indicator zone filled by the nav background. */
-  .bottom-nav { min-height:var(--bottom-bar); background:linear-gradient(180deg, #162236 0%, #0e1a2a 100%); border-top:1px solid rgba(0,192,243,0.2); display:flex; align-items:flex-start; padding:6px 4px 0; padding-bottom:env(safe-area-inset-bottom); flex-shrink:0; z-index:20; box-shadow:0 -2px 16px rgba(0,0,0,0.5), 0 -1px 0 rgba(0,192,243,0.07); }
+  /* viewport-fit=cover + 100dvh already stretches the nav background to the physical
+     screen edge in PWA standalone mode, so no safe-area bottom padding is needed.
+     Fixed 64px height keeps the layout identical in browser and PWA. */
+  .bottom-nav { min-height:var(--bottom-bar); background:linear-gradient(180deg, #162236 0%, #0e1a2a 100%); border-top:1px solid rgba(0,192,243,0.2); display:flex; align-items:center; padding:0 4px; flex-shrink:0; z-index:20; box-shadow:0 -2px 16px rgba(0,0,0,0.5), 0 -1px 0 rgba(0,192,243,0.07); }
   .bnav-btn { flex:1; height:52px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:10px; transition:all .15s; position:relative; }
   .bnav-btn.active { color:var(--accent); }
   .bnav-label { font-size:10px; font-weight:500; letter-spacing:.02em; }
