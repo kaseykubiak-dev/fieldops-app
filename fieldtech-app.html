@@ -5650,17 +5650,16 @@
       }
     }
 
-    // Find Monday of the anchor's week (ISO week: Mon=0)
+    // Find Sunday of the anchor's week (week starts Sun)
     const anchorDay = anchor.getDay(); // 0=Sun
-    const mondayOffset = anchorDay === 0 ? -6 : 1 - anchorDay;
-    const monday = new Date(anchor);
-    monday.setDate(anchor.getDate() + mondayOffset);
+    const sunday = new Date(anchor);
+    sunday.setDate(anchor.getDate() - anchorDay);
 
-    // Build 7 day columns (Mon-Sun)
+    // Build 7 day columns (Sun-Sat)
     const days = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
+      const d = new Date(sunday);
+      d.setDate(sunday.getDate() + i);
       days.push(d);
     }
 
@@ -5678,7 +5677,7 @@
     });
 
     const todayStr = calDateStr(new Date());
-    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const inspectionDueDates = getInspectionDueDates();
 
     let html = '<div class="cal-week-view">';
