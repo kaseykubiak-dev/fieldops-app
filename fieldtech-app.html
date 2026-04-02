@@ -5159,32 +5159,53 @@
     const content = document.getElementById('travel-box-content');
     if (!addr || addr === '—' || !navigator.geolocation) { box.classList.remove('show'); return; }
 
+    // Capture the active case so a slow response doesn't overwrite a different ticket
+    const capturedCase = currentCaseNumber;
+
     box.classList.add('show');
     content.textContent = 'Calculating…';
 
+    // Geocode a query string via Nominatim, restricted to US results
+    async function geocode(query) {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=us`,
+        { headers: { 'Accept-Language': 'en', 'User-Agent': 'FieldTechApp/1.0' } }
+      );
+      const data = await res.json();
+      return data.length ? { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) } : null;
+    }
+
     navigator.geolocation.getCurrentPosition(async pos => {
+      // Discard if the tech has already navigated to a different ticket
+      if (currentCaseNumber !== capturedCase) return;
+
       const { latitude: lat1, longitude: lon1 } = pos.coords;
-      const encoded = encodeURIComponent(addr.replace(/\s*·\s*/g, ', '));
       try {
-        const geoRes  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`, {
-          headers: { 'Accept-Language': 'en', 'User-Agent': 'FieldTechApp/1.0' }
-        });
-        const geoData = await geoRes.json();
-        if (!geoData.length) throw new Error();
-        const lat2 = parseFloat(geoData[0].lat);
-        const lon2 = parseFloat(geoData[0].lon);
+        // Primary: full address ("Street, City, State")
+        const fullAddr = addr.replace(/\s*·\s*/g, ', ');
+        let geo = await geocode(fullAddr);
 
-        const routeRes  = await fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`);
+        // Fallback: city + state only (segments after the street)
+        if (!geo) {
+          const segments = addr.split(/\s*·\s*/);
+          if (segments.length > 1) geo = await geocode(segments.slice(1).join(', '));
+        }
+
+        if (!geo) throw new Error('geocode_failed');
+
+        const routeRes  = await fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${geo.lon},${geo.lat}?overview=false`);
         const routeData = await routeRes.json();
-        if (routeData.code !== 'Ok') throw new Error();
+        if (routeData.code !== 'Ok') throw new Error('route_failed');
 
-        const mins  = Math.round(routeData.routes[0].duration / 60);
-        const miles = (routeData.routes[0].distance * 0.000621371).toFixed(1);
+        // Guard again — route fetch also takes time
+        if (currentCaseNumber !== capturedCase) return;
+
+        const mins    = Math.round(routeData.routes[0].duration / 60);
+        const miles   = (routeData.routes[0].distance * 0.000621371).toFixed(1);
         const timeStr = mins >= 60 ? `${Math.floor(mins/60)}h ${mins % 60}m` : `${mins} min`;
-
         document.getElementById('travel-box-content').textContent = `${timeStr} · ${miles} mi`;
       } catch {
-        box.classList.remove('show');
+        if (currentCaseNumber === capturedCase) box.classList.remove('show');
       }
     }, () => { box.classList.remove('show'); }, { timeout: 8000, maximumAge: 60000 });
   }
