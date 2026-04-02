@@ -643,7 +643,9 @@
 
   .filter-tabs { display:flex; gap:4px; padding:8px 16px; border-bottom:1px solid rgba(0,192,243,0.18); background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); flex-shrink:0; }
   .refresh-bar { display:flex; align-items:center; justify-content:space-between; padding:7px 16px; background:linear-gradient(135deg, #162236 0%, #0e1a2a 100%); border-bottom:1px solid rgba(0,192,243,0.18); flex-shrink:0; }
-  .refresh-label { font-size:12px; font-weight:500; color:var(--text-muted); }
+  .refresh-label { font-size:12px; font-weight:500; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .auto-refresh-dot { width:6px; height:6px; border-radius:50%; background:var(--success); flex-shrink:0; animation:autoRefreshPulse 2s ease-in-out infinite; }
+  @keyframes autoRefreshPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(.7)} }
   .refresh-btn { display:flex; align-items:center; gap:6px; padding:5px 11px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; color:var(--text-dim); font-family:var(--sans); font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; }
   .refresh-btn:active { background:var(--border); }
   .refresh-btn svg { transition:transform .5s ease; }
@@ -3018,6 +3020,13 @@
     <!-- ══ MORE ══ -->
     <!-- SETTINGS SCREEN (formerly More — accessed via user menu) -->
     <div class="screen" id="screen-more">
+
+      <!-- Settings topbar -->
+      <div class="detail-topbar" style="gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:.01em;">Settings</span>
+      </div>
+
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
         <!-- ── Appearance ── -->
@@ -3211,7 +3220,7 @@
             </div>
 
             <!-- Force Refresh -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);">
               <div style="display:flex;align-items:center;gap:10px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
                 <div>
@@ -3220,6 +3229,15 @@
                 </div>
               </div>
               <button onclick="forceAppRefresh()" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Refresh</button>
+            </div>
+
+            <!-- Version -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
+              </div>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v1.0</span>
             </div>
 
           </div>
@@ -7251,6 +7269,10 @@
     const autoRefresh = localStorage.getItem('ft_auto_refresh');
     const refreshSel  = document.getElementById('pref-auto-refresh');
     if (refreshSel && autoRefresh) refreshSel.value = autoRefresh;
+
+    // Sync the refresh bar indicator (updateAutoRefreshIndicator is defined later
+    // in the script; defer to avoid a TDZ error if restoreSettings runs first)
+    setTimeout(updateAutoRefreshIndicator, 0);
   })();
 
   function timeAgo(date) {
@@ -7275,6 +7297,18 @@
   function saveSettingAutoRefresh(value) {
     localStorage.setItem('ft_auto_refresh', value);
     startAutoRefresh();
+    updateAutoRefreshIndicator();
+  }
+
+  function updateAutoRefreshIndicator() {
+    const label = document.getElementById('refresh-label');
+    if (!label) return;
+    const mins = parseInt(localStorage.getItem('ft_auto_refresh') || '0', 10);
+    if (mins > 0) {
+      label.innerHTML = `<span class="auto-refresh-dot"></span>Auto · ${mins} min`;
+    } else {
+      label.textContent = 'Refresh Cases';
+    }
   }
 
   // Starts (or restarts) the auto-refresh timer based on the saved preference.
