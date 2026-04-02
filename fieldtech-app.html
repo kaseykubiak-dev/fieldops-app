@@ -1444,7 +1444,7 @@
   }
   .cal-week {
     display:grid; grid-template-columns:repeat(7,1fr);
-    flex:1; min-height:90px;
+    flex-shrink:0; min-height:90px;
     border-bottom:1px solid var(--border);
   }
   .cal-week:last-child { border-bottom:none; }
@@ -1452,7 +1452,7 @@
     border-right:1px solid var(--border);
     padding:5px 4px 4px;
     display:flex; flex-direction:column; gap:3px;
-    cursor:pointer; position:relative;
+    cursor:default; position:relative;
     transition:background .12s;
   }
   .cal-day:last-child { border-right:none; }
@@ -5788,26 +5788,33 @@
           dayTix.length > 0 ? 'has-tickets' : ''
         ].filter(Boolean).join(' ');
 
-        html += `<div class="${cls}" onclick="selectCalDay('${dStr}')">`;
+        html += `<div class="${cls}">`;
         html += `<span class="cal-day-num">${d.getDate()}</span>`;
 
         const dueBanners = inMonth ? inspectionDueDates.filter(b => b.dueStr === dStr) : [];
-        if (dayTix.length > 0 || dueBanners.length > 0) {
-          html += '<div class="cal-chips">';
-          dueBanners.forEach(b => {
-            html += `<div class="cal-chip chip-inspection">${escHtml(b.shortLabel)}</div>`;
-          });
-          dayTix.slice(0, 2).forEach(inc => {
-            const typeCls = getCaseType(inc).cls === 'installation' ? 'chip-install' : 'chip-repair';
-            const company = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || inc.number || '';
-            const label   = company.length > 14 ? company.slice(0,13) + '…' : company;
-            html += `<div class="cal-chip ${typeCls}">${escHtml(label)}</div>`;
-          });
-          if (dayTix.length > 2) {
-            html += `<div class="cal-chip chip-more">+${dayTix.length - 2} more</div>`;
-          }
-          html += '</div>';
-        }
+        dueBanners.forEach(b => {
+          html += `<div class="cal-week-inspection">${escHtml(b.shortLabel)}</div>`;
+        });
+        dayTix.forEach(inc => {
+          const state    = STATE_MAP[inc.state]    || { label:'Open',   cls:'pill-open'   };
+          const caseType = getCaseType(inc);
+          const company  = inc['account.name'] || (typeof inc.account === 'string' ? inc.account : '') || 'Unknown';
+          const startRaw = inc.u_scheduled_start;
+          const timeStr  = startRaw
+            ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
+            : '—';
+          html += `
+          <div class="cal-mini-card" style="border-left:3px solid var(--accent);padding:5px 8px;border-radius:7px;" onclick="openDetail('${escHtml(inc.number)}');event.stopPropagation();">
+            <div class="cal-mini-top">
+              <span class="cal-mini-company">${escHtml(company)}</span>
+              <span class="cal-mini-time">${timeStr}</span>
+            </div>
+            <div class="cal-mini-pills" style="margin-top:3px;">
+              <span class="pill ${state.cls}">${state.label}</span>
+              <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
+            </div>
+          </div>`;
+        });
 
         html += '</div>';
       }
@@ -5815,17 +5822,7 @@
     }
 
     document.getElementById('cal-grid').innerHTML = html;
-
-    // Re-open panel if a day was already selected
-    // selectedDay may be a number (from picker) — resolve to date string key
-    const selKey = selectedDay
-      ? (typeof selectedDay === 'number' || /^\d{1,2}$/.test(selectedDay))
-        ? calDateStr(new Date(year, month, Number(selectedDay)))
-        : selectedDay
-      : null;
-    if (selKey && byDay[selKey]?.length) {
-      renderCalDayPanel(selKey, byDay[selKey]);
-    }
+    closeCalDayPanel();
   }
 
   function renderCalendarAgenda() {
