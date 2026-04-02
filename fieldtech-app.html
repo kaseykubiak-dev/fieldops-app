@@ -1892,6 +1892,11 @@
   html[data-theme="cspire"] .cx-send-btn { color:#fff; }
   html[data-theme="cspire"] .cx-all-accounts-btn { border-color:rgba(0,120,180,0.35); }
   html[data-theme="cspire"] .cx-action-btn { background:rgba(15,61,88,0.85); border-color:rgba(0,120,180,0.28); }
+  @media(max-width:799px) {
+    .cx-input-bar { padding:8px 10px; gap:5px; }
+    .cx-action-btn { padding:6px 10px; font-size:12px; }
+    .cx-send-btn   { padding:6px 12px; font-size:12px; }
+  }
 
   /* ── SAFETY CHECK TRACKER ─────────────────────────────────────────────── */
 
@@ -2066,7 +2071,7 @@
     .safety-acc-header .acc-actions {
       order:10;                         /* always after icon/title/chevron */
       flex-basis:100%;                  /* own row */
-      margin:0 0 4px 42px !important;  /* 32px icon + 10px gap = align with text */
+      margin:0 0 4px 0 !important;     /* flush left — icon removed, no offset needed */
       justify-content:flex-start;
       gap:6px !important;
     }
