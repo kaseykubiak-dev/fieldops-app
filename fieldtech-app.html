@@ -333,6 +333,80 @@
     font-family: var(--sans);
   }
 
+  /* ── SETTINGS SCREEN COMPONENTS ── */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .settings-select {
+    padding: 6px 10px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    max-width: 140px;
+  }
+  .settings-input {
+    padding: 7px 10px;
+    font-family: var(--sans);
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    outline: none;
+    width: 160px;
+    flex-shrink: 0;
+    transition: border-color .15s;
+  }
+  .settings-input:focus { border-color: var(--accent); }
+  .settings-input::placeholder { color: var(--text-muted); font-size: 12px; }
+  /* Simple toggle button for settings (push/sound) */
+  .settings-toggle-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .stb-track {
+    width: 44px; height: 26px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    position: relative;
+    transition: background .2s, border-color .2s;
+  }
+  .stb-knob {
+    width: 18px; height: 18px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: transform .2s ease, background .2s;
+  }
+  .settings-toggle-btn[data-on="1"] .stb-track {
+    background: rgba(0,192,243,0.2);
+    border-color: var(--accent);
+  }
+  .settings-toggle-btn[data-on="1"] .stb-knob {
+    background: var(--accent);
+    transform: translateX(18px);
+  }
+  @media (max-width: 799px) {
+    .settings-input { width: 130px; }
+    .settings-select { max-width: 120px; }
+  }
+
   /* C Spire branded header bar — border-bottom:none is set in the main topbar/detail-topbar blocks above */
   html[data-theme="cspire"] .bottom-nav { border-top: 1.5px solid rgba(136,77,157,0.25); }
   html[data-theme="cspire"] .cspire-wordmark { display: flex !important; }
@@ -2944,6 +3018,7 @@
     <div class="screen" id="screen-more">
       <div class="detail-scroll" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;">
 
+        <!-- ── Appearance ── -->
         <h2 class="section-title">Appearance</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
@@ -2982,6 +3057,119 @@
           </div>
         </div>
 
+        <!-- ── Preferences ── -->
+        <h2 class="section-title" style="margin-top:4px;">Preferences</h2>
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Default Tab -->
+            <div class="settings-row" style="border-bottom:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Default Tab</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Which screen opens on launch</div>
+                </div>
+              </div>
+              <select id="pref-default-tab" class="settings-select" onchange="saveSettingDefaultTab(this.value)">
+                <option value="list">My Work</option>
+                <option value="calendar">My Calendar</option>
+                <option value="cx360">CX 360</option>
+                <option value="techtools">My Tools</option>
+              </select>
+            </div>
+
+            <!-- Default Ticket View -->
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Default Ticket View</div>
+                  <div style="font-size:11px;color:var(--text-muted);">My Work opens to this filter</div>
+                </div>
+              </div>
+              <select id="pref-default-view" class="settings-select" onchange="saveSettingDefaultView(this.value)">
+                <option value="today">Today</option>
+                <option value="assigned">Assigned</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Profile ── -->
+        <h2 class="section-title" style="margin-top:4px;">Profile</h2>
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Name -->
+            <div class="settings-row" style="border-bottom:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <label for="prof-name" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;">Name</label>
+              </div>
+              <input id="prof-name" type="text" class="settings-input" placeholder="Full name" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
+            </div>
+
+            <!-- Badge Number -->
+            <div class="settings-row" style="border-bottom:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                <label for="prof-badge" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;">Badge #</label>
+              </div>
+              <input id="prof-badge" type="text" class="settings-input" placeholder="Badge number" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
+            </div>
+
+            <!-- Region -->
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <label for="prof-region" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;">Region</label>
+              </div>
+              <input id="prof-region" type="text" class="settings-input" placeholder="e.g. North Mississippi" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Notifications ── -->
+        <h2 class="section-title" style="margin-top:4px;">Notifications</h2>
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+
+            <!-- Push Notifications -->
+            <div class="settings-row" style="border-bottom:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">New Ticket Alerts</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Alert when a new ticket is assigned</div>
+                </div>
+              </div>
+              <button class="settings-toggle-btn" id="notif-push-btn" data-on="0" onclick="toggleSettingNotif('push')" aria-label="Toggle new ticket alerts">
+                <div class="stb-track"><div class="stb-knob"></div></div>
+              </button>
+            </div>
+
+            <!-- Sound -->
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">Sound</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Play a sound with alerts</div>
+                </div>
+              </div>
+              <button class="settings-toggle-btn" id="notif-sound-btn" data-on="0" onclick="toggleSettingNotif('sound')" aria-label="Toggle alert sound">
+                <div class="stb-track"><div class="stb-knob"></div></div>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── App ── -->
         <h2 class="section-title" style="margin-top:4px;">App</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
@@ -2998,18 +3186,19 @@
           </div>
         </div>
 
+        <!-- ── Account ── -->
         <h2 class="section-title" style="margin-top:4px;">Account</h2>
         <div class="card">
           <div class="card-body" style="padding:0;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
-              <div style="display:flex;align-items:center;gap:10px;">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <div>
-                  <div style="font-size:14px;font-weight:600;color:var(--text);">Sign Out</div>
-                  <div style="font-size:11px;color:var(--text-muted);" id="more-username">—</div>
-                </div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);">Signed in as</div>
               </div>
-              <button onclick="confirmLogout()" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid rgba(255,82,82,0.4);background:rgba(255,82,82,0.1);color:var(--danger);cursor:pointer;">Sign Out</button>
+              <div style="font-size:12px;color:var(--text-muted);padding-left:26px;" id="more-username">—</div>
+            </div>
+            <div style="padding:14px 16px;">
+              <button onclick="confirmLogout()" style="width:100%;padding:10px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid rgba(255,82,82,0.4);background:rgba(255,82,82,0.08);color:var(--danger);cursor:pointer;letter-spacing:0.02em;">Sign Out of Delta</button>
             </div>
           </div>
         </div>
@@ -3575,6 +3764,9 @@
     });
     const moreUser = document.getElementById('more-username');
     if (moreUser) moreUser.textContent = name || SN.username;
+    // Seed the profile name field if not already customized in localStorage
+    const nameEl = document.getElementById('prof-name');
+    if (nameEl && !localStorage.getItem('ft_profile_name') && name) nameEl.value = name;
     // Hide mobile preview row on real mobile devices
     const mobileRow = document.getElementById('more-mobile-row');
     if (mobileRow && window.innerWidth < 800) mobileRow.style.display = 'none';
@@ -3596,14 +3788,22 @@
     document.getElementById('disclaimer-modal').classList.add('hidden');
     if (!isMobileView()) document.getElementById('desktop-topbar').style.display = 'flex';
 
-    // Restore last active tab, fallback to tickets
-    const savedTab = localStorage.getItem('ft_tab') || 'list';
-    const bnavId   = { list:'bnav-tickets', customers:'bnav-customers', calendar:'bnav-calendar', cx360:'bnav-cx360', techtools:'bnav-techtools', more:'bnav-techtools', network:'bnav-techtools', links:'bnav-techtools' };
+    // Default tab: user preference wins; fallback to last-visited tab, then 'list'
+    const preferredTab = localStorage.getItem('ft_default_tab');
+    const savedTab     = preferredTab || localStorage.getItem('ft_tab') || 'list';
+    const bnavId       = { list:'bnav-tickets', customers:'bnav-customers', calendar:'bnav-calendar', cx360:'bnav-cx360', techtools:'bnav-techtools', more:'bnav-techtools', network:'bnav-techtools', links:'bnav-techtools' };
     showScreen(savedTab, document.getElementById(bnavId[savedTab] || 'bnav-tickets'));
     setDesktopNav(savedTab === 'network' || savedTab === 'links' ? 'techtools' : savedTab);
 
-    // Load tickets
-    fetchTickets('today');
+    // Default ticket view — applies the saved filter preference and syncs the tab pill
+    const defaultView = localStorage.getItem('ft_default_ticket_view') || 'today';
+    activeFilter = defaultView;
+    document.querySelectorAll('.filter-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent.trim().toLowerCase() === defaultView);
+    });
+
+    // Load tickets with the preferred view
+    fetchTickets(defaultView);
 
     // Start polling for new ticket assignments
     startNotifPolling();
@@ -6959,6 +7159,35 @@
       const btn = document.getElementById('dev-mobile-toggle-more');
       if (btn) btn.textContent = '🖥 Desktop';
     }
+
+    // Preferences — Default Tab
+    const defaultTab = localStorage.getItem('ft_default_tab');
+    const tabSel = document.getElementById('pref-default-tab');
+    if (tabSel && defaultTab) tabSel.value = defaultTab;
+
+    // Preferences — Default Ticket View
+    const defaultView = localStorage.getItem('ft_default_ticket_view');
+    const viewSel = document.getElementById('pref-default-view');
+    if (viewSel && defaultView) viewSel.value = defaultView;
+
+    // Profile fields — localStorage first, fall back to session name for the Name field
+    const profName   = localStorage.getItem('ft_profile_name')   || sessionStorage.getItem('sn_user_name') || '';
+    const profBadge  = localStorage.getItem('ft_profile_badge')  || '';
+    const profRegion = localStorage.getItem('ft_profile_region') || '';
+    const nameEl   = document.getElementById('prof-name');
+    const badgeEl  = document.getElementById('prof-badge');
+    const regionEl = document.getElementById('prof-region');
+    if (nameEl)   nameEl.value   = profName;
+    if (badgeEl)  badgeEl.value  = profBadge;
+    if (regionEl) regionEl.value = profRegion;
+
+    // Notifications toggles
+    const notifPush  = localStorage.getItem('ft_notif_push')  || '0';
+    const notifSound = localStorage.getItem('ft_notif_sound') || '0';
+    const pushBtn  = document.getElementById('notif-push-btn');
+    const soundBtn = document.getElementById('notif-sound-btn');
+    if (pushBtn)  pushBtn.setAttribute('data-on',  notifPush);
+    if (soundBtn) soundBtn.setAttribute('data-on', notifSound);
   })();
 
   function timeAgo(date) {
@@ -6968,6 +7197,40 @@
     const hrs = Math.floor(mins / 60);
     if (hrs  < 24)  return `${hrs}h ago`;
     return `${Math.floor(hrs / 24)}d ago`;
+  }
+
+  // ── Settings save handlers ────────────────────────────────────────────────
+
+  function saveSettingDefaultTab(value) {
+    localStorage.setItem('ft_default_tab', value);
+  }
+
+  function saveSettingDefaultView(value) {
+    localStorage.setItem('ft_default_ticket_view', value);
+  }
+
+  // Debounce handle for profile saves (avoids hammering localStorage on every keystroke)
+  let _profileSaveTimer = null;
+  function saveSettingProfile() {
+    clearTimeout(_profileSaveTimer);
+    _profileSaveTimer = setTimeout(() => {
+      const name   = document.getElementById('prof-name')?.value   || '';
+      const badge  = document.getElementById('prof-badge')?.value  || '';
+      const region = document.getElementById('prof-region')?.value || '';
+      localStorage.setItem('ft_profile_name',   name);
+      localStorage.setItem('ft_profile_badge',  badge);
+      localStorage.setItem('ft_profile_region', region);
+    }, 400);
+  }
+
+  function toggleSettingNotif(key) {
+    const btnId = key === 'push' ? 'notif-push-btn' : 'notif-sound-btn';
+    const lsKey = key === 'push' ? 'ft_notif_push'  : 'ft_notif_sound';
+    const btn   = document.getElementById(btnId);
+    if (!btn) return;
+    const newVal = btn.getAttribute('data-on') === '1' ? '0' : '1';
+    btn.setAttribute('data-on', newVal);
+    localStorage.setItem(lsKey, newVal);
   }
 
   // ── SAFETY CHECK TRACKER ──────────────────────────────────────────────────
