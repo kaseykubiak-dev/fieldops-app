@@ -2190,9 +2190,10 @@
   #close-success-overlay.show { opacity:1; pointer-events:auto; }
   #close-success-popup {
     display:flex; flex-direction:column; align-items:center; gap:10px;
+    width:min(340px,88vw);
     background:var(--surface2,#1a2535);
     border:1px solid rgba(0,201,106,0.35); border-radius:16px;
-    padding:32px 40px; text-align:center;
+    padding:28px 28px 24px; text-align:center;
     box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,201,106,0.12), 0 0 30px rgba(0,201,106,0.08);
     transform:scale(0.92); transition:transform .25s ease;
   }
@@ -2205,13 +2206,17 @@
     display:flex; align-items:center; justify-content:center; color:var(--success,#00c96a);
   }
   #close-success-title {
-    font-size:18px; font-weight:700; color:var(--text,#e2eaf3); letter-spacing:-.01em;
+    font-size:17px; font-weight:700; color:var(--text,#e2eaf3); letter-spacing:-.01em;
+    text-align:center;
   }
-  #close-success-sub {
-    font-size:12px; color:var(--text-muted,#6a8099); font-family:var(--mono);
-  }
+  .csp-divider { width:100%; height:1px; background:rgba(255,255,255,0.07); margin:2px 0; flex-shrink:0; }
+  .csp-detail-row { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 0; text-align:left; }
+  .csp-label { font-size:11px; color:var(--text-muted,#6a8099); font-weight:500; flex-shrink:0; }
+  .csp-value { font-size:13px; font-weight:600; color:var(--text,#e2eaf3); text-align:right; }
+  .csp-mono  { font-family:var(--mono); color:var(--accent,#00c0f3); }
   html[data-theme="cspire"] #close-success-popup { background:var(--surface); border-color:rgba(0,135,90,0.35); box-shadow:0 8px 40px rgba(0,0,0,0.18), 0 0 20px rgba(0,135,90,0.08); }
   html[data-theme="cspire"] #close-success-icon { background:rgba(0,135,90,0.12); border-color:rgba(0,135,90,0.35); color:#00875a; box-shadow:0 0 16px rgba(0,135,90,0.1); }
+  html[data-theme="cspire"] .csp-divider { background:rgba(0,0,0,0.1); }
 
   /* ── Customer banner collapse on ticket close ── */
   .cust-banner { transition:opacity .35s ease, max-height .4s ease, margin .35s ease; overflow:hidden; }
@@ -3236,7 +3241,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.35</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.36</span>
             </div>
 
           </div>
@@ -4190,6 +4195,9 @@
   // ── Fetch and populate the detail screen (CSM Cases) ─────────────────────
   let currentCaseSysId   = null;
   let currentCaseNumber  = null;
+  let currentCaseCompany = null;   // company name at time of last case open
+  let currentCaseType    = null;   // { label, cls } from getCaseType()
+  let _onSiteStartTime   = null;   // Date.now() when tech taps "Start Work"
   const _closedThisSession = new Set();
 
   // ── Ticket Action Button state machine ───────────────────────────────────
@@ -4258,6 +4266,7 @@
       }
     }
 
+    if (state === 'work')  _onSiteStartTime = Date.now();   // start on-site timer
     if (state === 'close') _scrollToUpdateTicket();
 
     _ticketActionState[number] = cfg.next;
@@ -4312,10 +4321,12 @@
       const res = await snFetch(`${SN.instance}/api/now/table/customer_account/${accountSysId}?sysparm_fields=name,number,account_type,u_tier,street,city,state,zip`);
       const a = await res.json();
       const acct = a.result;
-      document.getElementById('detail-cust-name').textContent = acct?.name || fallbackName || '—';
+      currentCaseCompany = acct?.name || fallbackName || null;
+      document.getElementById('detail-cust-name').textContent = currentCaseCompany || '—';
       document.getElementById('detail-cust-id').textContent   = acct?.number || '—';
     } catch {
-      document.getElementById('detail-cust-name').textContent = fallbackName || '—';
+      currentCaseCompany = fallbackName || null;
+      document.getElementById('detail-cust-name').textContent = currentCaseCompany || '—';
       document.getElementById('detail-cust-id').textContent   = '—';
     }
   }
@@ -4401,6 +4412,9 @@
 
       // Description vs Service Order — swap based on ticket type
       const caseType = getCaseType(c);
+      currentCaseType    = caseType;   // store for close confirmation popup
+      currentCaseCompany = null;       // reset; fetchDetailAccount will populate it
+      _onSiteStartTime   = null;       // reset timer when opening a new case
       const isInstall = caseType.cls === 'installation';
       document.getElementById('description-section').style.display    = isInstall ? 'none' : '';
       document.getElementById('service-order-section').style.display  = isInstall ? '' : 'none';
@@ -5519,15 +5533,45 @@
   function showCloseSuccessPopup(onDismiss) {
     const overlay = document.getElementById('close-success-overlay');
     if (!overlay) return;
+
+    // Populate ticket number
+    const numEl = document.getElementById('csp-number');
+    if (numEl) numEl.textContent = currentCaseNumber || '—';
+
+    // Populate company name
+    const coEl = document.getElementById('csp-company');
+    if (coEl) coEl.textContent = currentCaseCompany || document.getElementById('detail-cust-name')?.textContent || '—';
+
+    // Populate type pill
+    const typeEl = document.getElementById('csp-type');
+    if (typeEl && currentCaseType) {
+      typeEl.textContent = currentCaseType.label;
+      typeEl.className   = `pill pill-${currentCaseType.cls}`;
+    }
+
+    // Populate time on site (only if tech tapped Start Work)
+    const timeRow = document.getElementById('csp-time-row');
+    const timeEl  = document.getElementById('csp-time');
+    if (timeRow && timeEl && _onSiteStartTime) {
+      const mins    = Math.max(0, Math.floor((Date.now() - _onSiteStartTime) / 60000));
+      const hrs     = Math.floor(mins / 60);
+      const remMins = mins % 60;
+      timeEl.textContent   = hrs > 0 ? `${hrs}h ${remMins}m` : `${mins}m`;
+      timeRow.style.display = '';
+    } else if (timeRow) {
+      timeRow.style.display = 'none';
+    }
+
+    // Wire dismiss button; clicking the backdrop also closes
     const dismiss = () => {
-      clearTimeout(overlay._dismissTimer);
       overlay.classList.remove('show');
       if (typeof onDismiss === 'function') onDismiss();
     };
+    const backBtn = document.getElementById('csp-back-btn');
+    if (backBtn) backBtn.onclick = dismiss;
+    overlay.onclick = e => { if (e.target === overlay) dismiss(); };
+
     overlay.classList.add('show');
-    clearTimeout(overlay._dismissTimer);
-    overlay._dismissTimer = setTimeout(dismiss, 2000);
-    overlay.onclick = dismiss;
   }
 
   // Restore any saved draft when a case is opened
@@ -8090,8 +8134,26 @@
     <div id="close-success-icon">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <div id="close-success-title">Ticket Closed</div>
-    <div id="close-success-sub">Successfully submitted to ServiceNow</div>
+    <div id="close-success-title">Ticket Closed Successfully</div>
+    <div class="csp-divider"></div>
+    <div class="csp-detail-row">
+      <span class="csp-label">Ticket</span>
+      <span class="csp-value csp-mono" id="csp-number">—</span>
+    </div>
+    <div class="csp-detail-row">
+      <span class="csp-label">Customer</span>
+      <span class="csp-value" id="csp-company">—</span>
+    </div>
+    <div class="csp-detail-row">
+      <span class="csp-label">Type</span>
+      <span class="pill" id="csp-type">—</span>
+    </div>
+    <div class="csp-detail-row" id="csp-time-row">
+      <span class="csp-label">Time on Site</span>
+      <span class="csp-value" id="csp-time">—</span>
+    </div>
+    <div class="csp-divider"></div>
+    <button class="btn btn-accent" id="csp-back-btn" style="width:100%;margin-top:2px;">Back to My Work</button>
   </div>
 </div>
 
