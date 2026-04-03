@@ -1,0 +1,23 @@
+{
+  "name": "Delta — Field Operations",
+  "short_name": "Delta",
+  "description": "C Spire field technician dispatch and ticket management",
+  "start_url": "./fieldtech-app.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#131e29",
+  "theme_color": "#0e1a2a",
+  "icons": [
+    {
+      "src": "delta-favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "delta-icon-dark.png",
+      "sizes": "520x520",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
