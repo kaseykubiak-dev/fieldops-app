@@ -3307,7 +3307,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.51</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.52</span>
             </div>
 
           </div>
@@ -7936,13 +7936,9 @@
 
   function checkSafetyModal() {
     if (_safetyModalShown) return;
-    if (getSafetyUrgency() !== 'high') return;
+    if (getSafetyUrgency() === 'none') return; // show whenever any item is due
     _safetyModalShown = true;
     _renderSafetyModalChecklist();
-    const countEl = document.getElementById('safety-modal-count');
-    const monthEl = document.getElementById('safety-modal-month');
-    if (countEl) countEl.textContent = _safetyIncompleteCount();
-    if (monthEl) monthEl.textContent = _safetyMonthName();
     const modal = document.getElementById('safety-modal');
     if (modal) modal.classList.add('active');
   }
@@ -7950,14 +7946,13 @@
   function _renderSafetyModalChecklist() {
     const el = document.getElementById('safety-modal-checklist');
     if (!el) return;
-    el.innerHTML = _SAFETY_TYPES.map(t => {
-      const due = _isSafetyDue(t.key);
-      return '<div class="safety-modal-item ' + (!due ? 'item-done' : '') + '">' +
-        '<span class="safety-modal-item-icon">' + (!due ? '&#9989;' : '&#9744;') + '</span>' +
-        '<span class="safety-modal-item-label">' + escHtml(t.label) + '</span>' +
-        (due ? '<button class="safety-btn safety-btn-primary" style="padding:5px 10px;font-size:11px;" onclick="markSafetyComplete(\'' + escHtml(t.key) + '\')">Done</button>' : '') +
-      '</div>';
-    }).join('');
+    const dueItems = _SAFETY_TYPES.filter(t => _isSafetyDue(t.key));
+    el.innerHTML = dueItems.map(t =>
+      '<div class="safety-modal-item">' +
+      '<span class="safety-modal-item-icon">&#9744;</span>' +
+      '<span class="safety-modal-item-label">' + escHtml(t.label) + '</span>' +
+      '</div>'
+    ).join('');
   }
 
   function acknowledgeSafetyModal() {
@@ -8251,20 +8246,18 @@
   // ── End pull-to-refresh ──────────────────────────────────────────────────
 </script>
 
-<!-- Safety Check Modal (high urgency login gate) -->
+<!-- Safety Check Modal (login gate — fires whenever any item is due) -->
 <div class="safety-modal-overlay" id="safety-modal" role="dialog" aria-modal="true" aria-labelledby="safety-modal-title">
   <div class="safety-modal-card">
     <div class="safety-modal-icon" aria-hidden="true">&#9888;&#65039;</div>
-    <div class="safety-modal-title" id="safety-modal-title">Safety Checks Overdue</div>
+    <div class="safety-modal-title" id="safety-modal-title">Pending Inspections/Reports</div>
     <div class="safety-modal-body">
-      You have <strong id="safety-modal-count">2</strong> incomplete safety
-      inspection(s) for <strong id="safety-modal-month"></strong>.
-      Monthly checks must be completed before the end of the month.
+      You have pending inspections/reports due:
     </div>
     <div class="safety-modal-checklist" id="safety-modal-checklist"></div>
     <div class="safety-modal-actions">
       <button class="safety-modal-btn safety-modal-btn-sospes" onclick="launchSospes('all')">Open Sospes to Complete</button>
-      <button class="safety-modal-btn safety-modal-btn-acknowledge" onclick="acknowledgeSafetyModal()">I'll complete later today</button>
+      <button class="safety-modal-btn safety-modal-btn-acknowledge" onclick="acknowledgeSafetyModal()">Acknowledge</button>
     </div>
   </div>
 </div>
