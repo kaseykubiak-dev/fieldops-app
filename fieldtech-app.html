@@ -857,7 +857,7 @@
   .so-lic-label  { font-size:10px; color:var(--text-muted); margin-top:2px; }
 
   /* ── ORDER LINKS & PORTAL LINKS ── */
-  .order-link { font-size:13px; font-weight:600; font-family:var(--mono); color:var(--accent); text-decoration:none; display:block; }
+  .order-link { font-size:13px; font-weight:600; font-family:var(--mono); color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
   .order-link:hover { text-decoration:underline; }
   .link-group-label { font-size:10px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:.06em; padding:8px 14px 4px; border-top:1px solid var(--border); }
   .link-group-label:first-child { border-top:none; }
@@ -2174,7 +2174,7 @@
   .safety-modal-btn-acknowledge:hover { background:rgba(255,255,255,0.1); }
 
   /* Badge dot — nav buttons */
-  .safety-badge-dot { display:none; position:absolute; top:4px; right:4px; width:8px; height:8px; border-radius:50%; background:var(--accent2); box-shadow:0 0 6px rgba(255,103,32,0.5); }
+  .safety-badge-dot { display:none; position:absolute; top:4px; right:calc(50% - 18px); width:8px; height:8px; border-radius:50%; background:var(--accent2); box-shadow:0 0 6px rgba(255,103,32,0.5); }
   .safety-badge-dot.urgency-high { background:var(--danger); box-shadow:0 0 6px rgba(255,82,82,0.5); animation:slaPulse 2s ease-in-out infinite; }
   .safety-badge-dot.visible { display:block; }
   .dnav-safety-badge { display:none; width:7px; height:7px; border-radius:50%; background:var(--accent2); margin-left:4px; box-shadow:0 0 5px rgba(255,103,32,0.4); }
@@ -3307,7 +3307,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.50</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.51</span>
             </div>
 
           </div>
@@ -5050,8 +5050,9 @@
     // Populate order numbers
     const sfNum = _hash(caseNumber + 'sf-order') % 10000000;
     const snNum = _hash(caseNumber + 'sn-order') % 100000;
-    document.getElementById('detail-sf-order').textContent = 'SO-00' + String(sfNum).padStart(7, '0');
-    document.getElementById('detail-sn-order').textContent = 'ORD00' + String(snNum).padStart(5, '0');
+    const _extIcon = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;opacity:0.65;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+    document.getElementById('detail-sf-order').innerHTML = 'SO-00' + String(sfNum).padStart(7, '0') + _extIcon;
+    document.getElementById('detail-sn-order').innerHTML = 'ORD00' + String(snNum).padStart(5, '0') + _extIcon;
   }
 
   // ── Project Coordinator & Sales Rep — deterministic by account sys_id ───────
@@ -5207,8 +5208,9 @@
       const wan1Arkis = wan1Owner === 'C Spire' ? arkisId('arkis1') : null;
       const wan2Arkis = wan2Owner === 'C Spire' ? arkisId('arkis2') : null;
 
+      const _extLinkIcon = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;opacity:0.65;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
       const arkisVal = (id) => id
-        ? `<a href="#" onclick="return false;" class="order-link" style="font-size:12px;">${escHtml(id)}</a>`
+        ? `<a href="#" onclick="return false;" class="order-link" style="font-size:12px;">${escHtml(id)}${_extLinkIcon}</a>`
         : `<span style="color:var(--text-muted);">N/A</span>`;
 
       const _statusColor = { 'pill-resolved': 'var(--success)', 'pill-critical': 'var(--danger)', 'pill-warning': 'var(--warning)' };
@@ -6578,6 +6580,8 @@
     }
     if (ticketNumber) {
       document.getElementById('no-ticket-overlay').classList.add('hidden');
+      const _ds = document.querySelector('#screen-detail .detail-scroll');
+      if (_ds) _ds.scrollTop = 0;
       fetchCaseDetail(ticketNumber);
     }
   }
