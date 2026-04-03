@@ -2278,6 +2278,28 @@
   html[data-theme="cspire"] #close-success-icon { background:rgba(0,135,90,0.12); border-color:rgba(0,135,90,0.35); color:#00875a; box-shadow:0 0 16px rgba(0,135,90,0.1); }
   html[data-theme="cspire"] .csp-divider { background:rgba(0,0,0,0.1); }
 
+  /* ── Generic confirm dialog ── */
+  #confirm-dialog-overlay {
+    position:fixed; inset:0; z-index:10200;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  #confirm-dialog-overlay.show { opacity:1; pointer-events:auto; }
+  #confirm-dialog-box {
+    width:min(320px,88vw); background:var(--surface2);
+    border:1px solid var(--border); border-radius:16px;
+    padding:24px 22px 18px; display:flex; flex-direction:column; gap:16px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    transform:scale(0.93); transition:transform .2s ease;
+  }
+  #confirm-dialog-overlay.show #confirm-dialog-box { transform:scale(1); }
+  #confirm-dialog-msg { font-size:14px; font-weight:500; color:var(--text); line-height:1.5; }
+  #confirm-dialog-btns { display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn-no  { padding:7px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; }
+  .confirm-btn-yes { padding:7px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid rgba(0,192,243,0.4); background:rgba(0,192,243,0.12); color:var(--accent); cursor:pointer; }
+  html[data-theme="cspire"] #confirm-dialog-box { background:var(--surface); }
+
   /* ── Customer banner collapse on ticket close ── */
   .cust-banner { transition:opacity .35s ease, max-height .4s ease, margin .35s ease; overflow:hidden; }
   .cust-banner.collapsed { opacity:0; max-height:0 !important; margin-top:0 !important; margin-bottom:0 !important; pointer-events:none; }
@@ -2522,6 +2544,7 @@
       </div>
 
       <div class="detail-pills">
+        <span style="font-size:12px;color:var(--text-muted);">Ticket Status:</span>
         <span class="tc-status" id="detail-pill-state" style="font-size:13px;font-weight:600;"></span>
         <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">Assigned: <strong style="color:var(--text)" id="detail-assigned">—</strong></span>
         <button class="sn-link-btn" id="sn-link-btn" onclick="openInServiceNow()" title="Open in ServiceNow" style="display:none;margin-left:auto;">
@@ -3292,7 +3315,7 @@
                   <div style="font-size:11px;color:var(--text-muted);">Clear cache and reload latest version</div>
                 </div>
               </div>
-              <button onclick="forceAppRefresh()" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Refresh</button>
+              <button onclick="confirmForceRefresh()" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid rgba(0,192,243,0.35);background:rgba(0,192,243,0.1);color:var(--accent);cursor:pointer;">Refresh</button>
             </div>
 
             <!-- Version -->
@@ -3301,7 +3324,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.43</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.44</span>
             </div>
 
           </div>
@@ -3948,6 +3971,13 @@
     initInventoryChecks();
   }
 
+  function confirmForceRefresh() {
+    showConfirmDialog(
+      'This will reset all local settings and cached data. Do you want to proceed?',
+      () => forceAppRefresh()
+    );
+  }
+
   async function forceAppRefresh() {
     if ('caches' in window) {
       const keys = await caches.keys();
@@ -4212,6 +4242,7 @@
               <div class="ticket-title">${escHtml(inc.short_description)}</div>
               ${location ? `<div class="ticket-addr"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;color:var(--text-muted)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${escHtml(location)}</div>` : ''}
               <div class="ticket-pills">
+                <span style="font-size:11px;color:var(--text-muted);">Ticket Status:</span>
                 <span class="tc-status">${state.label}</span>
               </div>
             </div>
@@ -5621,6 +5652,20 @@
   }
 
   function hideFeedback(el) { el.style.display = 'none'; }
+
+  let _confirmDialogResolve = null;
+  function showConfirmDialog(message, onYes) {
+    const overlay = document.getElementById('confirm-dialog-overlay');
+    const msg     = document.getElementById('confirm-dialog-msg');
+    if (!overlay || !msg) { if (onYes) onYes(); return; }
+    msg.textContent = message;
+    _confirmDialogResolve = (confirmed) => {
+      overlay.classList.remove('show');
+      _confirmDialogResolve = null;
+      if (confirmed && onYes) onYes();
+    };
+    overlay.classList.add('show');
+  }
 
   function showCloseSuccessPopup(onDismiss) {
     const overlay = document.getElementById('close-success-overlay');
@@ -8239,6 +8284,17 @@
 <div id="safety-freq-toast" role="status" aria-live="polite">
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   <span id="safety-freq-toast-msg">Reminder frequency updated</span>
+</div>
+
+<!-- Generic confirm dialog -->
+<div id="confirm-dialog-overlay" role="dialog" aria-modal="true">
+  <div id="confirm-dialog-box">
+    <div id="confirm-dialog-msg"></div>
+    <div id="confirm-dialog-btns">
+      <button class="confirm-btn-no"  onclick="_confirmDialogResolve(false)">No</button>
+      <button class="confirm-btn-yes" onclick="_confirmDialogResolve(true)">Yes</button>
+    </div>
+  </div>
 </div>
 
 <!-- Ticket closed success popup -->
