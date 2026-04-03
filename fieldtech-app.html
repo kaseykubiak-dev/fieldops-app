@@ -3241,7 +3241,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.36</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.37</span>
             </div>
 
           </div>
@@ -4267,7 +4267,7 @@
     }
 
     if (state === 'work')  _onSiteStartTime = Date.now();   // start on-site timer
-    if (state === 'close') _scrollToUpdateTicket();
+    if (state === 'close') { _scrollToUpdateTicket(); return; } // stay here until closeTicket() succeeds
 
     _ticketActionState[number] = cfg.next;
     renderTicketActionButton(number);
@@ -4450,6 +4450,10 @@
       renderFirewallSection(accountSysId || currentCaseSysId);
       renderVoipSection(accountSysId || currentCaseSysId);
       renderProjectContacts(accountSysId || currentCaseSysId);
+      // If ticket is already closed/resolved in ServiceNow, lock button to terminal state
+      if (stateVal === '4' || stateVal === '5' || _closedThisSession.has(currentCaseNumber)) {
+        _ticketActionState[currentCaseNumber] = 'done';
+      }
       renderTicketActionButton(currentCaseNumber);
 
       // Travel estimate
@@ -5396,7 +5400,12 @@
       fetchTimeline(currentCaseSysId);
 
       // Track this ticket so re-renders also show Closed
-      if (currentCaseNumber) _closedThisSession.add(currentCaseNumber);
+      if (currentCaseNumber) {
+        _closedThisSession.add(currentCaseNumber);
+        // Advance action button to terminal state now that close API succeeded
+        _ticketActionState[currentCaseNumber] = 'done';
+        renderTicketActionButton(currentCaseNumber);
+      }
 
       // Collapse the customer banner to de-emphasise the now-closed ticket body
       const banner = document.querySelector('.cust-banner');
