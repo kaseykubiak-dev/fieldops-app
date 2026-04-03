@@ -3297,7 +3297,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.48</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.49</span>
             </div>
 
           </div>
@@ -5286,7 +5286,7 @@
         badge.className   = 'conn-badge all-off';
         body.innerHTML    = `<div class="cal-empty-day" style="padding:18px 14px;">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>No managed firewall(s) on record.</span>
+          <span>No Firewall On Record</span>
         </div>`;
         return;
       }
@@ -5304,6 +5304,7 @@
       const fw2Down  = isHA && (s % 7 === 0); // ~14% chance secondary is offline
 
       const fwChev = `<svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
+      const _statusColor = { 'pill-resolved': 'var(--success)', 'pill-critical': 'var(--danger)', 'pill-warning': 'var(--warning)' };
 
       const fwBlock = (label, roleTag, statusCls, statusTxt, role, serial, mgmtIp, uptimeOrSync, uptimeLabel, location, isNA) => `
         <div class="sub-acc">
