@@ -4186,9 +4186,9 @@
         const startRaw = isClosed ? (inc.resolved_at || inc.u_scheduled_start) : inc.u_scheduled_start;
         const startLabel = isClosed ? 'Closed ' : 'Start ';
         const startStr = startRaw ? formatTime(parseSNDate(startRaw)) : '—';
-        const caseType = getCaseType(inc);
-        const isClosed = state.cls === 'pill-resolved';
-        const tcClass  = isClosed ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
+        const caseType      = getCaseType(inc);
+        const isTicketDone  = state.cls === 'pill-resolved';
+        const tcClass       = isTicketDone ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
 
         html += `
         <div class="ticket-card" data-number="${inc.number}" onclick="openDetail('${inc.number}')">
