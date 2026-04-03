@@ -465,6 +465,7 @@
   .icon-btn:active { background:var(--surface2); }
   .icon-btn .badge { position:absolute; top:5px; right:5px; width:7px; height:7px; background:var(--danger); border-radius:50%; border:2px solid var(--surface); display:none; }
   .icon-btn .badge.has-unread { display:block; }
+  .notif-bell { color:var(--accent); }
 
   /* ── NOTIFICATION PANEL ── */
   .notif-backdrop { position:fixed; inset:0; z-index:1998; display:none; }
@@ -3242,7 +3243,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.38</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.39</span>
             </div>
 
           </div>
@@ -3747,6 +3748,7 @@
   const _ticketCache      = {};     // keyed by filterState → { result, timestamp }
   let _notifs             = [];
   let _notifSeen          = new Set();
+  let _notifRead          = new Set(); // persisted — ticket numbers the tech has read
   let _notifLastCheck     = null;
   let _notifPollTimer     = null;
   let _notifFailCount     = 0;
@@ -7148,10 +7150,10 @@
     _notifLastCheck = now.toISOString().slice(0,19).replace('T',' ');
 
     const query  = `assigned_to=${SN.technicianId}^sys_created_on>${cutoff}^state!=4^state!=5`;
-    const fields = 'number,short_description,priority,account,sys_created_on';
+    const fields = 'number,short_description,priority,account,account.name,sys_created_on';
     const url    = `${SN.instance}/api/now/table/sn_customerservice_case`
                  + `?sysparm_query=${encodeURIComponent(query)}`
-                 + `&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=true`;
+                 + `&sysparm_fields=${fields}&sysparm_limit=50&sysparm_display_value=false`;
 
     try {
       const res = await snFetch(url, {}, 8000);
@@ -7162,14 +7164,17 @@
         _notifSeen.add(t.number);
         _notifs.unshift({
           number:  t.number,
-          company: t.account?.display_value || t.account || '',
+          company: t['account.name'] || '',
           desc:    t.short_description || '',
           priority: t.priority,
           time:    parseSNDate(t.sys_created_on),
-          read:    false
+          read:    _notifRead.has(t.number)
         });
       });
-      if (fresh.length > 0) updateNotifBadge();
+      if (fresh.length > 0) {
+        try { localStorage.setItem('ft_notif_seen', JSON.stringify([..._notifSeen])); } catch (_e) {}
+        updateNotifBadge();
+      }
     } catch (_) {
       _notifFailCount++;
     }
@@ -7283,7 +7288,11 @@
   }
 
   function markAllNotifsRead() {
-    _notifs.forEach(n => n.read = true);
+    _notifs.forEach(n => { n.read = true; _notifRead.add(n.number); });
+    try {
+      localStorage.setItem('ft_notif_read', JSON.stringify([..._notifRead]));
+      localStorage.setItem('ft_notif_seen', JSON.stringify([..._notifSeen]));
+    } catch (_e) {}
     updateNotifBadge();
     renderNotifList();
   }
@@ -7355,6 +7364,14 @@
     const autoRefresh = localStorage.getItem('ft_auto_refresh');
     const refreshSel  = document.getElementById('pref-auto-refresh');
     if (refreshSel && autoRefresh) refreshSel.value = autoRefresh;
+
+    // Notifications — restore seen/read sets so state survives reloads
+    try {
+      const seen = localStorage.getItem('ft_notif_seen');
+      const read = localStorage.getItem('ft_notif_read');
+      if (seen) _notifSeen = new Set(JSON.parse(seen));
+      if (read) _notifRead = new Set(JSON.parse(read));
+    } catch (_e) {}
 
     // Sync the refresh bar indicator (updateAutoRefreshIndicator is defined later
     // in the script; defer to avoid a TDZ error if restoreSettings runs first)
