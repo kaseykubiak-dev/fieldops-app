@@ -733,8 +733,12 @@
   }
   .cal-mini-card.tc-closed:active { background: linear-gradient(155deg, rgba(0,230,118,0.22) 0%, rgba(0,180,80,0.14) 100%); }
   /* Plain-text labels replacing pills on cards */
-  .tc-label { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:rgba(255,255,255,0.52); margin-left:auto; flex-shrink:0; }
-  .tc-status { font-size:11px; font-weight:500; color:rgba(255,255,255,0.48); }
+  .tc-label  { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-left:auto; flex-shrink:0; color:rgba(255,255,255,0.55); }
+  .tc-status { font-size:11px; font-weight:600; color:rgba(255,255,255,0.88); }
+  /* Type label color per card variant */
+  .tc-install .tc-label { color:#1a7ab5; }
+  .tc-repair  .tc-label { color:#c94d14; }
+  .tc-closed  .tc-label { color:rgba(255,255,255,0.55); }
   /* Light mode overrides */
   html[data-theme="cspire"] .ticket-inner.tc-repair { border-left-color: #cc5218; }
   html[data-theme="cspire"] .ticket-inner.tc-repair .cust-glance {
@@ -2518,7 +2522,7 @@
       </div>
 
       <div class="detail-pills">
-        <span class="pill" id="detail-pill-state"></span>
+        <span class="tc-status" id="detail-pill-state" style="font-size:13px;font-weight:600;"></span>
         <span style="font-size:12px;color:var(--text-muted);margin-left:2px;">Assigned: <strong style="color:var(--text)" id="detail-assigned">—</strong></span>
         <button class="sn-link-btn" id="sn-link-btn" onclick="openInServiceNow()" title="Open in ServiceNow" style="display:none;margin-left:auto;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3297,7 +3301,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.41</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.43</span>
             </div>
 
           </div>
@@ -4340,13 +4344,10 @@
     // Apply this button's side-effects before advancing
     _updateTicketListPill(number, cfg.pill);
 
-    // Mirror the same pill text/class into the detail state pill
+    // Mirror state text into the detail state label
     if (cfg.pill) {
       const detailPill = document.getElementById('detail-pill-state');
-      if (detailPill) {
-        detailPill.className = `pill ${cfg.pill.cls}`;
-        detailPill.textContent = cfg.pill.text;
-      }
+      if (detailPill) detailPill.textContent = cfg.pill.text;
     }
 
     if (state === 'work')  _onSiteStartTime = Date.now();   // start on-site timer
@@ -4481,10 +4482,10 @@
       document.getElementById('detail-tb-id').textContent    = `${c.number} · ${dateStr}`;
       document.getElementById('detail-tb-title').textContent = c.short_description || '—';
 
-      // State pill (priority pill removed)
+      // State label
       const state = STATE_MAP[c.state?.value || c.state] || { label: 'Open', cls: 'pill-open' };
       const stateEl = document.getElementById('detail-pill-state');
-      stateEl.textContent = state.label; stateEl.className = `pill ${state.cls}`;
+      stateEl.textContent = state.label;
 
       // Pre-select current state in update form
       const sel = document.getElementById('detail-state-select');
@@ -4620,10 +4621,9 @@
       const newStateKey = String(updated.result?.state || state);
       const newState = STATE_MAP[newStateKey] || { label: 'Updated', cls: 'pill-medium' };
 
-      // Refresh pills and state select to reflect new state
+      // Refresh state label
       const stateEl = document.getElementById('detail-pill-state');
       stateEl.textContent = newState.label;
-      stateEl.className = `pill ${newState.cls}`;
 
       // Clear notes field
       document.getElementById('detail-work-notes').value = '';
@@ -5472,9 +5472,9 @@
 
       const responseData = await res.json().catch(() => ({}));
 
-      // Always mark pill as Closed on success — don't rely on response state value
+      // Mark state label as Closed on success
       const pill = document.getElementById('detail-pill-state');
-      if (pill) { pill.textContent = 'Closed'; pill.className = 'pill pill-resolved'; }
+      if (pill) pill.textContent = 'Closed';
 
       document.getElementById('detail-work-notes').value = '';
       document.getElementById('detail-resolution-select').value = '';
