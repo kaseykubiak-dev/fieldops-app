@@ -1040,9 +1040,7 @@
     margin-left:auto; padding:5px 12px; border-radius:6px; cursor:pointer;
     font-size:11px; font-weight:700; font-family:var(--mono); letter-spacing:.04em;
     flex-shrink:0; border:1.5px solid; transition:all .2s ease;
-    display:flex; align-items:center; gap:5px;
   }
-  .ticket-action-btn::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
   /* State: travel (blue — matches Open pill) */
   .ticket-action-btn[data-action-state="travel"] {
     background:linear-gradient(135deg, rgba(0,192,243,0.22) 0%, rgba(0,192,243,0.07) 100%);
@@ -1050,7 +1048,6 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
     text-shadow:0 1px 2px rgba(0,0,0,0.3);
   }
-  .ticket-action-btn[data-action-state="travel"]::before { background:var(--accent); box-shadow:0 0 5px rgba(0,192,243,0.6); }
   .ticket-action-btn[data-action-state="travel"]:hover {
     background:linear-gradient(135deg, rgba(0,192,243,0.32) 0%, rgba(0,192,243,0.12) 100%);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,192,243,0.2), inset 0 1px 0 rgba(0,192,243,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
@@ -1063,7 +1060,6 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(136,77,157,0.14), inset 0 1px 0 rgba(136,77,157,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
     text-shadow:0 1px 2px rgba(0,0,0,0.3);
   }
-  .ticket-action-btn[data-action-state="work"]::before { background:#b07ccc; box-shadow:0 0 5px rgba(136,77,157,0.6); }
   .ticket-action-btn[data-action-state="work"]:hover {
     background:linear-gradient(135deg, rgba(136,77,157,0.32) 0%, rgba(136,77,157,0.12) 100%);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(136,77,157,0.22), inset 0 1px 0 rgba(136,77,157,0.22), inset 0 -1px 0 rgba(0,0,0,0.15);
@@ -1076,7 +1072,6 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 8px rgba(0,201,106,0.12), inset 0 1px 0 rgba(0,201,106,0.15), inset 0 -1px 0 rgba(0,0,0,0.15);
     text-shadow:0 1px 2px rgba(0,0,0,0.3);
   }
-  .ticket-action-btn[data-action-state="close"]::before { background:var(--success); box-shadow:0 0 5px rgba(0,201,106,0.6); }
   .ticket-action-btn[data-action-state="close"]:hover {
     background:linear-gradient(135deg, rgba(0,201,106,0.32) 0%, rgba(0,201,106,0.12) 100%);
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 10px rgba(0,0,0,0.2), 0 0 12px rgba(0,201,106,0.2), inset 0 1px 0 rgba(0,201,106,0.2), inset 0 -1px 0 rgba(0,0,0,0.15);
@@ -1089,13 +1084,10 @@
     box-shadow:0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
     cursor:default; pointer-events:none; opacity:0.7;
   }
-  .ticket-action-btn[data-action-state="done"]::before { background:var(--text-muted); box-shadow:none; }
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="done"] { border-color:rgba(0,0,0,0.15); color:#7a8fa6; }
   /* C Spire theme overrides */
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(0,152,210,0.22) 0%, rgba(0,96,200,0.08) 100%); border-color:rgba(0,152,210,0.44); color:#0f3d58; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(0,152,210,0.12), inset 0 1px 0 rgba(0,152,210,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
-  html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"]::before { background:#0f3d58; }
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="work"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#6b3a7d; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(122,85,152,0.12), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
-  html[data-theme="cspire"] .ticket-action-btn[data-action-state="work"]::before { background:#6b3a7d; }
 
   .cust-banner-grid { display:grid; grid-template-columns:1fr 1fr; }
   .cust-field { padding:10px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -2681,7 +2673,7 @@
                 <div class="wan-block">
                   <div class="wan-label-row">
                     <span class="wan-label">WAN 1</span>
-                    <span class="pill pill-critical" style="font-size:10px;">OFFLINE</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--danger);">OFFLINE</span>
                   </div>
                   <div class="equip-detail-grid">
                     <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">CIRC-NX-0041</div></div>
@@ -2699,7 +2691,7 @@
                 <div class="wan-block">
                   <div class="wan-label-row">
                     <span class="wan-label">WAN 2</span>
-                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--success);">ONLINE</span>
                   </div>
                   <div class="equip-detail-grid">
                     <div class="edg-item"><div class="edg-label">Circuit ID</div><div class="edg-val mono">CIRC-NX-0042</div></div>
@@ -2734,7 +2726,7 @@
                 <div class="wan-block">
                   <div class="wan-label-row">
                     <span class="wan-label">FW-01 <span style="font-weight:400;color:var(--text-muted);font-size:11px;">Primary</span></span>
-                    <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--success);">ONLINE</span>
                   </div>
                   <div class="equip-detail-grid">
                     <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Fortinet FG-200E</div></div>
@@ -2753,7 +2745,7 @@
                 <div class="wan-block">
                   <div class="wan-label-row">
                     <span class="wan-label">FW-02 <span style="font-weight:400;color:var(--text-muted);font-size:11px;">Secondary</span></span>
-                    <span class="pill pill-resolved" style="font-size:10px;">STANDBY</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--success);">STANDBY</span>
                   </div>
                   <div class="equip-detail-grid">
                     <div class="edg-item"><div class="edg-label">Model</div><div class="edg-val">Fortinet FG-200E</div></div>
@@ -2808,7 +2800,7 @@
                   <div class="sub-acc-header" onclick="toggleSubAcc(this)">
                     <div class="sub-acc-left">
                       <span class="sub-acc-label">Core Switch</span>
-                      <span class="pill pill-resolved" style="font-size:10px;">ONLINE</span>
+                      <span style="font-size:10px;font-weight:700;color:var(--success);">ONLINE</span>
                     </div>
                     <svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
                   </div>
@@ -2827,7 +2819,7 @@
                   <div class="sub-acc-header" onclick="toggleSubAcc(this)">
                     <div class="sub-acc-left">
                       <span class="sub-acc-label">DDoS Protection</span>
-                      <span class="pill pill-resolved" style="font-size:10px;">ACTIVE</span>
+                      <span style="font-size:10px;font-weight:700;color:var(--success);">ACTIVE</span>
                     </div>
                     <svg class="sub-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
                   </div>
@@ -3305,7 +3297,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.47</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.48</span>
             </div>
 
           </div>
@@ -5209,12 +5201,13 @@
         ? `<a href="#" onclick="return false;" class="order-link" style="font-size:12px;">${escHtml(id)}</a>`
         : `<span style="color:var(--text-muted);">N/A</span>`;
 
+      const _statusColor = { 'pill-resolved': 'var(--success)', 'pill-critical': 'var(--danger)', 'pill-warning': 'var(--warning)' };
       const wanBlock = (label, circ, cfg, statusCls, statusTxt, owner, arkis) => `
         <div class="sub-acc">
           <div class="sub-acc-header" onclick="toggleSubAcc(this)">
             <div class="sub-acc-left">
               <span class="sub-acc-label">${label}</span>
-              <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+              <span style="font-size:10px;font-weight:700;color:${_statusColor[statusCls]||'var(--text-muted)'};">${statusTxt}</span>
             </div>
             ${chevSvg}
           </div>
@@ -5317,7 +5310,7 @@
           <div class="sub-acc-header" onclick="toggleSubAcc(this)">
             <div class="sub-acc-left">
               <span class="sub-acc-label">${label} <span style="font-weight:400;color:var(--text-muted);font-size:11px;">${roleTag}</span></span>
-              <span class="pill ${statusCls}" style="font-size:10px;">${statusTxt}</span>
+              <span style="font-size:10px;font-weight:700;color:${_statusColor[statusCls]||'var(--text-muted)'};">${statusTxt}</span>
             </div>
             ${fwChev}
           </div>
