@@ -45,12 +45,14 @@ When making choices regarding color, scheme, tone, or overall presentation, refe
 - `v0.35` — CX 360 header placeholder note added
 - `v0.36` — Ticket close confirmation screen (Ticket Closed Successfully popup)
 - `v0.37` — Ticket action button state machine fixed (premature done state + already-closed tickets)
+- `v0.38` — PWA manifest link, request deduplication in snFetch, stale ticket cache with offline indicator
+- `v0.39` — Notification bell: accent color, time accuracy (display_value=false), Mark All Read persistence
 
 Per-commit versioning convention: commit subject prefixed with version (e.g. `v0.38 —`), in-app Settings version span updated in same commit. Increment by 0.01 until next major version.
 
 ---
 
-## Current State (as of v0.37)
+## Current State (as of v0.39)
 
 ### Completed this sprint
 - **Settings panel**: Reorganized into 6 named sections — Appearance, Preferences, Profile, Notifications, App, Account. Accessed via the TT avatar in the topbar.
@@ -69,8 +71,6 @@ Per-commit versioning convention: commit subject prefixed with version (e.g. `v0
 - `seed_rest_of_april.py` — 38 cases for April 6–30, 2026 (weekdays only, 2/day, mix of install/repair)
 
 ### Next up (candidates)
-- `manifest.json` — PWA install prompt (one file, high impact)
-- Stale ticket cache — "Last updated X min ago" when offline/slow
 - On-site timer UI — visible stopwatch while ticket is On Site
 - Weather badge on ticket detail
 - Pre-arrival "Brief Me" card
