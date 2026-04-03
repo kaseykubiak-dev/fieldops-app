@@ -859,8 +859,8 @@
   .portal-link.last { /* last in group — no special styling needed, border handled by next sibling */ }
   .portal-link .link-label { flex:1; min-width:0; }
   .portal-link .ext-icon { flex-shrink:0; opacity:0.55; margin-left:auto; }
-  .vpn-badge { margin-left:6px; font-size:9px; font-weight:700; letter-spacing:.04em; padding:2px 6px; border-radius:4px; background:linear-gradient(135deg, rgba(255,215,64,0.24) 0%, rgba(255,215,64,0.08) 100%); color:var(--warning); border:1.5px solid rgba(255,215,64,0.42); flex-shrink:0; text-shadow:0 1px 2px rgba(0,0,0,0.3); box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,215,64,0.12), inset 0 1px 0 rgba(255,215,64,0.18), inset 0 -1px 0 rgba(0,0,0,0.15); }
-  html[data-theme="cspire"] .vpn-badge { background:linear-gradient(135deg, rgba(255,215,64,0.18) 0%, rgba(255,180,0,0.07) 100%); border:1.5px solid rgba(255,180,0,0.35); box-shadow:0 2px 4px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.08), 0 0 10px rgba(255,215,64,0.08), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.1); text-shadow:0 1px 2px rgba(0,0,0,0.15); }
+  .vpn-badge { margin-left:6px; font-size:9px; font-weight:700; letter-spacing:.04em; color:var(--warning); flex-shrink:0; }
+  html[data-theme="cspire"] .vpn-badge { color:#b87800; }
 
   .chevron { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); opacity:.4; }
 
@@ -3324,7 +3324,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.44</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.45</span>
             </div>
 
           </div>
@@ -5041,7 +5041,7 @@
     const itemRow = item => {
       const right = item.group === 'service'
         ? `<div class="so-item-right"><div class="so-lic-count">${item.licenses}</div><div class="so-lic-label">Licenses</div></div>`
-        : `<div class="so-item-right"><div class="so-item-qty">&times;&nbsp;${item.qty}</div><span class="pill pill-pending" style="font-size:10px;">Pending Installation</span></div>`;
+        : `<div class="so-item-right"><div class="so-item-qty">&times;&nbsp;${item.qty}</div><span style="font-size:10px;font-weight:700;color:var(--warning);">Pending Installation</span></div>`;
       return `
         <div class="so-item">
           <div class="so-item-body">
