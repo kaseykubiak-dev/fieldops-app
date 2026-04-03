@@ -2050,28 +2050,11 @@
   .safety-section-hd { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding:0 2px; }
   .safety-section-hd h2 { font-family:var(--sans); font-size:15px; font-weight:700; color:var(--text); letter-spacing:0.01em; margin:0; }
 
-  .safety-urgency-pill { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; padding:2px 8px; border-radius:4px; line-height:1.4; text-shadow:0 1px 2px rgba(0,0,0,0.3); }
-  .safety-urgency-pill.urgency-none {
-    background:linear-gradient(135deg, rgba(0,230,118,0.2) 0%, rgba(0,230,118,0.06) 100%);
-    color:var(--success); border:1.5px solid rgba(0,230,118,0.42);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,230,118,0.12), inset 0 1px 0 rgba(0,230,118,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
-  }
-  .safety-urgency-pill.urgency-low {
-    background:linear-gradient(135deg, rgba(0,192,243,0.2) 0%, rgba(0,192,243,0.06) 100%);
-    color:var(--accent); border:1.5px solid rgba(0,192,243,0.44);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
-  }
-  .safety-urgency-pill.urgency-medium {
-    background:linear-gradient(135deg, rgba(255,215,64,0.24) 0%, rgba(255,215,64,0.08) 100%);
-    color:var(--warning); border:1.5px solid rgba(255,215,64,0.42);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,215,64,0.12), inset 0 1px 0 rgba(255,215,64,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
-  }
-  .safety-urgency-pill.urgency-high {
-    background:linear-gradient(135deg, rgba(255,82,82,0.24) 0%, rgba(255,82,82,0.08) 100%);
-    color:var(--danger); border:1.5px solid rgba(255,82,82,0.42);
-    box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(255,82,82,0.12), inset 0 1px 0 rgba(255,82,82,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
-    animation:slaPulse 2s ease-in-out infinite;
-  }
+  .safety-urgency-pill { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; line-height:1.4; }
+  .safety-urgency-pill.urgency-none   { color:var(--success); }
+  .safety-urgency-pill.urgency-low    { color:var(--accent); }
+  .safety-urgency-pill.urgency-medium { color:var(--warning); }
+  .safety-urgency-pill.urgency-high   { color:var(--danger); animation:slaPulse 2s ease-in-out infinite; }
 
   .safety-cards { display:flex; flex-direction:column; gap:10px; }
   .safety-card {
@@ -3022,32 +3005,38 @@
     <!-- ══ CALENDAR ══ -->
     <div class="screen" id="screen-calendar">
       <div class="detail-topbar">
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <!-- left spacer — matches right controls width so label stays centered -->
+        <div style="flex:1;"></div>
+        <!-- center: month label + date picker -->
+        <div style="display:flex;align-items:center;gap:8px;">
           <span class="cal-month-label" id="cal-month-label">Loading…</span>
-          <div class="cal-picker-wrap" id="cal-picker-wrap" style="margin-left:8px;">
+          <div class="cal-picker-wrap" id="cal-picker-wrap">
             <button class="cal-picker-btn" id="cal-picker-btn" onclick="toggleCalPicker()" title="Jump to date" aria-label="Jump to date" aria-expanded="false" aria-controls="cal-picker-drop">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
-          <div class="cal-picker-drop" id="cal-picker-drop">
-            <div class="cal-picker-head">
-              <button class="cal-picker-nav" onclick="pickerNavigate(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-              <span class="cal-picker-lbl" id="cal-picker-lbl"></span>
-              <button class="cal-picker-nav" onclick="pickerNavigate(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+            <div class="cal-picker-drop" id="cal-picker-drop">
+              <div class="cal-picker-head">
+                <button class="cal-picker-nav" onclick="pickerNavigate(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <span class="cal-picker-lbl" id="cal-picker-lbl"></span>
+                <button class="cal-picker-nav" onclick="pickerNavigate(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+              </div>
+              <div class="cal-picker-dow">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div class="cal-picker-grid" id="cal-picker-grid"></div>
             </div>
-            <div class="cal-picker-dow">
-              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-            </div>
-            <div class="cal-picker-grid" id="cal-picker-grid"></div>
-          </div>
           </div>
         </div>
-        <div class="cal-view-toggle" id="cal-view-toggle">
-          <button class="cal-view-btn active" id="cal-vbtn-month" onclick="setCalView('month')" title="Month view">Month</button>
-          <button class="cal-view-btn" id="cal-vbtn-week" onclick="setCalView('week')" title="Week view">Week</button>
+        <!-- right controls -->
+        <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+          <div class="cal-view-toggle" id="cal-view-toggle">
+            <button class="cal-view-btn active" id="cal-vbtn-month" onclick="setCalView('month')" title="Month view">Month</button>
+            <button class="cal-view-btn" id="cal-vbtn-week" onclick="setCalView('week')" title="Week view">Week</button>
+          </div>
+          <button class="icon-btn" onclick="loadCalendarScreen(true)" title="Refresh">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
         </div>
-        <button class="icon-btn" onclick="loadCalendarScreen(true)" title="Refresh">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        </button>
       </div>
       <div class="cal-dow-row" role="row" aria-hidden="true">
         <div class="cal-dow-cell" role="columnheader">Sunday</div>
@@ -3219,13 +3208,13 @@
               <input id="prof-name" type="text" class="settings-input" placeholder="Full name" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
             </div>
 
-            <!-- Badge Number -->
+            <!-- Job Title -->
             <div class="settings-row" style="border-bottom:1px solid var(--border);">
               <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-                <label for="prof-badge" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;">Badge #</label>
+                <label for="prof-badge" style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;">Job Title</label>
               </div>
-              <input id="prof-badge" type="text" class="settings-input" placeholder="Badge number" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
+              <input id="prof-badge" type="text" class="settings-input" placeholder="Job title" onblur="saveSettingProfile()" oninput="saveSettingProfile()">
             </div>
 
             <!-- Region -->
@@ -3316,7 +3305,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.46</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.47</span>
             </div>
 
           </div>
@@ -7433,7 +7422,7 @@
 
     // Profile fields — localStorage first, fall back to session name for the Name field
     const profName   = localStorage.getItem('ft_profile_name')   || sessionStorage.getItem('sn_user_name') || '';
-    const profBadge  = localStorage.getItem('ft_profile_badge')  || '';
+    const profBadge  = localStorage.getItem('ft_profile_jobtitle') || localStorage.getItem('ft_profile_badge') || '';
     const profRegion = localStorage.getItem('ft_profile_region') || '';
     const nameEl   = document.getElementById('prof-name');
     const badgeEl  = document.getElementById('prof-badge');
@@ -7538,9 +7527,17 @@
       const name   = document.getElementById('prof-name')?.value   || '';
       const badge  = document.getElementById('prof-badge')?.value  || '';
       const region = document.getElementById('prof-region')?.value || '';
-      localStorage.setItem('ft_profile_name',   name);
-      localStorage.setItem('ft_profile_badge',  badge);
-      localStorage.setItem('ft_profile_region', region);
+      localStorage.setItem('ft_profile_name',    name);
+      localStorage.setItem('ft_profile_jobtitle', badge);
+      localStorage.setItem('ft_profile_region',  region);
+      // Update avatar initials live whenever the name changes
+      if (name) {
+        const parts    = name.trim().split(/\s+/).filter(Boolean);
+        const initials = ((parts[0]?.[0] || '') + (parts.length > 1 ? (parts[parts.length - 1]?.[0] || '') : '')).toUpperCase() || '??';
+        document.querySelectorAll('#user-avatar').forEach(el => { el.textContent = initials; });
+        const menuAvatar = document.getElementById('user-menu-avatar');
+        if (menuAvatar) menuAvatar.textContent = initials;
+      }
     }, 400);
   }
 
