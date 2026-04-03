@@ -705,6 +705,60 @@
     box-shadow:0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15), 0 0 10px rgba(0,192,243,0.12), inset 0 1px 0 rgba(0,192,243,0.18), inset 0 -1px 0 rgba(0,0,0,0.15);
   }
 
+  /* ── TICKET / CALENDAR CARD COLOR VARIANTS ─────────────────────────── */
+  /* tc-install = blue (default — ticket-inner already has blue border-left) */
+  .ticket-inner.tc-repair { border-left-color: var(--accent2); }
+  .ticket-inner.tc-repair .cust-glance {
+    background: linear-gradient(135deg, rgba(255,103,32,0.16) 0%, rgba(255,103,32,0.05) 100%);
+    border-bottom-color: rgba(255,103,32,0.26);
+  }
+  .ticket-inner.tc-closed { border-left-color: var(--success); }
+  .ticket-inner.tc-closed .cust-glance {
+    background: linear-gradient(135deg, rgba(0,230,118,0.14) 0%, rgba(0,230,118,0.04) 100%);
+    border-bottom-color: rgba(0,230,118,0.24);
+  }
+  /* Week cards */
+  .cal-week-card.tc-repair { border-left-color: var(--accent2); }
+  .cal-week-card.tc-closed { border-left-color: var(--success); }
+  /* Mini cards (month + agenda) — add base border-left, then override per variant */
+  .cal-mini-card { border-left: 3px solid var(--accent); }
+  .cal-mini-card.tc-repair {
+    background: linear-gradient(155deg, rgba(255,103,32,0.18) 0%, rgba(180,55,10,0.12) 100%);
+    border-color: rgba(255,103,32,0.28); border-left-color: var(--accent2);
+  }
+  .cal-mini-card.tc-repair:active { background: linear-gradient(155deg, rgba(255,103,32,0.26) 0%, rgba(180,55,10,0.18) 100%); }
+  .cal-mini-card.tc-closed {
+    background: linear-gradient(155deg, rgba(0,230,118,0.15) 0%, rgba(0,180,80,0.08) 100%);
+    border-color: rgba(0,230,118,0.26); border-left-color: var(--success);
+  }
+  .cal-mini-card.tc-closed:active { background: linear-gradient(155deg, rgba(0,230,118,0.22) 0%, rgba(0,180,80,0.14) 100%); }
+  /* Plain-text labels replacing pills on cards */
+  .tc-label { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:rgba(255,255,255,0.52); margin-left:auto; flex-shrink:0; }
+  .tc-status { font-size:11px; font-weight:500; color:rgba(255,255,255,0.48); }
+  /* Light mode overrides */
+  html[data-theme="cspire"] .ticket-inner.tc-repair { border-left-color: #cc5218; }
+  html[data-theme="cspire"] .ticket-inner.tc-repair .cust-glance {
+    background: linear-gradient(135deg, rgba(255,103,32,0.1) 0%, rgba(255,103,32,0.03) 100%);
+    border-bottom-color: rgba(204,82,24,0.2);
+  }
+  html[data-theme="cspire"] .ticket-inner.tc-closed { border-left-color: #00875a; }
+  html[data-theme="cspire"] .ticket-inner.tc-closed .cust-glance {
+    background: linear-gradient(135deg, rgba(0,135,90,0.1) 0%, rgba(0,135,90,0.03) 100%);
+    border-bottom-color: rgba(0,135,90,0.2);
+  }
+  html[data-theme="cspire"] .cal-week-card.tc-repair { border-left-color: #cc5218; }
+  html[data-theme="cspire"] .cal-week-card.tc-closed { border-left-color: #00875a; }
+  html[data-theme="cspire"] .cal-mini-card.tc-repair {
+    background: linear-gradient(155deg, rgba(255,103,32,0.12) 0%, rgba(204,82,24,0.06) 100%);
+    border-color: rgba(204,82,24,0.26); border-left-color: #cc5218;
+  }
+  html[data-theme="cspire"] .cal-mini-card.tc-closed {
+    background: linear-gradient(155deg, rgba(0,135,90,0.12) 0%, rgba(0,135,90,0.05) 100%);
+    border-color: rgba(0,135,90,0.24); border-left-color: #00875a;
+  }
+  html[data-theme="cspire"] .tc-label  { color: rgba(0,0,0,0.38); }
+  html[data-theme="cspire"] .tc-status { color: rgba(0,0,0,0.36); }
+
   /* Card body */
   .ticket-body { padding:9px 12px 10px; display:flex; flex-direction:column; gap:7px; position:relative; z-index:1; }
   .ticket-row1 { display:flex; justify-content:space-between; align-items:center; }
@@ -3243,7 +3297,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div style="font-size:14px;font-weight:600;color:var(--text);">Version</div>
               </div>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.40</span>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Delta v0.41</span>
             </div>
 
           </div>
@@ -4133,14 +4187,16 @@
         const startLabel = isClosed ? 'Closed ' : 'Start ';
         const startStr = startRaw ? formatTime(parseSNDate(startRaw)) : '—';
         const caseType = getCaseType(inc);
+        const isClosed = state.cls === 'pill-resolved';
+        const tcClass  = isClosed ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
 
         html += `
         <div class="ticket-card" data-number="${inc.number}" onclick="openDetail('${inc.number}')">
-          <div class="ticket-inner">
+          <div class="ticket-inner ${tcClass}">
             <div class="cust-glance">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--accent);flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <span class="cust-glance-name">${escHtml(company)}</span>
-              <span class="type-badge ${caseType.cls}" style="margin-left:auto;">${caseType.label}</span>
+              <span class="tc-label">${caseType.label}</span>
             </div>
             <div class="ticket-body">
               <div class="ticket-row1">
@@ -4152,8 +4208,7 @@
               <div class="ticket-title">${escHtml(inc.short_description)}</div>
               ${location ? `<div class="ticket-addr"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;color:var(--text-muted)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${escHtml(location)}</div>` : ''}
               <div class="ticket-pills">
-                <span style="font-size:11px;color:var(--text-muted);">Ticket Status:</span>
-                <span class="pill ${state.cls}">${state.label}</span>
+                <span class="tc-status">${state.label}</span>
               </div>
             </div>
           </div>
@@ -4257,11 +4312,8 @@
     if (!pillCfg) return;
     const card = document.querySelector(`.ticket-card[data-number="${number}"]`);
     if (!card) return;
-    const pill = card.querySelector('.ticket-pills .pill');
-    if (!pill) return;
-    pill.className = pill.className.replace(/\bpill-\S+/g, '').trim();
-    pill.classList.add('pill', pillCfg.cls);
-    pill.textContent = pillCfg.text;
+    const statusEl = card.querySelector('.ticket-pills .tc-status');
+    if (statusEl) statusEl.textContent = pillCfg.text;
   }
 
   function _scrollToUpdateTicket() {
@@ -6200,15 +6252,17 @@
           const startStr = startRaw ? formatTime(parseSNDate(startRaw)) : '';
           const desc = inc.short_description || '';
 
-          html += `<div class="cal-week-card" onclick="openDetail('${escHtml(inc.number)}')">`;
+          const wkClosed  = state.cls === 'pill-resolved';
+          const wkTcClass = wkClosed ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
+          html += `<div class="cal-week-card ${wkTcClass}" onclick="openDetail('${escHtml(inc.number)}')">`;
           html += `<div style="display:flex;align-items:center;gap:5px;">`;
           html += `<span class="cwk-company">${escHtml(company)}</span>`;
-          html += `<span class="type-badge ${caseType.cls}" style="font-size:9px;padding:1px 6px;margin-left:auto;flex-shrink:0;">${caseType.label}</span>`;
+          html += `<span class="tc-label">${caseType.label}</span>`;
           html += `</div>`;
           if (desc) html += `<div class="cwk-desc">${escHtml(desc)}</div>`;
           html += `<div class="cwk-meta">`;
           html += `<span class="cwk-id">${escHtml(inc.number)}</span>`;
-          html += `<span class="pill ${state.cls}" style="font-size:9px;padding:1px 6px;">${state.label}</span>`;
+          html += `<span class="tc-status" style="font-size:10px;">${state.label}</span>`;
           if (startStr) html += `<span class="cwk-time">${startStr}</span>`;
           html += `</div>`;
           html += `</div>`;
@@ -6289,15 +6343,17 @@
           const timeStr  = startRaw
             ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
             : '—';
+          const mnClosed  = state.cls === 'pill-resolved';
+          const mnTcClass = mnClosed ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
           html += `
-          <div class="cal-mini-card" style="border-left:3px solid var(--accent);padding:5px 8px;border-radius:7px;" onclick="openDetail('${escHtml(inc.number)}');event.stopPropagation();">
+          <div class="cal-mini-card ${mnTcClass}" style="padding:5px 8px;border-radius:7px;" onclick="openDetail('${escHtml(inc.number)}');event.stopPropagation();">
             <div class="cal-mini-top">
               <span class="cal-mini-company">${escHtml(company)}</span>
               <span class="cal-mini-time">${timeStr}</span>
             </div>
             <div class="cal-mini-pills" style="margin-top:3px;justify-content:space-between;">
-              <span class="pill ${state.cls}">${state.label}</span>
-              <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
+              <span class="tc-status">${state.label}</span>
+              <span class="tc-label" style="margin-left:0;">${caseType.label}</span>
             </div>
           </div>`;
         });
@@ -6363,16 +6419,18 @@
           const timeStr  = startRaw
             ? formatTime(new Date(startRaw.includes('T') ? startRaw : startRaw.replace(' ','T')+'Z'))
             : '—';
+          const agClosed  = state.cls === 'pill-resolved';
+          const agTcClass = agClosed ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
           html += `
-          <div class="cal-mini-card" onclick="openDetail('${escHtml(inc.number)}')">
+          <div class="cal-mini-card ${agTcClass}" onclick="openDetail('${escHtml(inc.number)}')">
             <div class="cal-mini-top">
               <span class="cal-mini-company">${escHtml(company)}</span>
               <span class="cal-mini-time">${timeStr}</span>
             </div>
             <div class="cal-mini-desc">${escHtml(inc.short_description || '—')}</div>
             <div class="cal-mini-pills">
-              <span class="pill ${state.cls}">${state.label}</span>
-              <span class="type-badge ${caseType.cls}" style="font-size:10px;">${caseType.label}</span>
+              <span class="tc-status">${state.label}</span>
+              <span class="tc-label" style="margin-left:0;">${caseType.label}</span>
               <span class="cal-mini-num">${escHtml(inc.number)}</span>
             </div>
           </div>`;
