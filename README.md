@@ -14,36 +14,40 @@ Built as a single HTML file (~7,700 lines) with no framework, no build step, and
 ![Install workflow — closing a ticket](https://github.com/user-attachments/assets/69715da5-731f-444c-a90e-2bfc9a473c87)
  
 <details>
-<summary>📡 Catalyst Center — Live Network Data</summary>
+<summary>Catalyst Center — Live Network Data</summary>
 <br>
-![Catalyst Center network data](https://github.com/user-attachments/assets/7fd42558-9119-4038-89ce-871cef01365f)
  
-Live device data pulled from Cisco Catalyst Center via an authenticated Node.js proxy hosted on Railway. Devices are grouped by type and rendered in both list and canvas topology views.
+ Live device data pulled from Cisco Catalyst Center via an authenticated Node.js proxy hosted on Railway. Devices are grouped by type and rendered in both list and canvas topology views.
+ 
+![Catalyst Center network data](https://github.com/user-attachments/assets/128a2d0b-835e-48b7-b618-d123d29f6d5f)
  
 </details>
 <details>
-<summary>🎫 Repair Ticket — Sections & Accordions</summary>
+<summary>Repair Ticket — Sections & Accordions</summary>
 <br>
-![Repair ticket screen](https://github.com/user-attachments/assets/128a2d0b-835e-48b7-b618-d123d29f6d5f)
  
-Ticket detail view populated via five parallel async ServiceNow sub-fetches — assignee, SLA, account, contact, and CMDB device data. Network infrastructure, firewall, and VoIP sections expand via accordions below.
+ Ticket detail view populated via five parallel async ServiceNow sub-fetches — assignee, SLA, account, contact, and CMDB device data. Network infrastructure, firewall, and VoIP sections expand via accordions below.
+ 
+![Repair ticket screen](https://github.com/user-attachments/assets/7fd42558-9119-4038-89ce-871cef01365f)
  
 </details>
 <details>
-<summary>📅 Calendar — Ticket Integration</summary>
+<summary>Calendar — Ticket Integration</summary>
 <br>
+ 
+ Month, week, and agenda views with ticket chips linked directly to ticket detail. Safety inspection and inventory due dates surface as calendar banners automatically.
+ 
 ![Calendar tab](https://github.com/user-attachments/assets/11b636f3-5980-4cc7-a840-4c472ced3ce7)
  
-Month, week, and agenda views with ticket chips linked directly to ticket detail. Safety inspection and inventory due dates surface as calendar banners automatically.
- 
 </details>
 <details>
-<summary>🔧 Tech Tools — Safety & Inventory Tracking</summary>
+<summary>Tech Tools — Safety & Inventory Tracking</summary>
 <br>
-![Tech Tools section](https://github.com/user-attachments/assets/c2321812-6c70-4a31-93a5-80cea79fda62)
  
 Vehicle inspection, ladder inspection, mileage reporting, and truck stock inventory tracking with configurable reminder frequencies, urgency escalation, and badge indicators on the nav tab.
  
+![Tech Tools section](https://github.com/user-attachments/assets/c2321812-6c70-4a31-93a5-80cea79fda62)
+  
 </details>
 
 ---
