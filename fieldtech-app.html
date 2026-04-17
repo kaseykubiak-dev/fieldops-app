@@ -1968,83 +1968,68 @@
   html[data-theme="cspire"] #screen-list { border-right:2px solid rgba(0,80,160,0.35); }
 
   /* ── COMPASS ─────────────────────────────────────────────────────────────── */
-  .cx-chat-area { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:16px; }
-  .cx-welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px; flex:1; }
-  .cx-welcome-icon { width:72px; height:72px; border-radius:50%; background:rgba(0,192,243,0.1); border:1.5px solid rgba(0,192,243,0.25); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
-  .cx-welcome-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:6px; letter-spacing:0.02em; }
-  .cx-welcome-sub { font-size:13px; color:var(--text-muted); max-width:340px; line-height:1.5; margin-bottom:24px; }
-  .cx-suggestions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:420px; }
-  .cx-chip { padding:8px 14px; font-size:12px; font-weight:500; border-radius:20px; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; transition:all 0.15s; text-align:left; line-height:1.35; font-family:var(--sans); }
-  .cx-chip:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,192,243,0.06); }
-
-  .cx-input-bar { display:flex; align-items:center; gap:8px; padding:10px 16px; border-top:1px solid var(--border); background:var(--surface); flex-shrink:0; }
-  .cx-input { flex:1; padding:10px 14px; font-size:14px; border-radius:24px; border:1.5px solid var(--border); background:var(--surface2); color:var(--text); outline:none; font-family:var(--sans); transition:border-color 0.15s; }
-  .cx-input:focus { border-color:var(--accent); }
-  .cx-input::placeholder { color:var(--text-muted); }
-  .cx-send-btn { flex-shrink:0; padding:8px 18px; border-radius:20px; border:none; background:var(--accent); color:#061420; font-family:var(--sans); font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; display:flex; align-items:center; }
-  .cx-send-btn:hover { opacity:0.85; }
-
-  .cx-msg { display:flex; flex-direction:column; gap:4px; max-width:85%; animation:cx-fadein 0.25s ease; }
-  .cx-msg.user { align-self:flex-end; align-items:flex-end; }
-  .cx-msg.assistant { align-self:flex-start; align-items:flex-start; }
-  .cx-msg-bubble { padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.55; }
-  .cx-msg.user .cx-msg-bubble { background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
-  .cx-msg.assistant .cx-msg-bubble { background:var(--surface2); color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; }
-  .cx-msg-meta { font-size:10px; color:var(--text-muted); padding:0 4px; display:flex; align-items:center; gap:6px; }
-  .cx-agent-badge { font-size:9px; font-weight:700; letter-spacing:0.04em; padding:2px 7px; border-radius:10px; background:rgba(0,192,243,0.1); color:var(--accent); border:1px solid rgba(0,192,243,0.25); text-transform:uppercase; }
-  .cx-typing { display:flex; align-items:center; gap:4px; padding:12px 16px; }
-  .cx-typing-dot { width:7px; height:7px; border-radius:50%; background:var(--text-muted); animation:cx-bounce 1.4s infinite both; }
-  .cx-typing-dot:nth-child(2) { animation-delay:0.16s; }
-  .cx-typing-dot:nth-child(3) { animation-delay:0.32s; }
-  .cx-data-card { margin-top:8px; padding:10px 12px; border-radius:10px; background:var(--bg); border:1px solid var(--border); font-size:12px; line-height:1.6; }
-  .cx-data-card strong { color:var(--accent); font-weight:600; }
-  .cx-data-row { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); }
-  .cx-data-row:last-child { border-bottom:none; }
-  .cx-data-label { color:var(--text-muted); }
-  .cx-data-val { color:var(--text); font-weight:500; text-align:right; }
-  @keyframes cx-fadein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes cx-bounce { 0%,80%,100% { transform:scale(0); } 40% { transform:scale(1); } }
-
-  html[data-theme="cspire"] .cx-msg.user .cx-msg-bubble { background:linear-gradient(135deg, #0f3d58, #00689c); }
-  html[data-theme="cspire"] .cx-agent-badge { background:rgba(15,61,88,0.1); color:#0f3d58; border-color:rgba(15,61,88,0.25); }
-
-  /* ── COMPASS ONE CUSTOMER PANEL ── */
-  .cx-top-panel { flex-shrink:0; padding:10px 14px 0; }
-  .cx-top-panel-card {
-    background:rgba(14,22,36,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border:1px solid rgba(0,192,243,0.18); border-radius:14px; padding:12px 14px 12px;
-    box-shadow:0 2px 12px rgba(0,0,0,0.35),inset 0 1px 0 rgba(0,192,243,0.08);
-  }
-  .cx-account-row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:9px; }
-  .cx-account-label { font-family:var(--sans); font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--text); margin-bottom:3px; }
-  .cx-account-sub { font-family:var(--body); font-size:11px; color:var(--text-muted); line-height:1.4; }
-  .cx-all-accounts-btn { flex-shrink:0; padding:5px 13px; border-radius:20px; border:1.5px solid rgba(0,192,243,0.3); background:rgba(0,192,243,0.06); color:var(--text); font-family:var(--sans); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
-  .cx-all-accounts-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,192,243,0.1); }
-  .cx-account-search-wrap { position:relative; margin-bottom:10px; }
-  .cx-account-search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
-  .cx-account-search { width:100%; box-sizing:border-box; padding:9px 12px 9px 32px; font-family:var(--sans); font-size:13px; color:var(--text); background:rgba(0,192,243,0.05); border:1.5px solid rgba(0,192,243,0.22); border-radius:24px; outline:none; transition:border-color 0.15s; }
-  .cx-account-search:focus { border-color:rgba(0,192,243,0.5); background:rgba(0,192,243,0.08); }
-  .cx-account-search::placeholder { color:var(--text-muted); }
-  .cx-query-pills { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; padding-bottom:1px; }
-  .cx-query-pills::-webkit-scrollbar { display:none; }
-  .cx-query-pill { flex-shrink:0; padding:6px 13px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface2); color:var(--text-muted); font-family:var(--sans); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
-  .cx-query-pill:hover { border-color:var(--accent); color:var(--accent); }
-  .cx-query-pill.active { background:var(--accent); color:#061420; border-color:var(--accent); box-shadow:0 0 10px rgba(0,192,243,0.28); }
-  .cx-action-btn { flex-shrink:0; padding:8px 14px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.12); background:rgba(22,34,54,0.9); color:var(--text); font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
-  .cx-action-btn:hover { border-color:var(--accent); color:var(--accent); }
-  /* C Spire theme */
-  html[data-theme="cspire"] .cx-top-panel-card { background:linear-gradient(135deg, rgba(0,192,243,0.18) 0%, rgba(0,153,214,0.13) 55%, rgba(122,85,152,0.1) 100%); border-color:rgba(0,160,210,0.32); box-shadow:0 2px 12px rgba(0,120,180,0.12), inset 0 1px 0 rgba(255,255,255,0.55); }
-  html[data-theme="cspire"] .cx-account-search { background:rgba(0,120,180,0.08); border-color:rgba(0,120,180,0.28); }
-  html[data-theme="cspire"] .cx-account-search:focus { border-color:rgba(0,120,180,0.55); background:rgba(0,120,180,0.13); }
-  html[data-theme="cspire"] .cx-query-pill.active { color:#fff; }
-  html[data-theme="cspire"] .cx-send-btn { color:#fff; }
-  html[data-theme="cspire"] .cx-all-accounts-btn { border-color:rgba(0,120,180,0.35); }
-  html[data-theme="cspire"] .cx-action-btn { background:rgba(15,61,88,0.85); border-color:rgba(0,120,180,0.28); }
-  @media(max-width:799px) {
-    .cx-input-bar { padding:8px 10px; gap:5px; }
-    .cx-action-btn { padding:6px 10px; font-size:12px; }
-    .cx-send-btn   { padding:6px 12px; font-size:12px; }
-  }
+  /* Account search bar */
+  .cb-account-bar { flex-shrink:0; padding:10px 14px 0; position:relative; }
+  .cb-search-wrap { position:relative; display:flex; align-items:center; }
+  .cb-search-icon { position:absolute; left:12px; color:var(--text-muted); pointer-events:none; flex-shrink:0; }
+  .cb-search-input { width:100%; box-sizing:border-box; padding:11px 36px 11px 34px; font-family:var(--sans); font-size:14px; color:var(--text); background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; outline:none; transition:border-color 0.15s; }
+  .cb-search-input:focus { border-color:var(--accent); }
+  .cb-search-input::placeholder { color:var(--text-muted); }
+  .cb-search-clear { position:absolute; right:10px; background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; padding:4px; border-radius:50%; }
+  .cb-search-clear:hover { color:var(--text); }
+  /* Dropdown */
+  .cb-dropdown { position:absolute; top:calc(100% + 4px); left:14px; right:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); z-index:100; overflow:hidden; }
+  .cb-dropdown-item { padding:11px 14px; font-family:var(--sans); font-size:13px; color:var(--text); cursor:pointer; border-bottom:1px solid var(--border); }
+  .cb-dropdown-item:last-child { border-bottom:none; }
+  .cb-dropdown-item:hover { background:var(--surface2); }
+  .cb-dropdown-item-name { font-weight:600; margin-bottom:2px; }
+  .cb-dropdown-item-sub { font-size:11px; color:var(--text-muted); }
+  /* Tab strip */
+  .cb-tab-strip { flex-shrink:0; display:flex; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; padding:10px 14px 0; border-bottom:1px solid var(--border); gap:2px; }
+  .cb-tab-strip::-webkit-scrollbar { display:none; }
+  .cb-tab { flex-shrink:0; padding:8px 16px; font-family:var(--sans); font-size:12px; font-weight:600; color:var(--text-muted); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; transition:all 0.15s; white-space:nowrap; margin-bottom:-1px; }
+  .cb-tab:hover { color:var(--text); }
+  .cb-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  /* Briefing area */
+  .cb-brief-area { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
+  /* Empty state */
+  .cb-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px; flex:1; }
+  .cb-empty-icon { width:68px; height:68px; border-radius:50%; background:rgba(0,192,243,0.08); border:1.5px solid rgba(0,192,243,0.2); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+  .cb-empty-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .cb-empty-sub { font-size:13px; color:var(--text-muted); max-width:300px; line-height:1.5; margin-bottom:20px; }
+  .cb-quick-picks { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:380px; }
+  .cb-quick-pick { padding:7px 14px; font-size:12px; font-weight:500; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; transition:all 0.15s; font-family:var(--sans); }
+  .cb-quick-pick:hover { border-color:var(--accent); color:var(--accent); }
+  /* Briefing sections */
+  .cb-section { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .cb-section-header { padding:9px 14px; background:var(--surface2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .cb-section-title { font-family:var(--sans); font-size:10px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-muted); }
+  .cb-section-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; margin-left:auto; white-space:nowrap; }
+  .cb-section-badge.high { background:rgba(255,60,60,0.15); color:var(--danger); }
+  .cb-section-badge.warn { background:rgba(255,150,0,0.15); color:var(--warning); }
+  .cb-section-badge.ok   { background:rgba(0,192,100,0.15); color:var(--success); }
+  .cb-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:9px 14px; border-bottom:1px solid var(--border); }
+  .cb-row:last-child { border-bottom:none; }
+  .cb-row-label { font-size:12px; color:var(--text-muted); flex-shrink:0; padding-top:1px; }
+  .cb-row-val { font-size:12px; color:var(--text); font-weight:500; text-align:right; max-width:65%; line-height:1.4; }
+  .cb-row-val.accent  { color:var(--accent); }
+  .cb-row-val.danger  { color:var(--danger); }
+  .cb-row-val.success { color:var(--success); }
+  .cb-row-val.warning { color:var(--warning); }
+  /* Agent attribution strip */
+  .cb-agent-strip { display:flex; align-items:center; gap:8px; padding:4px 2px 2px; }
+  .cb-agent-label { font-size:10px; color:var(--text-muted); }
+  .cb-agent-badge { font-size:9px; font-weight:700; letter-spacing:0.04em; padding:2px 8px; border-radius:10px; background:rgba(0,192,243,0.1); color:var(--accent); border:1px solid rgba(0,192,243,0.25); text-transform:uppercase; }
+  /* Skeleton loader */
+  .cb-skeleton { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .cb-skeleton-row { height:38px; background:linear-gradient(90deg, var(--surface2) 25%, var(--surface) 50%, var(--surface2) 75%); background-size:200% 100%; animation:cb-shimmer 1.2s infinite; border-bottom:1px solid var(--border); }
+  .cb-skeleton-row:last-child { border-bottom:none; }
+  @keyframes cb-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  /* Light theme overrides */
+  html[data-theme="cspire"] .cb-tab.active { color:#0f3d58; border-bottom-color:#0f3d58; }
+  html[data-theme="cspire"] .cb-agent-badge { background:rgba(15,61,88,0.1); color:#0f3d58; border-color:rgba(15,61,88,0.25); }
+  html[data-theme="cspire"] .cb-quick-pick:hover { color:#0f3d58; border-color:#0f3d58; }
+  html[data-theme="cspire"] .cb-search-input:focus { border-color:#0f3d58; }
 
   /* ── SAFETY CHECK TRACKER ─────────────────────────────────────────────── */
 
@@ -3704,62 +3689,44 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
         <span style="font-weight:700;font-size:16px;letter-spacing:.01em;color:var(--text);">Compass</span>
         <span class="section-title-note" style="flex:1;">· Placeholder for future implementation.</span>
-        <button class="icon-btn" onclick="clearCx360Chat()" title="New conversation">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
       </div>
 
-      <!-- ONE CUSTOMER panel -->
-      <div class="cx-top-panel">
-        <div class="cx-top-panel-card">
-          <div class="cx-account-row">
-            <div>
-              <div class="cx-account-label">One Customer</div>
-              <div class="cx-account-sub">Select one customer for one-account questions. Leave it blank for all-account questions.</div>
-            </div>
-            <button class="cx-all-accounts-btn" onclick="cx360ClearAccount()">All accounts</button>
+      <!-- Account search -->
+      <div class="cb-account-bar">
+        <div class="cb-search-wrap">
+          <svg class="cb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="cb-search-input" id="cb-account-input" placeholder="Search account name…" autocomplete="off" oninput="compassAccountInput(this.value)" onfocus="compassShowDropdown()" onblur="setTimeout(compassHideDropdown,150)">
+          <button class="cb-search-clear hidden" id="cb-search-clear" onclick="compassClearAccount()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="cb-dropdown hidden" id="cb-dropdown"></div>
+      </div>
+
+      <!-- Brief type tabs -->
+      <div class="cb-tab-strip" id="cb-tab-strip">
+        <button class="cb-tab active" data-tab="summary" onclick="compassSetTab(this)">Summary</button>
+        <button class="cb-tab" data-tab="tickets" onclick="compassSetTab(this)">Tickets</button>
+        <button class="cb-tab" data-tab="billing" onclick="compassSetTab(this)">Billing</button>
+        <button class="cb-tab" data-tab="contract" onclick="compassSetTab(this)">Contract</button>
+        <button class="cb-tab" data-tab="renewal" onclick="compassSetTab(this)">Renewal</button>
+      </div>
+
+      <!-- Briefing content area -->
+      <div class="cb-brief-area" id="cb-brief-area">
+        <div class="cb-empty">
+          <div class="cb-empty-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           </div>
-          <div class="cx-account-search-wrap">
-            <svg class="cx-account-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" class="cx-account-search" id="cx360-account" placeholder="Search company name for one account" autocomplete="off">
-          </div>
-          <div class="cx-query-pills" id="cx360-query-pills">
-            <button class="cx-query-pill active" onclick="cx360SetPill(this)">Auto</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Executive Summary</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Support Trend Review</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Product Coverage</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">QBR Draft</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Top Customers</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Renewal Status</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Billing Snapshot</button>
-            <button class="cx-query-pill" onclick="cx360SetPill(this)">Accounts Needing Attention</button>
+          <div class="cb-empty-title">No account selected</div>
+          <div class="cb-empty-sub">Search for a customer above, then choose a brief type.</div>
+          <div class="cb-quick-picks">
+            <button class="cb-quick-pick" onclick="compassQuickPick('regions bank')">Regions Bank</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('baptist memorial')">Baptist Memorial Health</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('sanderson farms')">Sanderson Farms</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('cal-maine')">Cal-Maine Foods</button>
           </div>
         </div>
-      </div>
-
-      <div class="cx-chat-area" id="cx360-chat">
-        <div class="cx-welcome">
-          <div class="cx-welcome-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-          </div>
-          <div class="cx-welcome-title">Compass</div>
-          <div class="cx-welcome-sub">AI-powered customer intelligence across Salesforce, ServiceNow, Arkis, and billing systems.</div>
-          <div class="cx-suggestions" id="cx360-suggestions">
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">What's the account summary for Regions Bank?</button>
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Show open tickets for Baptist Memorial Health</button>
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Any billing discrepancies for Sanderson Farms?</button>
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">When does the contract renew for Cal-Maine Foods?</button>
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Give me an executive summary for Sanderson Farms</button>
-            <button class="cx-chip" onclick="cx360Ask(this.textContent)">Which accounts are up for renewal this quarter?</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="cx-input-bar">
-        <input type="text" class="cx-input" id="cx360-input" placeholder="Ask a question. Search above first when it is about one customer." autocomplete="off" onkeydown="if(event.key==='Enter')cx360Send()">
-        <button class="cx-action-btn" onclick="cx360Attach()">Attach</button>
-        <button class="cx-action-btn" onclick="cx360ShowAgents()">Agents</button>
-        <button class="cx-send-btn" id="cx360-send" onclick="cx360Send()">Send</button>
       </div>
     </div>
 
@@ -5782,197 +5749,375 @@
 
   // ── COMPASS ───────────────────────────────────────────────────────────────
 
-  const cx360Agents = [
-    'Account Insights Agent', 'Ticket Analysis Agent', 'Billing Agent',
-    'Contract Agent', 'Network Status Agent', 'QBR Agent',
-    'Service History Agent', 'Provisioning Agent', 'Escalation Agent', 'Routing Agent'
+  let _compassAccount = null;   // { name, key, tier, mrr } | null
+  let _compassTab     = 'summary';
+
+  const _compassAccounts = [
+    { name:'Regions Bank',            key:'regions bank',     tier:'Enterprise — Platinum', mrr:'$48,720' },
+    { name:'Baptist Memorial Health', key:'baptist memorial', tier:'Enterprise — Gold',      mrr:'$31,450' },
+    { name:'Sanderson Farms',         key:'sanderson farms',  tier:'Commercial — Silver',    mrr:'$12,680' },
+    { name:'Cal-Maine Foods',         key:'cal-maine',        tier:'Commercial — Standard',  mrr:'$15,620' },
   ];
 
-  const cx360Responses = {
+  const _compassBriefs = {
     'regions bank': {
-      agent: 'Account Insights Agent',
-      text: 'Here\'s the account summary for <strong>Regions Bank</strong>:',
-      card: [
-        ['Account ID', 'SF-00184729'],
-        ['Account Tier', 'Enterprise — Platinum'],
-        ['Primary Contact', 'David Mitchell, VP Infrastructure'],
-        ['Active Services', 'Dedicated Internet (10G), SD-WAN, DDoS Protection, VoIP (240 seats)'],
-        ['MRR', '$48,720'],
-        ['Contract End', 'Sep 15, 2026'],
-        ['Open Tickets', '3 (1 High, 2 Medium)'],
-        ['Satisfaction Score', '92 / 100'],
-        ['Last QBR', 'Jan 22, 2026']
-      ]
+      summary: [
+        { title:'Account Overview', rows:[
+          ['Account ID',      'SF-00184729'],
+          ['Tier',            'Enterprise — Platinum'],
+          ['Primary Contact', 'David Mitchell, VP Infrastructure'],
+          ['MRR',             '$48,720', 'accent'],
+          ['Satisfaction',    '92 / 100', 'success'],
+          ['Last QBR',        'Jan 22, 2026'],
+        ]},
+        { title:'Services', rows:[
+          ['Dedicated Internet', '10G'],
+          ['SD-WAN',             'Active'],
+          ['DDoS Protection',    'Active'],
+          ['VoIP',               '240 seats'],
+        ]},
+        { title:'Contract & Tickets', rows:[
+          ['Contract End',  'Sep 15, 2026'],
+          ['Open Tickets',  '3 (1 High, 2 Medium)', 'warning'],
+        ]},
+      ],
+      tickets: [
+        { title:'Open Tickets', badge:{ text:'3 Open', cls:'warn' }, rows:[
+          ['INC0041892 · High',   'Intermittent packet loss, MPLS circuit'],
+          ['INC0041756 · Medium', 'VoIP quality degradation, 3rd floor'],
+          ['INC0041610 · Medium', 'Meraki AP offline, radiology wing'],
+        ]},
+      ],
+      billing: [
+        { title:'Billing', badge:{ text:'Current', cls:'ok' }, rows:[
+          ['MRR',          '$48,720'],
+          ['Last Invoice', '$48,720 — Mar 1, 2026'],
+          ['Status',       'Paid', 'success'],
+          ['YTD Revenue',  '$146,160'],
+        ]},
+      ],
+      contract: [
+        { title:'Contract', badge:{ text:'Active', cls:'ok' }, rows:[
+          ['Contract ID',  'CSP-ENT-2021-0031'],
+          ['Term',         '60 months (Oct 2021 — Sep 2026)'],
+          ['Renewal Date', 'Sep 15, 2026'],
+          ['Auto-Renew',   'Yes — 90-day notice'],
+          ['Annual Value', '$584,640'],
+        ]},
+      ],
+      renewal: [
+        { title:'Renewal Risk', badge:{ text:'Low Risk', cls:'ok' }, rows:[
+          ['Renewal Date',    'Sep 15, 2026'],
+          ['Risk Level',      'Low', 'success'],
+          ['Satisfaction',    '92 / 100'],
+          ['Competitor Intel','None on file'],
+          ['QBR Status',      'Completed Jan 22, 2026'],
+          ['Recommended',     'Standard outreach by Jul 1'],
+        ]},
+      ],
     },
     'baptist memorial': {
-      agent: 'Ticket Analysis Agent',
-      text: 'Found <strong>5 open tickets</strong> for Baptist Memorial Health:',
-      card: [
-        ['INC0041892', 'High — Intermittent packet loss on MPLS circuit (Southaven campus)'],
-        ['INC0041756', 'Medium — VoIP call quality degradation, 3rd floor nursing station'],
-        ['INC0041610', 'Medium — Meraki AP offline in radiology wing'],
-        ['RITM0023481', 'Low — New firewall rule request for EMR vendor access'],
-        ['INC0041499', 'Low — Badge reader network port needs patching to VLAN 40']
-      ]
+      summary: [
+        { title:'Account Overview', rows:[
+          ['Account ID',      'SF-00092341'],
+          ['Tier',            'Enterprise — Gold'],
+          ['Primary Contact', 'Karen Whitfield, IT Director'],
+          ['MRR',             '$31,450', 'accent'],
+          ['Satisfaction',    '78 / 100', 'warning'],
+          ['Last QBR',        'Nov 5, 2025'],
+        ]},
+        { title:'Services', rows:[
+          ['Dedicated Internet', '2G (3 campuses)'],
+          ['MPLS',               '4 circuits'],
+          ['Managed Firewall',   'Active'],
+          ['VoIP',               '180 seats'],
+        ]},
+        { title:'Contract & Tickets', rows:[
+          ['Contract End',  'Mar 31, 2027'],
+          ['Open Tickets',  '5 (1 High, 3 Medium, 1 Low)', 'danger'],
+        ]},
+      ],
+      tickets: [
+        { title:'Open Tickets', badge:{ text:'5 Open', cls:'high' }, rows:[
+          ['INC0041892 · High',   'Intermittent packet loss on MPLS, Southaven campus'],
+          ['INC0041756 · Medium', 'VoIP call quality degradation, 3rd floor nursing'],
+          ['INC0041610 · Medium', 'Meraki AP offline in radiology wing'],
+          ['RITM0023481 · Low',   'New firewall rule for EMR vendor access'],
+          ['INC0041499 · Low',    'Badge reader port — patch to VLAN 40'],
+        ]},
+      ],
+      billing: [
+        { title:'Billing', badge:{ text:'Current', cls:'ok' }, rows:[
+          ['MRR',          '$31,450'],
+          ['Last Invoice', '$31,450 — Mar 1, 2026'],
+          ['Status',       'Paid', 'success'],
+          ['YTD Revenue',  '$94,350'],
+        ]},
+      ],
+      contract: [
+        { title:'Contract', badge:{ text:'Active', cls:'ok' }, rows:[
+          ['Contract ID',  'CSP-ENT-2023-0192'],
+          ['Term',         '48 months (Apr 2023 — Mar 2027)'],
+          ['Renewal Date', 'Mar 31, 2027'],
+          ['Auto-Renew',   'No — manual renewal required'],
+          ['Annual Value', '$377,400'],
+        ]},
+      ],
+      renewal: [
+        { title:'Renewal Risk', badge:{ text:'Medium Risk', cls:'warn' }, rows:[
+          ['Renewal Date',    'Mar 31, 2027'],
+          ['Risk Level',      'Medium', 'warning'],
+          ['Satisfaction',    '78 / 100'],
+          ['Concern',         '5 open tickets, elevated incident volume', 'warning'],
+          ['Competitor Intel','AT&T outreach logged Feb 2026'],
+          ['Recommended',     'QBR + remediation plan by Jun 1'],
+        ]},
+      ],
     },
     'sanderson farms': {
-      agent: 'Billing Agent',
-      text: 'Billing review for <strong>Sanderson Farms</strong>:',
-      card: [
-        ['Status', 'Discrepancy Detected'],
-        ['Issue', 'Invoice #INV-2026-0319 billed for 5G backup circuit — circuit was decommissioned Feb 2026'],
-        ['Overcharge Amount', '$1,240.00 / mo since Feb'],
-        ['Total Credit Owed', '$2,480.00 (2 months)'],
-        ['Resolution', 'Credit memo pending finance approval — ETA Apr 3'],
-        ['Account Rep', 'Jessica Torres'],
-        ['Current MRR (corrected)', '$12,680']
-      ]
+      summary: [
+        { title:'Account Overview', rows:[
+          ['Account ID',      'SF-00067821'],
+          ['Tier',            'Commercial — Silver'],
+          ['Primary Contact', 'Ray Patel, Network Manager'],
+          ['MRR',             '$12,680', 'accent'],
+          ['Satisfaction',    '84 / 100'],
+          ['Last QBR',        'Dec 12, 2025'],
+        ]},
+        { title:'Services', rows:[
+          ['Dedicated Internet', '500M'],
+          ['SD-WAN',             'Active (2 sites)'],
+          ['5G Backup',          'Decommissioned Feb 2026'],
+        ]},
+        { title:'Contract & Tickets', rows:[
+          ['Contract End',  'Nov 30, 2026'],
+          ['Open Tickets',  '1 (billing dispute)', 'warning'],
+        ]},
+      ],
+      tickets: [
+        { title:'Open Tickets', badge:{ text:'1 Open', cls:'warn' }, rows:[
+          ['RITM0024019 · Medium', 'Billing dispute — 5G circuit charged post-decommission'],
+        ]},
+      ],
+      billing: [
+        { title:'Billing', badge:{ text:'Discrepancy', cls:'high' }, rows:[
+          ['Issue',            '5G backup billed after Feb 2026 decommission', 'danger'],
+          ['Overcharge',       '$1,240.00 / month', 'danger'],
+          ['Total Credit Due', '$2,480.00 (2 months)', 'warning'],
+          ['Resolution',       'Credit memo pending finance — ETA Apr 3'],
+          ['MRR (corrected)',  '$12,680'],
+          ['Account Rep',      'Jessica Torres'],
+        ]},
+      ],
+      contract: [
+        { title:'Contract', badge:{ text:'Active', cls:'ok' }, rows:[
+          ['Contract ID',  'CSP-COM-2023-0614'],
+          ['Term',         '36 months (Dec 2023 — Nov 2026)'],
+          ['Renewal Date', 'Nov 30, 2026'],
+          ['Auto-Renew',   'Yes — 60-day notice'],
+          ['Annual Value', '$152,160'],
+        ]},
+      ],
+      renewal: [
+        { title:'Renewal Risk', badge:{ text:'Medium Risk', cls:'warn' }, rows:[
+          ['Renewal Date',    'Nov 30, 2026'],
+          ['Risk Level',      'Medium', 'warning'],
+          ['Satisfaction',    '84 / 100'],
+          ['Concern',         'Active billing dispute — resolve before renewal', 'warning'],
+          ['Competitor Intel','None on file'],
+          ['Recommended',     'Resolve credit, then renewal outreach Sep 1'],
+        ]},
+      ],
     },
     'cal-maine': {
-      agent: 'Contract Agent',
-      text: 'Contract details for <strong>Cal-Maine Foods</strong>:',
-      card: [
-        ['Contract ID', 'CSP-ENT-2023-0847'],
-        ['Term', '36 months (Aug 2023 — Aug 2026)'],
-        ['Renewal Date', 'Aug 1, 2026'],
-        ['Auto-Renew', 'Yes — 12-month extension unless 60-day notice'],
-        ['Notice Deadline', 'Jun 2, 2026'],
-        ['Services', 'Dedicated Internet (1G), Managed Firewall, SD-WAN (4 sites)'],
-        ['Annual Value', '$187,440'],
-        ['Renewal Risk', 'Medium — competitor pricing inquiry logged Mar 14']
-      ]
-    }
+      summary: [
+        { title:'Account Overview', rows:[
+          ['Account ID',      'SF-00103847'],
+          ['Tier',            'Commercial — Standard'],
+          ['Primary Contact', 'Linda Chu, IT Manager'],
+          ['MRR',             '$15,620', 'accent'],
+          ['Satisfaction',    '88 / 100'],
+          ['Last QBR',        'Feb 3, 2026'],
+        ]},
+        { title:'Services', rows:[
+          ['Dedicated Internet', '1G'],
+          ['Managed Firewall',   'Active'],
+          ['SD-WAN',             '4 sites'],
+        ]},
+        { title:'Contract & Tickets', rows:[
+          ['Contract End',    'Aug 1, 2026'],
+          ['Notice Deadline', 'Jun 2, 2026', 'danger'],
+          ['Open Tickets',    'None', 'success'],
+        ]},
+      ],
+      tickets: [
+        { title:'Open Tickets', badge:{ text:'None', cls:'ok' }, rows:[
+          ['Status', 'No open tickets', 'success'],
+        ]},
+      ],
+      billing: [
+        { title:'Billing', badge:{ text:'Current', cls:'ok' }, rows:[
+          ['MRR',          '$15,620'],
+          ['Last Invoice', '$15,620 — Mar 1, 2026'],
+          ['Status',       'Paid', 'success'],
+          ['YTD Revenue',  '$46,860'],
+        ]},
+      ],
+      contract: [
+        { title:'Contract', badge:{ text:'Expiring Soon', cls:'warn' }, rows:[
+          ['Contract ID',    'CSP-ENT-2023-0847'],
+          ['Term',           '36 months (Aug 2023 — Aug 2026)'],
+          ['Renewal Date',   'Aug 1, 2026', 'warning'],
+          ['Auto-Renew',     'Yes — 60-day notice'],
+          ['Notice Deadline','Jun 2, 2026', 'danger'],
+          ['Annual Value',   '$187,440'],
+        ]},
+      ],
+      renewal: [
+        { title:'Renewal Risk', badge:{ text:'Medium Risk', cls:'warn' }, rows:[
+          ['Renewal Date',    'Aug 1, 2026'],
+          ['Risk Level',      'Medium', 'warning'],
+          ['Satisfaction',    '88 / 100'],
+          ['Competitor Intel','Pricing inquiry logged Mar 14', 'warning'],
+          ['Notice Deadline', 'Jun 2, 2026'],
+          ['Recommended',     'Begin renewal conversation immediately'],
+        ]},
+      ],
+    },
   };
 
-  function cx360MatchResponse(query) {
-    const q = query.toLowerCase();
-    for (const [key, resp] of Object.entries(cx360Responses)) {
-      if (q.includes(key)) return resp;
-    }
-    // Generic fallback
-    const agents = ['Account Insights Agent', 'Service History Agent', 'Ticket Analysis Agent'];
-    return {
-      agent: agents[Math.floor(Math.random() * agents.length)],
-      text: 'I searched across Salesforce, ServiceNow, Arkis, and billing for <strong>"' + query.replace(/</g,'&lt;') + '"</strong>.',
-      card: [
-        ['Data Sources Queried', 'Salesforce, ServiceNow, Arkis, Billing'],
-        ['Records Scanned', (Math.floor(Math.random()*400)+100).toLocaleString()],
-        ['Result', 'No exact match found. Try searching by account name, ticket number, or service address.'],
-        ['Tip', 'Ask about a specific customer like "account summary for Regions Bank"']
-      ]
-    };
+  const _compassAgentMap = {
+    summary:  'Account Insights Agent',
+    tickets:  'Ticket Analysis Agent',
+    billing:  'Billing Agent',
+    contract: 'Contract Agent',
+    renewal:  'Renewal Risk Agent',
+  };
+
+  function compassAccountInput(val) {
+    const dd = document.getElementById('cb-dropdown');
+    if (!val.trim()) { dd.classList.add('hidden'); return; }
+    const q = val.toLowerCase();
+    const matches = _compassAccounts.filter(a => a.name.toLowerCase().includes(q));
+    if (!matches.length) { dd.classList.add('hidden'); return; }
+    dd.innerHTML = matches.map(a =>
+      `<div class="cb-dropdown-item" onmousedown="compassSelectAccount('${a.key}')">
+        <div class="cb-dropdown-item-name">${a.name}</div>
+        <div class="cb-dropdown-item-sub">${a.tier} &middot; MRR ${a.mrr}</div>
+      </div>`
+    ).join('');
+    dd.classList.remove('hidden');
   }
 
-  function cx360Ask(text) {
-    document.getElementById('cx360-input').value = text;
-    cx360Send();
+  function compassShowDropdown() {
+    const input = document.getElementById('cb-account-input');
+    if (input && input.value.trim()) compassAccountInput(input.value);
   }
 
-  function cx360SetPill(el) {
-    document.querySelectorAll('#cx360-query-pills .cx-query-pill').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
+  function compassHideDropdown() {
+    const dd = document.getElementById('cb-dropdown');
+    if (dd) dd.classList.add('hidden');
   }
 
-  function cx360ClearAccount() {
-    const input = document.getElementById('cx360-account');
+  function compassSelectAccount(key) {
+    const acct = _compassAccounts.find(a => a.key === key);
+    if (!acct) return;
+    _compassAccount = acct;
+    const input = document.getElementById('cb-account-input');
+    if (input) input.value = acct.name;
+    const clr = document.getElementById('cb-search-clear');
+    if (clr) clr.classList.remove('hidden');
+    compassHideDropdown();
+    compassRunBrief();
+  }
+
+  function compassClearAccount() {
+    _compassAccount = null;
+    const input = document.getElementById('cb-account-input');
     if (input) input.value = '';
+    const clr = document.getElementById('cb-search-clear');
+    if (clr) clr.classList.add('hidden');
+    compassRunBrief();
   }
 
-  function cx360Attach() {
-    // Placeholder — file attachment will be wired to Compass agents in production
+  function compassQuickPick(key) {
+    compassSelectAccount(key);
   }
 
-  function cx360ShowAgents() {
-    // Show a quick peek at the available agents in the chat for demo purposes
-    const chat = document.getElementById('cx360-chat');
-    const welcome = chat.querySelector('.cx-welcome');
-    if (welcome) welcome.style.display = 'none';
-    const agentMsg = document.createElement('div');
-    agentMsg.className = 'cx-msg assistant';
-    const agentList = cx360Agents.map(a => `<div class="cx-data-row"><span class="cx-data-label">&bull;</span><span class="cx-data-val">${a}</span></div>`).join('');
-    agentMsg.innerHTML = `<div class="cx-msg-meta"><span class="cx-agent-badge">Compass</span></div><div class="cx-msg-bubble">Available agents:<div class="cx-data-card">${agentList}</div></div>`;
-    chat.appendChild(agentMsg);
-    chat.scrollTop = chat.scrollHeight;
+  function compassSetTab(el) {
+    document.querySelectorAll('#cb-tab-strip .cb-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    _compassTab = el.dataset.tab;
+    compassRunBrief();
   }
 
-  function cx360Send() {
-    const input = document.getElementById('cx360-input');
-    const query = input.value.trim();
-    if (!query) return;
-    input.value = '';
+  function compassRunBrief() {
+    const area = document.getElementById('cb-brief-area');
+    if (!area) return;
 
-    const chat = document.getElementById('cx360-chat');
+    if (!_compassAccount) {
+      area.innerHTML = `
+        <div class="cb-empty">
+          <div class="cb-empty-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
+          <div class="cb-empty-title">No account selected</div>
+          <div class="cb-empty-sub">Search for a customer above, then choose a brief type.</div>
+          <div class="cb-quick-picks">
+            <button class="cb-quick-pick" onclick="compassQuickPick('regions bank')">Regions Bank</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('baptist memorial')">Baptist Memorial Health</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('sanderson farms')">Sanderson Farms</button>
+            <button class="cb-quick-pick" onclick="compassQuickPick('cal-maine')">Cal-Maine Foods</button>
+          </div>
+        </div>`;
+      return;
+    }
 
-    // Hide welcome
-    const welcome = chat.querySelector('.cx-welcome');
-    if (welcome) welcome.style.display = 'none';
+    // Skeleton while loading
+    area.innerHTML =
+      '<div class="cb-skeleton">' + '<div class="cb-skeleton-row"></div>'.repeat(4) + '</div>' +
+      '<div class="cb-skeleton">' + '<div class="cb-skeleton-row"></div>'.repeat(3) + '</div>';
 
-    // User message
-    const userMsg = document.createElement('div');
-    userMsg.className = 'cx-msg user';
-    userMsg.innerHTML = '<div class="cx-msg-bubble">' + query.replace(/</g,'&lt;') + '</div>';
-    chat.appendChild(userMsg);
-
-    // Routing indicator
-    const routing = document.createElement('div');
-    routing.className = 'cx-msg assistant';
-    routing.innerHTML = '<div class="cx-msg-meta"><span class="cx-agent-badge">Routing</span> Analyzing request…</div>';
-    chat.appendChild(routing);
-    chat.scrollTop = chat.scrollHeight;
-
-    // Show typing after routing
     setTimeout(() => {
-      const resp = cx360MatchResponse(query);
-      routing.querySelector('.cx-agent-badge').textContent = resp.agent;
-      routing.querySelector('.cx-msg-meta').lastChild.textContent = ' Processing…';
+      const data = _compassBriefs[_compassAccount.key];
+      if (!data) return;
+      const sections = data[_compassTab] || data.summary;
 
-      const typing = document.createElement('div');
-      typing.className = 'cx-msg assistant';
-      typing.innerHTML = '<div class="cx-msg-bubble cx-typing"><div class="cx-typing-dot"></div><div class="cx-typing-dot"></div><div class="cx-typing-dot"></div></div>';
-      chat.appendChild(typing);
-      chat.scrollTop = chat.scrollHeight;
+      let html = sections.map(section => {
+        const badgeHtml = section.badge
+          ? `<span class="cb-section-badge ${section.badge.cls}">${section.badge.text}</span>`
+          : '';
+        const rowsHtml = section.rows.map(([label, val, cls]) =>
+          `<div class="cb-row">
+            <span class="cb-row-label">${label}</span>
+            <span class="cb-row-val${cls ? ' ' + cls : ''}">${val}</span>
+          </div>`
+        ).join('');
+        return `<div class="cb-section">
+          <div class="cb-section-header">
+            <span class="cb-section-title">${section.title}</span>${badgeHtml}
+          </div>
+          ${rowsHtml}
+        </div>`;
+      }).join('');
 
-      // Show response
-      setTimeout(() => {
-        chat.removeChild(typing);
-        routing.querySelector('.cx-msg-meta').lastChild.textContent = '';
-
-        let cardHtml = '<div class="cx-data-card">';
-        resp.card.forEach(([label, val]) => {
-          cardHtml += '<div class="cx-data-row"><span class="cx-data-label">' + label + '</span><span class="cx-data-val">' + val + '</span></div>';
-        });
-        cardHtml += '</div>';
-
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'cx-msg assistant';
-        aiMsg.innerHTML = '<div class="cx-msg-meta"><span class="cx-agent-badge">' + resp.agent + '</span></div><div class="cx-msg-bubble">' + resp.text + cardHtml + '</div>';
-        chat.appendChild(aiMsg);
-        chat.scrollTop = chat.scrollHeight;
-      }, 1200 + Math.random() * 800);
-    }, 600 + Math.random() * 400);
-  }
-
-  function clearCx360Chat() {
-    const chat = document.getElementById('cx360-chat');
-    chat.innerHTML = '';
-    const welcome = document.createElement('div');
-    welcome.className = 'cx-welcome';
-    welcome.innerHTML = `
-      <div class="cx-welcome-icon">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      </div>
-      <div class="cx-welcome-title">Compass</div>
-      <div class="cx-welcome-sub">AI-powered customer intelligence across Salesforce, ServiceNow, Arkis, and billing systems.</div>
-      <div class="cx-suggestions">
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">What's the account summary for Regions Bank?</button>
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Show open tickets for Baptist Memorial Health</button>
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Any billing discrepancies for Sanderson Farms?</button>
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">When does the contract renew for Cal-Maine Foods?</button>
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Give me an executive summary for Sanderson Farms</button>
-        <button class="cx-chip" onclick="cx360Ask(this.textContent)">Which accounts are up for renewal this quarter?</button>
+      html += `<div class="cb-agent-strip">
+        <span class="cb-agent-label">Powered by</span>
+        <span class="cb-agent-badge">${_compassAgentMap[_compassTab] || 'Compass Agent'}</span>
       </div>`;
-    chat.appendChild(welcome);
+
+      area.innerHTML = html;
+    }, 500 + Math.random() * 400);
   }
+
+  // Stubs so any residual references don't throw
+  function cx360Ask(){}
+  function cx360SetPill(){}
+  function cx360ClearAccount(){}
+  function cx360Attach(){}
+  function cx360ShowAgents(){}
+  function cx360Send(){}
+  function clearCx360Chat(){ compassClearAccount(); }
 
   // ── Calendar ───────────────────────────────────────────────────────────────
   let _cal = { year: null, month: null, tickets: null, selectedDay: null };
