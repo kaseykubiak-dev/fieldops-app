@@ -2326,6 +2326,7 @@
       </div>
       <div class="login-error" id="login-error" role="alert" aria-live="assertive"></div>
       <button class="login-btn" id="login-btn" type="submit" onclick="event.preventDefault();attemptLogin();">Sign In</button>
+      <button type="button" onclick="demoLogin()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;padding:4px;text-decoration:underline;text-underline-offset:3px;letter-spacing:.02em;align-self:center;">Preview without login</button>
     </form>
   </div>
 </div>
@@ -3886,6 +3887,15 @@
       btn.disabled = false;
       btn.textContent = 'Sign In';
     }
+  }
+
+  function demoLogin() {
+    sessionStorage.setItem('sn_username',      'demo.tech');
+    sessionStorage.setItem('sn_password',      '');
+    sessionStorage.setItem('sn_user_sysid',    'demo-user-001');
+    sessionStorage.setItem('sn_user_name',     'Demo Technician');
+    sessionStorage.setItem('sn_user_initials', 'DT');
+    startSession();
   }
 
   function startSession() {
