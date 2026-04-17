@@ -1157,7 +1157,7 @@
   }
   @media(max-width:799px) {
     .teams-contact-name { white-space:normal; overflow:visible; text-overflow:clip; line-height:1.25; }
-    /* Compact sub-topbars on Calendar and CX360 — they now sit below the persistent mobile topbar */
+    /* Compact sub-topbars on Calendar and Compass — they now sit below the persistent mobile topbar */
     #screen-calendar .detail-topbar,
     #screen-cx360 .detail-topbar { min-height:auto; padding-top:7px; padding-bottom:7px; }
     /* Detail topbar also sits below #mobile-topbar on mobile — remove the duplicate safe-area-inset-top */
@@ -1967,7 +1967,7 @@
   html[data-theme="cspire"] .panel-resize-handle:hover::after { background:var(--resize-bar-hover); }
   html[data-theme="cspire"] #screen-list { border-right:2px solid rgba(0,80,160,0.35); }
 
-  /* ── CX 360 ─────────────────────────────────────────────────────────────── */
+  /* ── COMPASS ─────────────────────────────────────────────────────────────── */
   .cx-chat-area { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:16px; }
   .cx-welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px; flex:1; }
   .cx-welcome-icon { width:72px; height:72px; border-radius:50%; background:rgba(0,192,243,0.1); border:1.5px solid rgba(0,192,243,0.25); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
@@ -2008,7 +2008,7 @@
   html[data-theme="cspire"] .cx-msg.user .cx-msg-bubble { background:linear-gradient(135deg, #0f3d58, #00689c); }
   html[data-theme="cspire"] .cx-agent-badge { background:rgba(15,61,88,0.1); color:#0f3d58; border-color:rgba(15,61,88,0.25); }
 
-  /* ── CX 360 ONE CUSTOMER PANEL ── */
+  /* ── COMPASS ONE CUSTOMER PANEL ── */
   .cx-top-panel { flex-shrink:0; padding:10px 14px 0; }
   .cx-top-panel-card {
     background:rgba(14,22,36,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
@@ -2411,8 +2411,8 @@
         My Calendar
       </button>
       <button class="desktop-nav-btn" id="dnav-cx360" onclick="showScreen('cx360',null);setDesktopNav('cx360')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        CX 360
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        Compass
       </button>
       <button class="desktop-nav-btn" id="dnav-techtools" onclick="showScreen('techtools',null);setDesktopNav('techtools')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -3156,7 +3156,7 @@
               <select id="pref-default-tab" class="settings-select" onchange="saveSettingDefaultTab(this.value)">
                 <option value="list">My Work</option>
                 <option value="calendar">My Calendar</option>
-                <option value="cx360">CX 360</option>
+                <option value="cx360">Compass</option>
                 <option value="techtools">My Tools</option>
               </select>
             </div>
@@ -3698,11 +3698,11 @@
       </div>
     </div>
 
-    <!-- CX 360 SCREEN -->
+    <!-- COMPASS SCREEN -->
     <div class="screen" id="screen-cx360">
       <div class="detail-topbar" style="gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <span style="font-weight:700;font-size:16px;letter-spacing:.01em;color:var(--text);">CX 360</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <span style="font-weight:700;font-size:16px;letter-spacing:.01em;color:var(--text);">Compass</span>
         <span class="section-title-note" style="flex:1;">· Placeholder for future implementation.</span>
         <button class="icon-btn" onclick="clearCx360Chat()" title="New conversation">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -3740,9 +3740,9 @@
       <div class="cx-chat-area" id="cx360-chat">
         <div class="cx-welcome">
           <div class="cx-welcome-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           </div>
-          <div class="cx-welcome-title">CX 360</div>
+          <div class="cx-welcome-title">Compass</div>
           <div class="cx-welcome-sub">AI-powered customer intelligence across Salesforce, ServiceNow, Arkis, and billing systems.</div>
           <div class="cx-suggestions" id="cx360-suggestions">
             <button class="cx-chip" onclick="cx360Ask(this.textContent)">What's the account summary for Regions Bank?</button>
@@ -3782,8 +3782,8 @@
       <span class="bnav-label">My Calendar</span>
     </button>
     <button class="bnav-btn" id="bnav-cx360" onclick="showScreen('cx360',this)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      <span class="bnav-label">CX 360</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      <span class="bnav-label">Compass</span>
     </button>
     <button class="bnav-btn" id="bnav-techtools" onclick="showScreen('techtools',this)" style="position:relative;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -5780,7 +5780,7 @@
     if (btn) btn.classList.add('active');
   }
 
-  // ── CX 360 ────────────────────────────────────────────────────────────────
+  // ── COMPASS ───────────────────────────────────────────────────────────────
 
   const cx360Agents = [
     'Account Insights Agent', 'Ticket Analysis Agent', 'Billing Agent',
@@ -5879,7 +5879,7 @@
   }
 
   function cx360Attach() {
-    // Placeholder — file attachment will be wired to CX 360 agents in production
+    // Placeholder — file attachment will be wired to Compass agents in production
   }
 
   function cx360ShowAgents() {
@@ -5890,7 +5890,7 @@
     const agentMsg = document.createElement('div');
     agentMsg.className = 'cx-msg assistant';
     const agentList = cx360Agents.map(a => `<div class="cx-data-row"><span class="cx-data-label">&bull;</span><span class="cx-data-val">${a}</span></div>`).join('');
-    agentMsg.innerHTML = `<div class="cx-msg-meta"><span class="cx-agent-badge">CX 360</span></div><div class="cx-msg-bubble">Available agents:<div class="cx-data-card">${agentList}</div></div>`;
+    agentMsg.innerHTML = `<div class="cx-msg-meta"><span class="cx-agent-badge">Compass</span></div><div class="cx-msg-bubble">Available agents:<div class="cx-data-card">${agentList}</div></div>`;
     chat.appendChild(agentMsg);
     chat.scrollTop = chat.scrollHeight;
   }
@@ -5959,9 +5959,9 @@
     welcome.className = 'cx-welcome';
     welcome.innerHTML = `
       <div class="cx-welcome-icon">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
       </div>
-      <div class="cx-welcome-title">CX 360</div>
+      <div class="cx-welcome-title">Compass</div>
       <div class="cx-welcome-sub">AI-powered customer intelligence across Salesforce, ServiceNow, Arkis, and billing systems.</div>
       <div class="cx-suggestions">
         <button class="cx-chip" onclick="cx360Ask(this.textContent)">What's the account summary for Regions Bank?</button>
