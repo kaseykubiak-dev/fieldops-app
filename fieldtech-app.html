@@ -668,13 +668,13 @@
   }
   .ticket-inner { position:relative; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-left:3px solid var(--accent); border-radius:11px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
 
-  /* C Spire Burst watermark on ticket cards */
+  /* Delta icon watermark on ticket cards */
   .ticket-inner::after {
     content:'';
     position:absolute;
     bottom:-18px; right:-12px;
     width:120px; height:120px;
-    background:url('cspire_burst_cyan.png') no-repeat center/contain;
+    background:url('delta-icon-dark-transparent.png') no-repeat center/contain;
     opacity:0.09;
     pointer-events:none;
     z-index:0;
@@ -2341,7 +2341,7 @@
       </div>
     </div>
     <div class="disc-body">
-      <p class="disc-text">This application is intended for demonstration purposes only. No internal C Spire systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources.</p>
+      <p class="disc-text">This application is intended for demonstration purposes only. No proprietary systems, resources, or customer information were used in its development. All data presented is derived from demo environment APIs and randomly generated sources.</p>
       <button class="login-btn" onclick="dismissDisclaimer()">I Understand</button>
     </div>
   </div>
@@ -2512,7 +2512,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="cspire-logo-svg" style="margin-right:4px;">
-          <img src="CSB_Logo_cyan.png" alt="C Spire Business" height="49" class="csb-logo" style="object-fit:contain;">
+          <img src="delta-logo-dark-transparent.png" alt="Delta" height="49" class="csb-logo" style="object-fit:contain;">
         </div>
         <div class="detail-tb-info">
           <div class="detail-tb-id" id="detail-tb-id">—</div>
@@ -4909,7 +4909,7 @@
       { label: 'Broadsoft Cluster 3', vpn: true  },
     ]},
     { group: 'Inventory &amp; Vehicle Management', links: [
-      { label: 'C Spire Truck Stock',       vpn: true },
+      { label: 'Fleet Truck Stock',          vpn: true },
       { label: 'Vehicle Mileage Reporting', vpn: true },
     ]},
   ];
@@ -7194,8 +7194,8 @@
   function applyLogoForTheme(theme) {
     const src = theme === 'cspire' ? 'delta-logo-light-transparent.png' : 'delta-logo-dark-transparent.png';
     document.querySelectorAll('.delta-logo').forEach(img => img.src = src);
-    // C Spire Business logo on detail topbar: cyan for dark, white for light
-    const csbSrc = theme === 'cspire' ? 'CSB_Logo_white.png' : 'CSB_Logo_cyan.png';
+    // Delta logo on detail topbar: light variant for light theme, dark variant for dark theme
+    const csbSrc = theme === 'cspire' ? 'delta-logo-light-transparent.png' : 'delta-logo-dark-transparent.png';
     document.querySelectorAll('.csb-logo').forEach(img => img.src = csbSrc);
   }
 
