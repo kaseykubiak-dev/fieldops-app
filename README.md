@@ -1,13 +1,3 @@
-# Delta — README Additions
-
-The sections below are drafted to insert at the top of the existing README,
-before the current "Repository Layout" section. Each section is separated
-with a heading so you can review and adjust individually before adding them.
-
----
-
-## SECTION 1 — Opening Overview (replaces current first paragraph)
-
 # Delta — Field Operations Tech App
 
 A mobile-first progressive web app built for field technicians managing enterprise service tickets. Delta consolidates ServiceNow CSM ticketing, Cisco Catalyst Center network data, and a Webex Calling/VoIP reference layer into a single unified interface — designed around real workflows from my role as a Voice and Data Technician at C Spire.
@@ -58,8 +48,6 @@ Vehicle inspection, ladder inspection, mileage reporting, and truck stock invent
 
 ---
 
-## SECTION 2 — Why I Built This
-
 ## Why I Built This
 
 Field technicians at C Spire work across multiple disconnected systems on every job — ServiceNow for tickets, separate portals for network equipment, and no unified view of customer context or on-call contacts. Switching between tools on a phone in the field is slow and error-prone.
@@ -69,8 +57,6 @@ Delta was built to consolidate that into one mobile-optimized interface. A tech 
 The app started as a proof-of-concept for internal use and grew into a full-featured tool through iteration based on real field workflows.
 
 ---
-
-## SECTION 3 — Skills Demonstrated
 
 ## Skills Demonstrated
 
@@ -87,8 +73,6 @@ The app started as a proof-of-concept for internal use and grew into a full-feat
 | **Documentation** | Internal technical README, DECT setup guide authored for C Spire field use |
 
 ---
-
-## SECTION 4 — Planned Integrations
 
 ## Planned Integrations
 
