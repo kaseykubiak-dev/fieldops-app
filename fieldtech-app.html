@@ -735,6 +735,9 @@
   /* Plain-text labels replacing pills on cards */
   .tc-label  { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-left:auto; flex-shrink:0; color:rgba(255,255,255,0.55); }
   .tc-status { font-size:11px; font-weight:600; color:rgba(255,255,255,0.88); }
+  /* Live ticket — pulsing dot when En Route / On Site */
+  @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
+  .ticket-card.tc-live .tc-status::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:5px; vertical-align:middle; animation:live-pulse 2s ease-in-out infinite; }
   /* Type label color per card variant */
   .tc-install .tc-label { color:#1a7ab5; }
   .tc-repair  .tc-label { color:#c94d14; }
@@ -4483,6 +4486,17 @@
 
     list.innerHTML = html;
 
+    // Restore client-side action state pills (En Route / On Site) after re-render
+    Object.entries(_ticketActionState).forEach(([num, actionState]) => {
+      const text = actionState === 'work' ? 'En Route' : actionState === 'close' ? 'On Site' : null;
+      if (!text) return;
+      const card = list.querySelector(`.ticket-card[data-number="${num}"]`);
+      if (!card) return;
+      const statusEl = card.querySelector('.ticket-pills .tc-status');
+      if (statusEl) statusEl.textContent = text;
+      card.classList.add('tc-live');
+    });
+
     // For Assigned and Closed tabs, scroll to today's date divider (or the closest date)
     if (filterState !== 'today') {
       const todayStr = new Date().toDateString();
@@ -4624,6 +4638,7 @@
     if (!card) return;
     const statusEl = card.querySelector('.ticket-pills .tc-status');
     if (statusEl) statusEl.textContent = pillCfg.text;
+    card.classList.add('tc-live'); // pulsing dot while active in field
   }
 
   function _scrollToUpdateTicket() {
