@@ -2310,6 +2310,9 @@
   html[data-theme="cspire"] .cal-chip.chip-inspection { background:rgba(220,38,38,0.09); color:#dc2626; border-left-color:#dc2626; }
   html[data-theme="cspire"] .cal-week-inspection { background:rgba(220,38,38,0.07); border-color:rgba(220,38,38,0.22); border-left-color:#dc2626; color:#dc2626; box-shadow:0 1px 4px rgba(220,38,38,0.10),inset 0 1px 0 rgba(255,255,255,0.6); }
   html[data-theme="cspire"] .cal-agenda-inspection { background:rgba(220,38,38,0.07); border-color:rgba(220,38,38,0.22); border-left-color:#dc2626; color:#dc2626; box-shadow:0 1px 3px rgba(220,38,38,0.10),0 3px 10px rgba(220,38,38,0.06),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(0,0,0,0.06); }
+  /* Demo mode badge */
+  #demo-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; background:rgba(232,131,74,0.15); border:1px solid rgba(232,131,74,0.35); border-radius:10px; font-family:var(--sans); font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:0.05em; white-space:nowrap; }
+  #demo-badge.hidden { display:none !important; }
 </style>
 </head>
 <body>
@@ -2450,6 +2453,7 @@
         animation:tagline-shimmer 4s linear infinite;
         filter:drop-shadow(0 1px 6px rgba(124,111,205,0.45));
       ">Navigate Every Job</span>
+      <span id="demo-badge" class="hidden">DEMO</span>
       <button class="icon-btn notif-bell" onclick="toggleNotifPanel(this)" aria-label="Notifications" aria-expanded="false" aria-controls="notif-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" aria-hidden="true"></span></button>
       <button class="avatar-sm" id="user-avatar" onclick="toggleUserMenu(this)" title="User menu" aria-label="User menu" aria-expanded="false" aria-controls="user-menu-panel">??</button>
     </div>
@@ -3877,6 +3881,8 @@
   }
 
   function demoLogin() {
+    _setDemoMode(true);
+    _cachedDemoTickets = null; // rebuild with current date
     sessionStorage.setItem('sn_username',      'demo.tech');
     sessionStorage.setItem('sn_password',      '');
     sessionStorage.setItem('sn_user_sysid',    'demo-user-001');
@@ -4070,6 +4076,224 @@
     return 'Basic ' + btoa(SN.username + ':' + SN.password);
   }
 
+  // ── Demo Mode ─────────────────────────────────────────────────────────────
+  // Activated automatically when ServiceNow is unreachable, or explicitly via
+  // the "Preview without login" button. Uses date-relative embedded mock data.
+
+  let _demoMode = false;
+  let _cachedDemoTickets = null;
+
+  function _setDemoMode(on) {
+    _demoMode = on;
+    const badge = document.getElementById('demo-badge');
+    if (badge) badge.classList.toggle('hidden', !on);
+  }
+
+  /** Returns a SN-format UTC timestamp for localHour on a day offset from today. */
+  function _demoUTCStr(dayOffset, localHour) {
+    const d = new Date();
+    d.setDate(d.getDate() + dayOffset);
+    d.setHours(localHour, 0, 0, 0);
+    return d.toISOString().replace('T', ' ').slice(0, 19);
+  }
+
+  const _DEMO_ACCOUNTS = {
+    'acct-001': { name:'TechPoint Solutions',    number:'AC-00483', street:'1200 Commerce Pkwy',     city:'Ridgeland', state:'MS', zip:'39157', contact:'Marcus Webb',    phone:'601-555-0142' },
+    'acct-002': { name:'Gulf Coast Medical',      number:'AC-00291', street:'4900 Hospital Blvd',     city:'Gulfport',  state:'MS', zip:'39503', contact:'Sandra Liu',     phone:'228-555-0198' },
+    'acct-003': { name:'Regions Bank',            number:'AC-00184', street:'210 S Court St',         city:'Florence',  state:'MS', zip:'39073', contact:'David Mitchell', phone:'601-555-0311' },
+    'acct-004': { name:'Baptist Memorial Health', number:'AC-00318', street:'6019 Walnut Grove Rd',   city:'Memphis',   state:'TN', zip:'38120', contact:'Rachel Torres',  phone:'901-555-0247' },
+    'acct-005': { name:'Sanderson Farms',         number:'AC-00512', street:'127 Flynt Dr',           city:'Laurel',    state:'MS', zip:'39443', contact:'James Tillman',  phone:'601-555-0162' },
+    'acct-006': { name:'Cal-Maine Foods',         number:'AC-00629', street:'3320 Woodrow Wilson Dr', city:'Jackson',   state:'MS', zip:'39209', contact:'Patricia Odom',  phone:'601-555-0294' },
+  };
+
+  const _DEMO_CASE_DESCRIPTIONS = {
+    'CS0012441': 'Install new fiber internet circuit for business premium tier. Pull fiber from street to NID, terminate at customer demarc, provision CPE (Calix), and test throughput. Customer contact on-site during morning window.',
+    'CS0012442': 'Customer reports intermittent packet loss since Tuesday evening. Remote diagnostics show 3–8% loss on upstream segments. On-site inspection required to rule out physical layer issues at demarc and CPE.',
+    'CS0012445': 'Provision 10G dedicated fiber circuit for branch banking location. Includes conduit pull, splice, CPE installation (Cisco ASR), and BGP handoff with customer router team.',
+    'CS0012446': 'VLAN configuration mismatch following recent network upgrade is blocking VoIP traffic on VLAN 20. Switch replacement and reconfiguration required. Coordinate with customer IT department.',
+    'CS0012451': 'New enterprise internet service for processing facility. Install CPE, configure LAN-side routing, and verify upload/download meets contracted SLA before close.',
+    'CS0012452': 'Customer firewall rules applied after routine policy refresh are blocking outbound HTTPS on port 443 for several subnets. Review and correct ACL entries with customer network admin.',
+    'CS0012430': 'Completed fiber pull and CPE install for Hospital Wing B expansion. Circuit validated at 99.9% uptime target. Closed after customer sign-off.',
+    'CS0012431': 'Router firmware rollback completed. Throughput restored to contracted 1G symmetric. Closed after 24-hr monitoring window confirmed stability.',
+  };
+
+  function _buildDemoTickets() {
+    const mk = (acctKey, num, type, desc, dayOff, hour, state, resOff) => {
+      const a = _DEMO_ACCOUNTS[acctKey];
+      return {
+        number:              num,
+        short_description:   desc,
+        priority:            '2',
+        state:               state || '1',
+        opened_at:           _demoUTCStr(-7, 9),
+        resolved_at:         resOff != null ? _demoUTCStr(resOff, 16) : null,
+        'account.name':      a.name,
+        account:             a.name,
+        'location.street':   a.street,
+        'location.city':     a.city,
+        'location.state':    a.state,
+        assigned_to:         'demo-user-001',
+        u_scheduled_start:   _demoUTCStr(dayOff, hour),
+        u_ticket_type:       type,
+      };
+    };
+    return [
+      // Today
+      mk('acct-001','CS0012441','installation','Fiber Internet Installation — Business Premium',         0,  8),
+      mk('acct-002','CS0012442','repair',       'Internet Outage — Intermittent Packet Loss',            0, 13),
+      // Tomorrow
+      mk('acct-003','CS0012445','installation','Dedicated Fiber Install — 10G Circuit',                 1,  9),
+      mk('acct-004','CS0012446','repair',       'Network Switch Failure — VLAN Misconfiguration',        1, 14),
+      // Later this week
+      mk('acct-005','CS0012451','installation','Business Internet Setup — Enterprise Package',          4,  8),
+      mk('acct-006','CS0012452','repair',       'Firewall Rules Blocking Outbound Traffic',              4, 11),
+      // Recently closed
+      mk('acct-002','CS0012430','installation','Fiber Installation — Hospital Wing B',                 -4,  8, '4', -2),
+      mk('acct-001','CS0012431','repair',       'Router Firmware Degradation — Throughput Loss',        -3, 13, '4', -1),
+    ];
+  }
+
+  function _getDemoTickets() {
+    if (!_cachedDemoTickets) _cachedDemoTickets = _buildDemoTickets();
+    return _cachedDemoTickets;
+  }
+
+  function _filterDemoTickets(tickets, filterState) {
+    const todayStr = new Date().toDateString();
+    if (filterState === 'today')    return tickets.filter(t => t.state !== '4' && t.state !== '5' && parseSNDate(t.u_scheduled_start)?.toDateString() === todayStr);
+    if (filterState === 'assigned') return tickets.filter(t => t.state !== '4' && t.state !== '5');
+    if (filterState === 'closed')   return tickets.filter(t => t.state === '4');
+    return tickets.filter(t => t.state !== '4' && t.state !== '5');
+  }
+
+  function _getDemoCaseDetail(number) {
+    const base = _getDemoTickets().find(t => t.number === number);
+    if (!base) return null;
+    const a = Object.values(_DEMO_ACCOUNTS).find(ac => ac.name === base['account.name']);
+    return {
+      sys_id:            { value: 'demo-' + number },
+      number:            { value: number, display_value: number },
+      short_description: base.short_description,
+      description:       _DEMO_CASE_DESCRIPTIONS[number] || base.short_description,
+      priority:          { value: '2' },
+      state:             { value: base.state },
+      opened_at:         { value: _demoUTCStr(-7, 9) },
+      assigned_to:       { value: 'demo-user-001', display_value: 'Demo Technician' },
+      contact:           { value: 'demo-contact-' + number },
+      account:           { value: 'demo-acct-' + number, display_value: base['account.name'] },
+      cmdb_ci:           { value: '' },
+      location:          { value: 'demo-loc-' + number },
+      'location.street': a?.street || '—',
+      'location.city':   a?.city   || '—',
+      'location.state':  a?.state  || '—',
+      'location.zip':    a?.zip    || '—',
+      u_scheduled_start: { value: base.u_scheduled_start },
+      u_ticket_type:     { value: base.u_ticket_type, display_value: base.u_ticket_type },
+      _account:          a,
+    };
+  }
+
+  function _renderDemoTimeline(number, isInstall) {
+    const tl = document.getElementById('detail-timeline');
+    const entries = [
+      { sys_created_by:'system',          sys_created_on:_demoUTCStr(-7,9),  element:'comments',   value:'Case created and assigned to Demo Technician.' },
+      { sys_created_by:'dispatch.admin',  sys_created_on:_demoUTCStr(-6,14), element:'work_notes', value: isInstall ? 'Equipment kit confirmed: CPE, patch cables, fiber splice kit. Customer confirmed availability for scheduled window.' : 'Remote diagnostics completed. Packet loss confirmed on upstream segment. Physical layer inspection needed at demarc.' },
+      { sys_created_by:'Demo Technician', sys_created_on:_demoUTCStr(-1,16), element:'comments',   value: isInstall ? 'Pre-arrival confirmed with contact. Materials loaded. ETA 30 min before window start.' : 'On-site visit confirmed with customer IT contact. Will inspect demarc and CPE on arrival.' },
+    ];
+    const dotClass = e => e.element === 'work_notes' ? 'a' : e.element === 'comments' ? 's' : 'w';
+    tl.innerHTML = entries.map((e, i) => {
+      const isLast = i === entries.length - 1;
+      const ts = parseSNDate(e.sys_created_on);
+      return `<div class="tl-item">
+        <div class="tl-track">
+          <div class="tl-dot ${dotClass(e)}"></div>
+          ${!isLast ? '<div class="tl-line"></div>' : ''}
+        </div>
+        <div class="tl-content">
+          <div class="tl-meta"><span class="tl-author">${escHtml(e.sys_created_by)}</span><span class="tl-time">${ts ? formatDateTime(ts) : ''}</span></div>
+          <div class="tl-body">${escHtml(e.value)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function _loadDemoCaseDetail(number) {
+    const c = _getDemoCaseDetail(number);
+    if (!c) { document.getElementById('detail-tb-title').textContent = 'Case not found in demo data.'; return; }
+
+    currentCaseSysId  = c.sys_id.value;
+    currentCaseNumber = number;
+    document.getElementById('sn-link-btn').style.display = 'none'; // no live SN link in demo
+
+    // Topbar
+    const openedDate = parseSNDate(c.opened_at.value);
+    const dateStr = openedDate ? openedDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
+    document.getElementById('detail-tb-id').textContent    = `${number} · ${dateStr}`;
+    document.getElementById('detail-tb-title').textContent = c.short_description || '—';
+
+    // State
+    const stateVal = c.state.value;
+    const state = STATE_MAP[stateVal] || { label:'Open', cls:'pill-open' };
+    document.getElementById('detail-pill-state').textContent = state.label;
+    const sel = document.getElementById('detail-state-select');
+    [...sel.options].forEach(o => o.selected = (o.value === stateVal));
+    document.getElementById('detail-resolution-select').value = '';
+    syncCloseState();
+
+    // Case type
+    const caseType = getCaseType(c);
+    currentCaseType    = caseType;
+    currentCaseCompany = c.account.display_value;
+    _onSiteStartTime   = null;
+
+    const isInstall = caseType.cls === 'installation';
+    document.getElementById('description-section').style.display   = isInstall ? 'none' : '';
+    document.getElementById('service-order-section').style.display = isInstall ? '' : 'none';
+    if (isInstall) {
+      renderServiceOrderSection(number);
+    } else {
+      document.getElementById('detail-description').textContent = c.description || c.short_description || '—';
+      document.getElementById('detail-sf-order').textContent = '—';
+      document.getElementById('detail-sn-order').textContent = '—';
+    }
+
+    // Location
+    const addrParts = [c['location.street'], c['location.city'] && c['location.state'] ? c['location.city'] + ', ' + c['location.state'] : (c['location.city'] || c['location.state'] || ''), c['location.zip']].filter(Boolean);
+    document.getElementById('detail-cust-addr').textContent = addrParts.length ? addrParts.join(' · ') : '—';
+
+    // Account
+    document.getElementById('detail-cust-name').textContent = c.account.display_value || '—';
+    document.getElementById('detail-cust-id').textContent   = c._account?.number || '—';
+
+    // Contact
+    document.getElementById('detail-cust-contact').textContent = c._account?.contact || '—';
+    document.getElementById('detail-cust-phone').textContent   = c._account?.phone   || '—';
+
+    // Assignee & SLA
+    document.getElementById('detail-assigned').textContent = c.assigned_to.display_value || '—';
+    document.getElementById('detail-cust-sla').textContent = stateVal === '4' ? 'Resolved' : 'On Track · 4-Hr Response';
+
+    // Equipment sections — hash-based mock data, no SN needed
+    const seed = c.sys_id.value;
+    renderInternetSection(seed);
+    renderFirewallSection(seed);
+    renderVoipSection(seed);
+    renderProjectContacts(seed);
+
+    // Ticket action state
+    if (stateVal === '4' || stateVal === '5' || _closedThisSession.has(number)) {
+      _ticketActionState[number] = 'done';
+    }
+    renderTicketActionButton(number);
+
+    // Travel estimate (Nominatim is public — may geocode real MS addresses)
+    fetchTravelEstimate();
+
+    // Draft restore + mock timeline
+    restoreDraft(currentCaseSysId);
+    _renderDemoTimeline(number, isInstall);
+  }
+
   /** In-flight GET deduplication: collapses concurrent identical GET requests into one. */
   const _snPending = new Map();
 
@@ -4108,6 +4332,15 @@
     list.innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading cases…</span></div>';
     list.scrollTop = 0; // prevent iOS PWA from scrolling window on DOM replace
 
+    // Demo mode — skip SN entirely, use embedded mock data
+    if (_demoMode) {
+      const filtered = _filterDemoTickets(_getDemoTickets(), filterState);
+      _ticketCache[filterState] = { result: filtered, timestamp: Date.now() };
+      renderTickets(filtered, filterState);
+      _stampTicketUpdate();
+      return;
+    }
+
     // CSM case states: 1=Open, 2=Pending, 3=Solution Proposed, 4=Closed, 5=Cancelled
     const assignedTo = SN.technicianId ? `assigned_to=${SN.technicianId}^` : '';
     let query;
@@ -4139,14 +4372,12 @@
         renderTickets(cached.result, filterState);
         _stampStaleIndicator(cached.timestamp);
       } else {
-        list.innerHTML = `
-          <div class="list-error">
-            <strong>Could not load cases</strong>
-            ${escHtml(err.message)}<br><br>
-            Ensure the CSM plugin is active and the Table API CORS rule covers
-            <em>sn_customerservice_case</em>.
-            <br><button class="retry-btn" onclick="fetchTickets('${filterState || 'today'}')">Retry</button>
-          </div>`;
+        // No cache and SN unreachable — auto-activate demo mode
+        _setDemoMode(true);
+        _cachedDemoTickets = null;
+        const demoFiltered = _filterDemoTickets(_getDemoTickets(), filterState);
+        renderTickets(demoFiltered, filterState);
+        _stampTicketUpdate();
       }
     }
   }
@@ -4472,6 +4703,9 @@
      'detail-cust-pc','detail-cust-sr'
     ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '…'; });
     document.getElementById('detail-timeline').innerHTML = '<div class="list-loading"><div class="spinner"></div></div>';
+
+    // Demo mode — skip SN and populate from embedded mock data
+    if (_demoMode) { await _loadDemoCaseDetail(number); return; }
 
     const fields = 'sys_id,number,short_description,description,priority,state,opened_at,' +
                    'assigned_to,contact,account,cmdb_ci,location,location.street,location.city,location.state,location.zip,sla_due,u_scheduled_start,u_ticket_type';
