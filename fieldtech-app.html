@@ -3942,6 +3942,7 @@
     sessionStorage.setItem('ft_disclaimer_ack', '1');
     document.getElementById('disclaimer-modal').classList.add('hidden');
     if (!isMobileView()) document.getElementById('desktop-topbar').style.display = 'flex';
+    _loadTicketState(); // restore persisted action-button states for this session
 
     // Default tab: user preference wins; fallback to last-visited tab, then 'list'
     const preferredTab = localStorage.getItem('ft_default_tab');
@@ -4587,7 +4588,18 @@
   // ── Ticket Action Button state machine ───────────────────────────────────
   // _ticketActionState maps ticket number → current state key
   // States: 'travel' → 'work' → 'close' → 'done' (done = non-interactive closed pill)
+  // Persisted to sessionStorage so state survives SPA navigation and PWA lifecycle events.
   const _ticketActionState = {};
+
+  function _saveTicketState() {
+    try { sessionStorage.setItem('ft_ticket_states', JSON.stringify(_ticketActionState)); } catch(e) {}
+  }
+  function _loadTicketState() {
+    try {
+      const saved = sessionStorage.getItem('ft_ticket_states');
+      if (saved) Object.assign(_ticketActionState, JSON.parse(saved));
+    } catch(e) {}
+  }
 
   // pill: applied to the ticket list WHEN CLICKING this button (i.e. side-effect of this action)
   const _ACTION_CONFIG = {
@@ -4648,6 +4660,7 @@
     if (state === 'close') { _scrollToUpdateTicket(); return; } // stay here until closeTicket() succeeds
 
     _ticketActionState[number] = cfg.next;
+    _saveTicketState();
     renderTicketActionButton(number);
   }
 
@@ -5759,6 +5772,32 @@
       return;
     }
 
+    // Demo mode — simulate close without hitting SN
+    if (_demoMode) {
+      // Mark the cached demo ticket as closed so Closed tab reflects it
+      const demoT = _getDemoTickets().find(t => t.number === currentCaseNumber);
+      if (demoT) { demoT.state = '4'; demoT.resolved_at = _demoUTCStr(0, 0); }
+      // Run the same success flow as the real path
+      const pill = document.getElementById('detail-pill-state');
+      if (pill) pill.textContent = 'Closed';
+      document.getElementById('detail-work-notes').value = '';
+      document.getElementById('detail-resolution-select').value = '';
+      syncCloseState();
+      _renderDemoTimeline(currentCaseNumber, currentCaseType?.cls === 'installation');
+      if (currentCaseNumber) {
+        _closedThisSession.add(currentCaseNumber);
+        _ticketActionState[currentCaseNumber] = 'done';
+        _saveTicketState();
+        stopOnsiteTimer();
+        renderTicketActionButton(currentCaseNumber);
+      }
+      const demoBanner = document.querySelector('.cust-banner');
+      if (demoBanner) demoBanner.classList.add('collapsed');
+      fetchTickets(activeFilter);
+      showCloseSuccessPopup(closeDetail);
+      return;
+    }
+
     const payload = { sys_id: currentCaseSysId, resolution_code: closeReason, close_notes: notes };
 
     btn.disabled = true;
@@ -5789,6 +5828,7 @@
         _closedThisSession.add(currentCaseNumber);
         // Advance action button to terminal state now that close API succeeded
         _ticketActionState[currentCaseNumber] = 'done';
+        _saveTicketState();
         stopOnsiteTimer(); // freeze display — bar stays visible until tech navigates away
         renderTicketActionButton(currentCaseNumber);
       }
