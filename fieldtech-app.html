@@ -6562,6 +6562,16 @@
     document.getElementById('cal-grid').innerHTML =
       '<div class="list-loading"><div class="spinner"></div><span>Loading schedule…</span></div>';
 
+    // Demo mode — filter embedded tickets to the viewed month, skip SN
+    if (_demoMode) {
+      _cal.tickets = _getDemoTickets().filter(t => {
+        const d = parseSNDate(t.u_scheduled_start);
+        return d && d.getFullYear() === year && d.getMonth() === month;
+      });
+      renderCalendar();
+      return;
+    }
+
     const lastDay   = new Date(year, month+1, 0).getDate();
     const monthPad  = String(month+1).padStart(2,'0');
     const lastDayPad = String(lastDay).padStart(2,'0');
