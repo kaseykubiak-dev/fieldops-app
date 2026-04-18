@@ -668,12 +668,17 @@
     .cal-mini-card:active { transform:scale(0.98); }
   }
   .ticket-inner { position:relative; background:rgba(22,34,54,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-left:3px solid var(--accent); border-radius:11px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
-  /* Repair card: soft orange glow pulse on the left accent border */
+  /* Repair card: sharp left-edge glow + header border pulse */
   @keyframes repair-glow {
     0%,100% { box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18); }
-    50%     { box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18), -3px 0 16px rgba(232,131,74,0.5), 0 0 26px rgba(232,131,74,0.1); }
+    50%     { box-shadow:0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.18), -1px 0 8px rgba(232,131,74,0.65), inset 2px 0 10px rgba(232,131,74,0.08); }
   }
-  .ticket-inner.tc-repair { animation:repair-glow 3.5s ease-in-out infinite; }
+  @keyframes repair-header-glow {
+    0%,100% { border-bottom-color: rgba(255,103,32,0.28); }
+    50%     { border-bottom-color: rgba(255,103,32,0.72); }
+  }
+  .ticket-inner.tc-repair { animation:repair-glow 4s ease-in-out infinite; }
+  .ticket-inner.tc-repair .cust-glance { animation:repair-header-glow 4s ease-in-out infinite; }
 
   /* Delta icon watermark on ticket cards */
   .ticket-inner::after {
