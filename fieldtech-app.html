@@ -658,7 +658,8 @@
   .ticket-list { overflow-y:auto; flex:1; min-height:0; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior:contain; }
 
   /* TICKET CARD */
-  .ticket-card { padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; }
+  @keyframes card-appear { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .ticket-card { padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; animation:card-appear 280ms ease both; }
   .ticket-card:active { background:var(--surface2); }
   @media(max-width:799px){
     .ticket-card { transition:transform .12s ease; }
@@ -4433,6 +4434,7 @@
     const sortedEntries = Object.entries(groups).sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
     let html = '';
+    let cardIdx = 0;
     sortedEntries.forEach(([dateStr, tickets]) => {
       const d = new Date(dateStr);
       let label;
@@ -4458,7 +4460,7 @@
         const tcClass       = isTicketDone ? 'tc-closed' : (caseType.cls === 'repair' || caseType.cls === 'service-call' ? 'tc-repair' : 'tc-install');
 
         html += `
-        <div class="ticket-card" data-number="${inc.number}" onclick="openDetail('${inc.number}')">
+        <div class="ticket-card" data-number="${inc.number}" onclick="openDetail('${inc.number}')" style="animation-delay:${cardIdx++ * 42}ms">
           <div class="ticket-inner ${tcClass}">
             <div class="cust-glance">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--accent);flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
