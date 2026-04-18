@@ -4353,12 +4353,24 @@
     return promise;
   }
 
+  // ── Ticket list skeleton (shown while fetching) ───────────────────────────
+  function _ticketListSkeleton() {
+    const card = (delay, opacity) =>
+      `<div class="skeleton-card skeleton" style="${delay?'animation-delay:'+delay+'ms;':''}${opacity<1?'opacity:'+opacity+';':''}"></div>`;
+    return `
+      <div class="skeleton-divider skeleton"></div>
+      ${card(0,1)}${card(120,.82)}${card(240,.65)}
+      <div class="skeleton-divider skeleton" style="animation-delay:300ms;opacity:.8;"></div>
+      ${card(360,.78)}${card(480,.58)}
+    `;
+  }
+
   // ── Fetch CSM cases from ServiceNow ──────────────────────────────────────
   async function fetchTickets(filterState) {
     cachedAssignedTickets = null;
     document.getElementById('ticket-search').value = '';
     const list = document.getElementById('ticket-list');
-    list.innerHTML = '<div class="list-loading"><div class="spinner"></div><span>Loading cases…</span></div>';
+    list.innerHTML = _ticketListSkeleton();
     list.scrollTop = 0; // prevent iOS PWA from scrolling window on DOM replace
 
     // Demo mode — skip SN entirely, use embedded mock data
