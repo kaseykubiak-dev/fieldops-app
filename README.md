@@ -4,7 +4,7 @@ A mobile-first progressive web app built for field technicians managing enterpri
 
 Built as a single HTML file (~7,700 lines) with no framework, no build step, and no dependencies beyond a lightweight Node.js CORS proxy for Catalyst Center API access. Runs as a PWA on iPhone directly from the browser — no App Store deployment required.
 
-> **Live demo**: [fieldops-app-production-2ec3.up.railway.app](https://kaseykubiak-dev.github.io/fieldops-app/fieldtech-app.html)
+> **Live demo**: [https://kaseykubiak-dev.github.io/fieldops-app/fieldtech-app.html](https://kaseykubiak-dev.github.io/fieldops-app/fieldtech-app.html)
 > **Test credentials**: Username `test_fieldtech` / Password `TestFieldTech1!`
 
 ---
