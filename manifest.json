@@ -5,8 +5,8 @@
   "start_url": "./fieldtech-app.html",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#131e29",
-  "theme_color": "#0e1a2a",
+  "background_color": "#12111e",
+  "theme_color": "#7C6FCD",
   "icons": [
     {
       "src": "delta-favicon.png",
