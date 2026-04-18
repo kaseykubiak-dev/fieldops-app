@@ -7287,10 +7287,8 @@
 
     } catch (err) {
       container.innerHTML = `<div class="list-error">
-        <strong>Could not reach Catalyst Center</strong><br>
-        ${escHtml(err.message)}<br><br>
-        Make sure the proxy is running:<br>
-        <code>node meraki-proxy.js</code>
+        <strong>Catalyst Center Unavailable</strong><br>
+        The Cisco DevNet sandbox is temporarily unreachable — this is usually due to a scheduled reset or credential rotation on Cisco's end. Live network data will be restored once the sandbox is back online.
         <br><button class="retry-btn" onclick="loadNetworkScreen(true)">Retry</button>
       </div>`;
     } finally {
