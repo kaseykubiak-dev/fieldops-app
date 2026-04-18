@@ -2313,6 +2313,16 @@
   /* Demo mode badge */
   #demo-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; background:rgba(232,131,74,0.15); border:1px solid rgba(232,131,74,0.35); border-radius:10px; font-family:var(--sans); font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:0.05em; white-space:nowrap; }
   #demo-badge.hidden { display:none !important; }
+  /* On-site timer bar */
+  #onsite-timer-bar { display:flex; align-items:center; gap:10px; padding:11px 16px; margin-bottom:12px; background:rgba(124,111,205,0.08); border:1px solid rgba(124,111,205,0.22); border-left:3px solid var(--accent); border-radius:10px; }
+  #onsite-timer-bar.hidden { display:none !important; }
+  .onsite-timer-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; animation:onsite-pulse 1.4s ease-in-out infinite; }
+  .onsite-timer-label { font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted); }
+  #onsite-timer-display { font-family:monospace; font-size:17px; font-weight:700; color:var(--accent); margin-left:auto; letter-spacing:0.04em; }
+  @keyframes onsite-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  html[data-theme="cspire"] #onsite-timer-bar { background:rgba(0,152,210,0.06); border-color:rgba(0,152,210,0.2); border-left-color:#0098d2; }
+  html[data-theme="cspire"] .onsite-timer-dot { background:#0098d2; }
+  html[data-theme="cspire"] #onsite-timer-display { color:#0f3d58; }
 </style>
 </head>
 <body>
@@ -2888,6 +2898,13 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- ON-SITE TIMER — visible when tech is On Site or closing ticket -->
+        <div id="onsite-timer-bar" class="hidden">
+          <div class="onsite-timer-dot"></div>
+          <span class="onsite-timer-label">On Site</span>
+          <span id="onsite-timer-display">0:00:00</span>
         </div>
 
         <!-- UPDATE -->
@@ -4245,6 +4262,7 @@
     currentCaseType    = caseType;
     currentCaseCompany = c.account.display_value;
     _onSiteStartTime   = null;
+    stopOnsiteTimer(true);
 
     const isInstall = caseType.cls === 'installation';
     document.getElementById('description-section').style.display   = isInstall ? 'none' : '';
@@ -4530,7 +4548,41 @@
   let currentCaseCompany = null;   // company name at time of last case open
   let currentCaseType    = null;   // { label, cls } from getCaseType()
   let _onSiteStartTime   = null;   // Date.now() when tech taps "Start Work"
+  let _timerInterval     = null;   // setInterval handle for on-site timer
   const _closedThisSession = new Set();
+
+  function _fmtElapsed(ms) {
+    const s = Math.floor(ms / 1000);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function _tickTimer() {
+    if (!_onSiteStartTime) return;
+    const el = document.getElementById('onsite-timer-display');
+    if (el) el.textContent = _fmtElapsed(Date.now() - _onSiteStartTime);
+  }
+
+  function startOnsiteTimer() {
+    const bar = document.getElementById('onsite-timer-bar');
+    if (bar) bar.classList.remove('hidden');
+    if (_timerInterval) clearInterval(_timerInterval);
+    _timerInterval = setInterval(_tickTimer, 1000);
+    _tickTimer(); // tick immediately so display isn't blank for first second
+  }
+
+  /** stop: freeze the display. hide: also hide the bar (used when opening a new case). */
+  function stopOnsiteTimer(hide = false) {
+    if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+    if (hide) {
+      const bar = document.getElementById('onsite-timer-bar');
+      if (bar) bar.classList.add('hidden');
+      const el = document.getElementById('onsite-timer-display');
+      if (el) el.textContent = '0:00:00';
+    }
+  }
 
   // ── Ticket Action Button state machine ───────────────────────────────────
   // _ticketActionState maps ticket number → current state key
@@ -4592,7 +4644,7 @@
       if (detailPill) detailPill.textContent = cfg.pill.text;
     }
 
-    if (state === 'work')  _onSiteStartTime = Date.now();   // start on-site timer
+    if (state === 'work')  { _onSiteStartTime = Date.now(); startOnsiteTimer(); }
     if (state === 'close') { _scrollToUpdateTicket(); return; } // stay here until closeTicket() succeeds
 
     _ticketActionState[number] = cfg.next;
@@ -4744,6 +4796,7 @@
       currentCaseType    = caseType;   // store for close confirmation popup
       currentCaseCompany = null;       // reset; fetchDetailAccount will populate it
       _onSiteStartTime   = null;       // reset timer when opening a new case
+      stopOnsiteTimer(true);           // hide timer bar on new case open
       const isInstall = caseType.cls === 'installation';
       document.getElementById('description-section').style.display    = isInstall ? 'none' : '';
       document.getElementById('service-order-section').style.display  = isInstall ? '' : 'none';
@@ -5736,6 +5789,7 @@
         _closedThisSession.add(currentCaseNumber);
         // Advance action button to terminal state now that close API succeeded
         _ticketActionState[currentCaseNumber] = 'done';
+        stopOnsiteTimer(); // freeze display — bar stays visible until tech navigates away
         renderTicketActionButton(currentCaseNumber);
       }
 
