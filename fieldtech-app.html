@@ -1112,6 +1112,25 @@
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="travel"] { background:linear-gradient(135deg, rgba(0,152,210,0.22) 0%, rgba(0,96,200,0.08) 100%); border-color:rgba(0,152,210,0.44); color:#0f3d58; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(0,152,210,0.12), inset 0 1px 0 rgba(0,152,210,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
   html[data-theme="cspire"] .ticket-action-btn[data-action-state="work"] { background:linear-gradient(135deg, rgba(122,85,152,0.22) 0%, rgba(122,85,152,0.07) 100%); border-color:rgba(122,85,152,0.42); color:#6b3a7d; box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 0 8px rgba(122,85,152,0.12), inset 0 1px 0 rgba(122,85,152,0.18), inset 0 -1px 0 rgba(0,0,0,0.06); text-shadow:none; }
 
+  /* ── Lifecycle strip ─────────────────────────────────────────────────── */
+  .lifecycle-strip { display:flex; align-items:flex-start; padding:11px 16px 13px; background:rgba(124,111,205,0.04); border-bottom:1px solid rgba(124,111,205,0.12); }
+  .lc-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .lc-conn  { flex:1; height:2px; background:var(--border); margin-top:5px; border-radius:1px; transition:background 0.4s ease; }
+  .lc-node  { width:12px; height:12px; border-radius:50%; border:2px solid var(--border); background:var(--bg); transition:all 0.35s ease; flex-shrink:0; }
+  .lc-label { font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--text-muted); transition:color 0.35s ease; white-space:nowrap; }
+  /* Completed step */
+  .lc-step.lc-done .lc-node  { background:var(--success); border-color:var(--success); }
+  .lc-step.lc-done .lc-label { color:var(--success); }
+  .lc-conn.lc-filled          { background:var(--success); }
+  /* Active step — pulsing ring */
+  @keyframes lc-ring { 0%,100%{box-shadow:0 0 0 0 rgba(124,111,205,0.55)} 60%{box-shadow:0 0 0 5px rgba(124,111,205,0)} }
+  .lc-step.lc-active .lc-node  { background:var(--accent); border-color:var(--accent); animation:lc-ring 2.2s ease-out infinite; }
+  .lc-step.lc-active .lc-label { color:var(--accent); font-weight:800; }
+  /* Light theme */
+  html[data-theme="cspire"] .lifecycle-strip { background:rgba(0,152,210,0.03); border-bottom-color:rgba(0,152,210,0.18); }
+  html[data-theme="cspire"] .lc-step.lc-active .lc-node { animation-name:none; box-shadow:0 0 0 3px rgba(0,152,210,0.25); }
+  html[data-theme="cspire"] .lc-step.lc-active .lc-label { color:var(--accent); }
+
   .cust-banner-grid { display:grid; grid-template-columns:1fr 1fr; }
   .cust-field { padding:10px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
   .cust-field:nth-child(even) { border-right:none; }
@@ -2575,6 +2594,16 @@
               <div class="cust-bn-id" id="detail-cust-id">—</div>
             </div>
             <button class="ticket-action-btn" id="ticket-action-btn" data-action-state="travel" onclick="advanceTicketAction()">Start Travel</button>
+          </div>
+          <!-- Lifecycle progress strip -->
+          <div class="lifecycle-strip" id="lifecycle-strip">
+            <div class="lc-step lc-active" id="lc-0"><div class="lc-node"></div><span class="lc-label">Assigned</span></div>
+            <div class="lc-conn" id="lc-c0"></div>
+            <div class="lc-step" id="lc-1"><div class="lc-node"></div><span class="lc-label">En Route</span></div>
+            <div class="lc-conn" id="lc-c1"></div>
+            <div class="lc-step" id="lc-2"><div class="lc-node"></div><span class="lc-label">On-Site</span></div>
+            <div class="lc-conn" id="lc-c2"></div>
+            <div class="lc-step" id="lc-3"><div class="lc-node"></div><span class="lc-label">Closed</span></div>
           </div>
           <div class="cust-banner-grid">
             <!-- Row 1: SLA -->
@@ -4319,6 +4348,7 @@
       _ticketActionState[number] = 'done';
     }
     renderTicketActionButton(number);
+    renderLifecycleStrip(number);
 
     // Travel estimate (Nominatim is public — may geocode real MS addresses)
     fetchTravelEstimate();
@@ -4657,6 +4687,21 @@
     btn.textContent = cfg.label;
   }
 
+  function renderLifecycleStrip(number) {
+    const strip = document.getElementById('lifecycle-strip');
+    if (!strip) return;
+    const actionState = _ticketActionState[number] || 'travel';
+    const activeIdx = { travel:0, work:1, close:2, done:3 }[actionState] ?? 0;
+    const allDone = actionState === 'done';
+    strip.querySelectorAll('.lc-step').forEach((el, i) => {
+      el.classList.toggle('lc-done',   allDone || i < activeIdx);
+      el.classList.toggle('lc-active', !allDone && i === activeIdx);
+    });
+    strip.querySelectorAll('.lc-conn').forEach((el, i) => {
+      el.classList.toggle('lc-filled', allDone || i < activeIdx);
+    });
+  }
+
   function _updateTicketListPill(number, pillCfg) {
     if (!pillCfg) return;
     const card = document.querySelector(`.ticket-card[data-number="${number}"]`);
@@ -4702,6 +4747,7 @@
     _ticketActionState[number] = cfg.next;
     _saveTicketState();
     renderTicketActionButton(number);
+    renderLifecycleStrip(number);
   }
 
   // ── Open current case directly in ServiceNow ─────────────────────────────
@@ -4890,6 +4936,7 @@
         _ticketActionState[currentCaseNumber] = 'done';
       }
       renderTicketActionButton(currentCaseNumber);
+      renderLifecycleStrip(currentCaseNumber);
 
       // Travel estimate
       fetchTravelEstimate();
@@ -5830,6 +5877,7 @@
         _saveTicketState();
         stopOnsiteTimer();
         renderTicketActionButton(currentCaseNumber);
+        renderLifecycleStrip(currentCaseNumber);
       }
       const demoBanner = document.querySelector('.cust-banner');
       if (demoBanner) demoBanner.classList.add('collapsed');
@@ -5871,6 +5919,7 @@
         _saveTicketState();
         stopOnsiteTimer(); // freeze display — bar stays visible until tech navigates away
         renderTicketActionButton(currentCaseNumber);
+        renderLifecycleStrip(currentCaseNumber);
       }
 
       // Collapse the customer banner to de-emphasise the now-closed ticket body
